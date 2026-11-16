@@ -5,6 +5,7 @@ import json
 import re
 import sqlite3
 
+from .call_engine import CallEngine
 from .db import Database
 
 
@@ -21,6 +22,7 @@ class MmlResult:
 class MmlEngine:
     def __init__(self, db: Database):
         self.db = db
+        self.call_engine = CallEngine(db)
 
     def execute(self, raw: str) -> MmlResult:
         text = raw.strip()
@@ -102,6 +104,8 @@ class MmlEngine:
                 return self._disp_cpt(params)
             if verb == "DISP" and obj == "ALARMS":
                 return self._disp_alarms(params)
+            if verb == "DISP" and obj == "CALL":
+                return self._disp_call(params)
 
             if verb == "STAT" and obj == "SUB":
                 return self._stat_sub(params)
@@ -111,6 +115,8 @@ class MmlEngine:
                 return self._stat_module(params)
             if verb == "STAT" and obj == "PORT":
                 return self._stat_port(params)
+            if verb == "STAT" and obj == "CALL":
+                return self._stat_call(params)
             if verb == "STATPORT":
                 return self._stat_port(params)
 
@@ -120,6 +126,8 @@ class MmlEngine:
                 return self._test_dluc(params)
             if verb == "TEST" and obj in {"DLUMOD", "MODULE"}:
                 return self._diag_module(params, test_only=True)
+            if verb == "TEST" and obj == "CALL":
+                return self._test_call(params)
 
             if verb == "CR" and obj == "SUB":
                 return self._cr_sub(params)
@@ -704,6 +712,72 @@ class MmlEngine:
             ),
         ).fetchall()
         return MmlResult(True, "OK", f"{len(rows)} CPT route(s)", [dict(row) for row in rows])
+
+    def _disp_call(self, params: dict[str, str]) -> MmlResult:
+        self._required(params, "call")
+        call_id = params["call"]
+        data = self.call_engine.describe_call(call_id)
+        if not data:
+            return MmlResult(
+                False,
+                "CALL-NOT-FOUND",
+                f"Call {call_id} not found",
+            )
+        return MmlResult(
+            True,
+            "OK",
+            f"Call {call_id} display",
+            data,
+        )
+
+    def _stat_call(self, params: dict[str, str]) -> MmlResult:
+        result = self._disp_call(params)
+        if result.ok:
+            result.message = "Call status"
+        return result
+
+    def _test_call(self, params: dict[str, str]) -> MmlResult:
+        self._required(params, "caller", "number")
+        try:
+            analysis = self.call_engine.analyze(
+                params["caller"],
+                params["number"],
+            )
+        except ValueError as exc:
+            return MmlResult(False, str(exc), str(exc))
+        caller = self.db.get_subscriber(params["caller"])
+        if not caller:
+            return MmlResult(False, "CALL-NOT-FOUND", "Caller not found")
+        target = None
+        if analysis.number_type == "LOCAL":
+            target = self.db.get_subscriber(
+                analysis.target_dn or analysis.normalized,
+                caller["lac"],
+            )
+        path = self.call_engine.build_path(caller, analysis, target=target)
+        return MmlResult(
+            True,
+            "TEST-PASS",
+            f"Call analysis: {analysis.number_type}",
+            {
+                "caller": params["caller"],
+                "number": analysis.normalized,
+                "type": analysis.number_type,
+                "target_lac": analysis.target_lac,
+                "target_dn": analysis.target_dn,
+                "cpt": (
+                    {
+                        "dest": analysis.cpt.dest,
+                        "code": analysis.cpt.code,
+                        "eval": analysis.cpt.eval,
+                        "name": analysis.cpt.name,
+                    }
+                    if analysis.cpt
+                    else None
+                ),
+                "path": path.labels(),
+            },
+        )
 
     def _disp_alarms(self, params: dict[str, str]) -> MmlResult:
         rows = self.db.list_active_alarms()
