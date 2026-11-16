@@ -226,7 +226,7 @@ class DluSimulatorWindow(QMainWindow):
         self.dlu_combo = QComboBox()
         for row in self.db.list_dlus():
             self.dlu_combo.addItem(str(row["dlu_id"]))
-        self.dlu_combo.setCurrentText("50")
+        self.dlu_combo.setCurrentText("10")
         self.dlu_combo.currentTextChanged.connect(
             lambda value: self.show_dlu(int(value))
         )
@@ -473,6 +473,9 @@ class DluSimulatorWindow(QMainWindow):
     def show_hardware_home(self):
         self.current_view = "home"
         self.hardware.current_dlu = int(self.nav_dlu_combo.currentText()) if self.nav_dlu_combo.currentText() else 10
+        self.dlu_combo.blockSignals(True)
+        self.dlu_combo.setCurrentText(str(self.hardware.current_dlu))
+        self.dlu_combo.blockSignals(False)
         self.hardware.current_shelf = None
         self.hardware.current_module = None
         self.clear_scene()
@@ -678,6 +681,9 @@ class DluSimulatorWindow(QMainWindow):
 
     def show_dlu(self, dlu_id: int):
         self.hardware.current_dlu = dlu_id
+        self.dlu_combo.blockSignals(True)
+        self.dlu_combo.setCurrentText(str(dlu_id))
+        self.dlu_combo.blockSignals(False)
         self.hardware.current_shelf = None
         self.hardware.current_module = None
         self.current_view = "dlu"
