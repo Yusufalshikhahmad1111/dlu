@@ -67,3 +67,19 @@ Stage 3.5 will be closed after the Windows visual audit confirms the appearance 
 - MML result focus is deferred until terminal rendering settles, so DISP/STAT results target the requested DLU/Shelf/Module consistently.
 - Small card port banks such as CMRL 6P now render as explicit connector units even when every port is EMPTY.
 - CMRL/SLMA small-module visual density was adjusted for classroom readability.
+
+
+## Stage 3.5.1 hardening implemented
+
+The post-runtime hardening pass added:
+
+- one shared ThemePalette definition in dlu_app/theme.py.
+- one shared safe font helper in dlu_app/ui_utils.py.
+- Slot normalization for UI rendering paths.
+- normalized port-bank rendering for both dict and Slot inputs.
+- complete Brown + Ivory / Brown + Silver palette propagation to the Call Path view.
+- theme-aware hardware canvas background updates.
+- removal of duplicated hex design colors from ui.py and call_ui.py.
+- UI static audit in tools/ui_static_audit.py.
+- CI execution of the UI static audit before pytest.
+- regression coverage for theme token completeness, safe font sizing, and Slot normalization.
