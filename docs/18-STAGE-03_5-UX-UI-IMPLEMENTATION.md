@@ -56,3 +56,14 @@ Windows runtime verification must confirm:
 ## Release Gate
 
 Stage 3.5 will be closed after the Windows visual audit confirms the appearance changes do not hide or break existing functionality.
+
+## Final visual corrections
+
+- Added a real theme system with two presets:
+  - Brown + Ivory (default): light warm academic laboratory.
+  - Brown + Silver: darker metallic laboratory.
+- Theme selection is available under Tools → THEME.
+- Main UI and Call Path use the same semantic palette family.
+- MML result focus is deferred until terminal rendering settles, so DISP/STAT results target the requested DLU/Shelf/Module consistently.
+- Small card port banks such as CMRL 6P now render as explicit connector units even when every port is EMPTY.
+- CMRL/SLMA small-module visual density was adjusted for classroom readability.
