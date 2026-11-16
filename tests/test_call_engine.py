@@ -108,3 +108,46 @@ def test_cpt_longest_specific_match():
     finally:
         db.close()
         tmp.cleanup()
+
+
+def test_pdc_exhaustion_does_not_create_connected_call():
+    tmp, db, engine = make_engine()
+    try:
+        caller, _called = engine.prepare_demo_subscribers()
+        with db.conn:
+            engine.repo.reserve("CALL-RESERVE", "PDC-VOICE", 120)
+        result = engine.start_call(caller, "0522233500")
+        assert not result.ok
+        assert result.code == "CALL-RESOURCE-BUSY"
+        assert engine.resource_usage() == (120, 120)
+    finally:
+        with db.conn:
+            engine.repo.release_all("CALL-RESERVE")
+        db.close()
+        tmp.cleanup()
+
+
+def test_omt_call_analysis_and_status():
+    tmp, db, engine = make_engine()
+    try:
+        caller, called = engine.prepare_demo_subscribers()
+        from dlu_app.mml import MmlEngine
+        mml = MmlEngine(db)
+
+        analysis = mml.execute(
+            f"> test call: caller={caller}, number={called};"
+        )
+        assert analysis.ok
+        assert analysis.code == "TEST-PASS"
+        assert analysis.data["type"] == "LOCAL"
+
+        started = engine.start_call(caller, called)
+        shown = mml.execute(
+            f"> stat call: call={started.call_id};"
+        )
+        assert shown.ok
+        assert shown.data["call"]["state"] == "CONNECTED"
+        assert shown.data["path"] == ["DLU 50", "SN", "DLU 50"]
+    finally:
+        db.close()
+        tmp.cleanup()
