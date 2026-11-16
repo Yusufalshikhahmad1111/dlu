@@ -553,6 +553,25 @@ class DluSimulatorWindow(QMainWindow):
         ll.addWidget(navigator)
         self.refresh_nav_modules()
 
+        scenarios = QFrame()
+        scenarios.setObjectName("ScenarioBar")
+        scenario_layout = QHBoxLayout(scenarios)
+        scenario_layout.setContentsMargins(8, 6, 8, 6)
+        scenario_layout.setSpacing(8)
+        scenario_layout.addWidget(QLabel("TEACHING SCENARIOS"))
+        for label, handler in (
+            ("8-Line", self.run_8_line),
+            ("CMRL", self.run_cmrl),
+            ("Maintenance", self.run_maintenance_demo),
+            ("Inspect", self.run_inspect),
+        ):
+            button = QPushButton(label)
+            button.setMinimumHeight(32)
+            button.clicked.connect(handler)
+            scenario_layout.addWidget(button)
+        scenario_layout.addStretch()
+        ll.addWidget(scenarios)
+
         self.hardware = HardwareView()
         self.hardware.controller = self
         ll.addWidget(self.hardware, 1)
@@ -587,17 +606,7 @@ class DluSimulatorWindow(QMainWindow):
         row.addWidget(execute_btn)
         olt.addLayout(row)
 
-        quick = QHBoxLayout()
-        for label, action in (
-            ("8-Line", self.run_8_line),
-            ("CMRL", self.run_cmrl),
-            ("Maintenance", self.run_maintenance_demo),
-            ("Inspect", self.run_inspect),
-        ):
-            b = QPushButton(label)
-            b.clicked.connect(action)
-            quick.addWidget(b)
-        olt.addLayout(quick)
+        # Teaching scenarios are hosted in the persistent left-side Scenario Bar.
         self.omt_tab.setLayout(olt)
         right.addTab(self.omt_tab, "OMT")
 
@@ -646,7 +655,7 @@ class DluSimulatorWindow(QMainWindow):
                 font-family:Segoe UI;
                 font-size:13px;
             }}
-            QFrame#Header,QFrame#SYP,QFrame#Navigator {{
+            QFrame#Header,QFrame#SYP,QFrame#Navigator,QFrame#ScenarioBar {{
                 background:{PANEL};
                 border:1px solid {BORDER};
                 border-radius:8px;
@@ -657,6 +666,19 @@ class DluSimulatorWindow(QMainWindow):
             }}
             QLabel#Breadcrumb,QLabel#SectionTitle {{
                 font-weight:700;
+            }}
+            QFrame#ScenarioBar QLabel {{
+                color:{AMBER};
+                font-weight:800;
+            }}
+            QFrame#ScenarioBar QPushButton {{
+                background:#1b2c38;
+                border:1px solid #3b596b;
+                min-width:86px;
+                font-weight:700;
+            }}
+            QFrame#ScenarioBar QPushButton:hover {{
+                background:#294452;
             }}
             QLabel#Legend {{
                 color:{MUTED};
