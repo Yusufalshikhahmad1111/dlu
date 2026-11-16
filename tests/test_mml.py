@@ -15,7 +15,7 @@ def test_create_display_cancel():
     tmp, db, mml = make_engine()
     try:
         result = mml.execute(
-            "> cr sub: dn=2233500, eqn=50-1-5-0, "
+            "> cr sub: dn=2233500, eqn=50-0-15-0, "
             "lac=021, class=ms, c/s=PB;"
         )
         assert result.ok
@@ -23,7 +23,7 @@ def test_create_display_cancel():
 
         result = mml.execute("> disp sub: dn=2233500;")
         assert result.ok
-        assert result.data[0]["eqn"] == "50-1-5-0"
+        assert result.data[0]["eqn"] == "50-0-15-0"
 
         result = mml.execute(
             "> can sub: lac=021, dn=2233500;"
