@@ -59,6 +59,64 @@ AMBER = "#ffc857"
 WHITE = "#f7fbff"
 
 
+THEMES = {
+    "ivory": {
+        "BG": "#f3eadc",
+        "PANEL": "#fffaf1",
+        "PANEL2": "#eee3d2",
+        "PANEL3": "#e4d5c0",
+        "STEEL": "#7d6e5f",
+        "TEXT": "#2f271f",
+        "MUTED": "#746658",
+        "BORDER": "#bda98f",
+        "GREEN": "#2f8a68",
+        "YELLOW": "#b67825",
+        "RED": "#bd4f4f",
+        "BLUE": "#806b5c",
+        "CYAN": "#b66f42",
+        "VIOLET": "#765e50",
+        "AMBER": "#b67825",
+        "WHITE": "#fffdf8",
+        "CARD": "#f0e5d5",
+        "DEEP": "#e6d8c5",
+    },
+    "silver": {
+        "BG": "#292825",
+        "PANEL": "#3a3834",
+        "PANEL2": "#2f2e2b",
+        "PANEL3": "#47443f",
+        "STEEL": "#aaa49a",
+        "TEXT": "#f3efe8",
+        "MUTED": "#c4bfb7",
+        "BORDER": "#766f65",
+        "GREEN": "#66c39b",
+        "YELLOW": "#d2a35b",
+        "RED": "#df7777",
+        "BLUE": "#b2a79b",
+        "CYAN": "#c08b63",
+        "VIOLET": "#a58f84",
+        "AMBER": "#d2a35b",
+        "WHITE": "#fffdf8",
+        "CARD": "#3f3d39",
+        "DEEP": "#262522",
+    },
+}
+
+THEME_NAME = "ivory"
+
+
+def apply_theme_palette(name: str):
+    global BG, PANEL, PANEL2, PANEL3, STEEL, TEXT, MUTED, BORDER
+    global GREEN, YELLOW, RED, BLUE, CYAN, VIOLET, AMBER, WHITE
+    global THEME_NAME
+    palette = THEMES.get(name, THEMES["ivory"])
+    for key, value in palette.items():
+        globals()[key] = value
+    THEME_NAME = name
+
+
+apply_theme_palette("ivory")
+
 def state_color(state: str) -> str:
     value = (state or "").lower()
     if value in {"act", "idle"}:
@@ -535,6 +593,12 @@ class DluSimulatorWindow(QMainWindow):
         tool_btn.setText("TOOLS")
         tool_btn.setPopupMode(QToolButton.InstantPopup)
         tool_menu = QMenu(self)
+        theme_menu = tool_menu.addMenu("THEME")
+        ivory_action = theme_menu.addAction("Brown + Ivory")
+        silver_action = theme_menu.addAction("Brown + Silver")
+        ivory_action.triggered.connect(lambda: self.set_theme("ivory"))
+        silver_action.triggered.connect(lambda: self.set_theme("silver"))
+
         library_action = tool_menu.addAction("Hardware Library")
         library_action.triggered.connect(self.open_library)
         reset_action = tool_menu.addAction("Reset Demo")
@@ -927,6 +991,13 @@ class DluSimulatorWindow(QMainWindow):
             """
         )
 
+    def set_theme(self, name: str):
+        apply_theme_palette(name)
+        self._apply_style()
+        if hasattr(self, "call_lab") and hasattr(self.call_lab, "set_theme"):
+            self.call_lab.set_theme(name)
+        self._refresh_current_view()
+
     def set_mode(self, mode: str):
         self.mode = mode
         self._refresh_current_view()
@@ -1045,7 +1116,7 @@ class DluSimulatorWindow(QMainWindow):
             scene.addPath(
                 shell,
                 QPen(QColor("#36526d"), 1.8),
-                QBrush(QColor("#0b1a28")),
+                QBrush(QColor(CARD)),
             )
             rail = QPainterPath()
             rail.addRoundedRect(QRectF(x + 7, y + 9, 8, card_h - 18), 4, 4)
@@ -1214,7 +1285,7 @@ class DluSimulatorWindow(QMainWindow):
             scene.addPath(
                 shell,
                 QPen(QColor(accent), 1.5),
-                QBrush(QColor("#0e1e2c")),
+                QBrush(QColor(CARD)),
             )
             self.add_text(x + 12, control_y + 10, label, 10, TEXT, True)
             self.add_text(x + 12, control_y + 34, state.upper(), 11, accent, True)
@@ -1230,7 +1301,7 @@ class DluSimulatorWindow(QMainWindow):
             scene.addPath(
                 shell,
                 QPen(QColor("#29455d"), 1),
-                QBrush(QColor("#0c1a27")),
+                QBrush(QColor(DEEP)),
             )
             self.add_text(x + 7, 138, name, 7, BLUE if name.startswith("DIUD") else MUTED, True)
             scene.addEllipse(
@@ -1281,9 +1352,9 @@ class DluSimulatorWindow(QMainWindow):
             configured = slot["card_type"] != "UNCONFIGURED"
             fault = slot["fault_state"] == "fault"
             accent = RED if fault else (GREEN if configured else "#31485d")
-            fill = "#102a2b" if configured else "#0a1722"
+            fill = PANEL2 if configured else DEEP
             if fault:
-                fill = "#2d1820"
+                fill = PANEL3
 
             visual = rounded_path(mx, y + 10, 52, 42, 5)
             scene.addPath(
@@ -1354,7 +1425,7 @@ class DluSimulatorWindow(QMainWindow):
                 QRectF(x + 8, y + 8, w - 16, 22),
                 6, 6,
                 QPen(QColor("#294761"), 1),
-                QBrush(QColor("#10283b")),
+                QBrush(QColor(PANEL3)),
             )
             self.add_text(x + 16, y + 11, kind, 8, accent, True)
             self.add_text(
@@ -1461,9 +1532,9 @@ class DluSimulatorWindow(QMainWindow):
         configured = slot["card_type"] != "UNCONFIGURED"
         fault = slot["fault_state"] == "fault"
         accent = RED if fault else (GREEN if configured else "#345069")
-        body_fill = "#102a2b" if configured else "#0a1722"
+        body_fill = PANEL2 if configured else DEEP
         if fault:
-            body_fill = "#2d1820"
+            body_fill = PANEL3
 
         # Physical faceplate.
         body = rounded_path(x, y, w, h, 9)
@@ -1476,7 +1547,7 @@ class DluSimulatorWindow(QMainWindow):
             QRectF(x + 7, y + 7, w - 14, 26),
             5, 5,
             QPen(QColor("#29465e"), 0.8),
-            QBrush(QColor("#0b1e2e")),
+            QBrush(QColor(DEEP)),
         )
         add_rack_rivets(scene, x + 10, y + 12, w - 20, 2)
 
@@ -1518,7 +1589,7 @@ class DluSimulatorWindow(QMainWindow):
                 QRectF(px, py, 16, 11),
                 3, 3,
                 QPen(QColor("#35516d"), 0.8),
-                QBrush(QColor("#0a1420")),
+                QBrush(QColor(DEEP)),
             )
             scene.addEllipse(
                 QRectF(px + 5, py + 3, 5, 5),
@@ -1570,9 +1641,9 @@ class DluSimulatorWindow(QMainWindow):
         configured = slot.card_type != "UNCONFIGURED"
         fault = slot.fault_state == "fault"
         accent = RED if fault else (GREEN if configured else BORDER)
-        face_fill = "#102a2b" if configured else "#0b1824"
+        face_fill = PANEL2 if configured else DEEP
         if fault:
-            face_fill = "#2f1920"
+            face_fill = PANEL3
 
         # Detailed telecom card faceplate.
         face = rounded_path(card_x, card_y, card_w, card_h, 14)
@@ -1585,7 +1656,7 @@ class DluSimulatorWindow(QMainWindow):
             QRectF(card_x + 16, card_y + 16, card_w - 32, 68),
             9, 9,
             QPen(QColor("#345672"), 1),
-            QBrush(QColor("#0b1d2d")),
+            QBrush(QColor(DEEP)),
         )
         add_rack_rivets(
             scene,
@@ -1630,7 +1701,7 @@ class DluSimulatorWindow(QMainWindow):
             QRectF(card_x + 24, card_y + 145, 128, 48),
             6, 6,
             QPen(QColor("#28445d"), 1),
-            QBrush(QColor("#0a1724")),
+            QBrush(QColor(DEEP)),
         )
         self.add_text(card_x + 36, card_y + 156, "STATUS", 7, MUTED, True)
         self.add_text(
@@ -1643,7 +1714,7 @@ class DluSimulatorWindow(QMainWindow):
             QRectF(card_x + 170, card_y + 145, 140, 48),
             6, 6,
             QPen(QColor("#28445d"), 1),
-            QBrush(QColor("#0a1724")),
+            QBrush(QColor(DEEP)),
         )
         self.add_text(card_x + 182, card_y + 156, "EQN BASE", 7, MUTED, True)
         self.add_text(
@@ -1656,7 +1727,7 @@ class DluSimulatorWindow(QMainWindow):
             QRectF(card_x + 330, card_y + 145, 150, 48),
             6, 6,
             QPen(QColor("#28445d"), 1),
-            QBrush(QColor("#0a1724")),
+            QBrush(QColor(DEEP)),
         )
         self.add_text(card_x + 342, card_y + 156, "STATE", 7, MUTED, True)
         self.add_text(
@@ -1781,7 +1852,7 @@ class DluSimulatorWindow(QMainWindow):
             scene.addPath(
                 socket,
                 QPen(QColor("#29475f"), 1),
-                QBrush(QColor("#091723")),
+                QBrush(QColor(DEEP)),
             )
 
             # Connector slot.
@@ -1789,7 +1860,7 @@ class DluSimulatorWindow(QMainWindow):
                 QRectF(px + 10, py + 13, 34, 36),
                 6, 6,
                 QPen(QColor("#3b5d76"), 1),
-                QBrush(QColor("#07121d")),
+                QBrush(QColor(DEEP)),
             )
             for pin in range(3):
                 scene.addEllipse(
@@ -1887,25 +1958,40 @@ class DluSimulatorWindow(QMainWindow):
             self.details.setItem(row,0,QTableWidgetItem(str(k)))
             self.details.setItem(row,1,QTableWidgetItem(str(v)))
 
-    def focus_result(self,result:MmlResult):
+    def focus_result(self, result: MmlResult):
         data = result.data
         candidates = []
         if isinstance(data, dict):
             candidates = [data]
         elif isinstance(data, list):
-            candidates = [x for x in data if isinstance(x,dict)]
+            candidates = [x for x in data if isinstance(x, dict)]
+
+        # Prefer an exact EQN target, otherwise an explicit DLU/Shelf/Module target.
         for item in candidates:
-            if item.get("eqn"):
-                eqn = item["eqn"]
+            eqn = item.get("eqn")
+            if eqn:
                 try:
-                    dlu,shelf,module,port = map(int,eqn.split("-"))
+                    dlu, shelf, module, port = map(int, str(eqn).split("-"))
                 except ValueError:
                     continue
-                self.show_module(dlu,shelf,module)
-                self.select_port(dlu,shelf,module,port)
+                self._sync_location(dlu, shelf, module)
+                self.show_module(dlu, shelf, module)
+                self.select_port(dlu, shelf, module, port)
+                self.breadcrumb.setText(
+                    f"DLU {dlu}  /  SHELF {shelf}  /  MODULE {module}  /  PORT {port}"
+                )
                 return
-            if all(k in item for k in ("dlu","shelf","module")):
-                self.show_module(int(item["dlu"]),int(item["shelf"]),int(item["module"]))
+
+        for item in candidates:
+            if all(k in item for k in ("dlu", "shelf", "module")):
+                dlu = int(item["dlu"])
+                shelf = int(item["shelf"])
+                module = int(item["module"])
+                self._sync_location(dlu, shelf, module)
+                self.show_module(dlu, shelf, module)
+                self.breadcrumb.setText(
+                    f"DLU {dlu}  /  SHELF {shelf}  /  MODULE {module}"
+                )
                 return
 
     def refresh_event_log(self):
