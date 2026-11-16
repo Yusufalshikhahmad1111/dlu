@@ -36,6 +36,7 @@ from PySide6.QtWidgets import (
 )
 
 from .call_engine import CallEngine
+from .command_file_ui import CommandFileLab
 from .call_ui import CallLabWidget
 from .db import CardReference, Database
 from .mml import MmlEngine, MmlResult
@@ -724,6 +725,12 @@ class DluSimulatorWindow(QMainWindow):
         olt.addWidget(command_dock)
         self.omt_tab.setLayout(olt)
         right.addTab(self.omt_tab, "OMT")
+
+        self.command_file_lab = CommandFileLab(
+            self.mml.command_files,
+            parent=self,
+        )
+        right.addTab(self.command_file_lab, "Command Files")
 
         self.call_lab = CallLabWidget(
             self.call_engine,
