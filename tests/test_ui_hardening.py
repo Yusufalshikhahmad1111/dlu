@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 from dlu_app.db import Slot
 from dlu_app.theme import THEMES
@@ -41,4 +42,4 @@ def test_slot_mapping_accepts_dataclass_and_dict():
 def test_ui_source_does_not_duplicate_theme_hex_values():
     for path in ("dlu_app/ui.py", "dlu_app/call_ui.py"):
         text = Path(path).read_text(encoding="utf-8")
-        assert "#" not in text, f"hardcoded color found in {path}"
+        assert not re.search(r"#[0-9a-fA-F]{6}", text), f"hardcoded color found in {path}"
