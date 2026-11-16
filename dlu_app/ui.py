@@ -1356,63 +1356,134 @@ class DluSimulatorWindow(QMainWindow):
         self.current_view = "shelf"
         self.clear_scene()
         self.back_btn.setEnabled(True)
-        self.breadcrumb.setText(f"DLU {dlu_id} / Shelf {shelf}")
-        self.add_text(24, 18, f"DLU {dlu_id} · SHELF {shelf}", 22, TEXT, True)
-        self.add_text(24, 52, "16 physical module positions", 11, MUTED)
-        rack = QRectF(20, 90, 1060, 700)
-        self.hardware.scene_obj.addRect(
-            rack, QPen(QColor("#3a5265"),2),
-            QBrush(QColor("#0e1820"))
+        self.breadcrumb.setText(f"DLU {dlu_id}  /  SHELF {shelf}")
+        self.add_text(34, 18, f"SHELF {shelf}", 26, TEXT, True)
+        self.add_text(
+            34, 52,
+            f"DLU {dlu_id} · EQUIPMENT BAY · 16 MODULE POSITIONS",
+            11, MUTED, True
         )
+
+        scene = self.hardware.scene_obj
+        rack = rounded_path(24, 88, 1055, 735, 18)
+        scene.addPath(
+            rack,
+            QPen(QColor("#35516c"), 2.2),
+            QBrush(QColor("#081622")),
+        )
+
+        # Metal top rail + rack depth.
+        scene.addRoundedRect(
+            QRectF(42, 108, 1018, 44),
+            8, 8,
+            QPen(QColor("#2c4962"), 1.2),
+            QBrush(QColor("#102234")),
+        )
+        self.add_text(62, 121, f"DLU {dlu_id} / SHELF {shelf}", 13, CYAN, True)
+        self.add_text(62, 140, "MODULE FRONT PANELS", 8, MUTED, True)
+        add_rack_rivets(scene, 850, 122, 180, 4)
+
         slots = self.db.list_shelf(dlu_id, shelf)
         for i, slot in enumerate(slots):
             row = i // 8
             col = i % 8
-            x = 45 + col * 125
-            y = 125 + row * 290
-            self.draw_full_module_slot(slot, x, y, 108, 250)
-        self.hardware.scene_obj.setSceneRect(0,0,1110,820)
+            x = 52 + col * 126
+            y = 175 + row * 300
+            self.draw_full_module_slot(slot, x, y, 112, 260)
+
+        scene.setSceneRect(0, 0, 1110, 860)
         self.hardware.reset_zoom()
         self._set_details({
-            "DLU":dlu_id,
-            "Shelf":shelf,
-            "Positions":"Module 0..15",
-            "View":"Physical Shelf",
+            "DLU": dlu_id,
+            "Shelf": shelf,
+            "Positions": "Module 0..15",
+            "View": "Physical Equipment Bay",
         })
 
+
     def draw_full_module_slot(self, slot, x, y, w, h):
+        scene = self.hardware.scene_obj
         configured = slot["card_type"] != "UNCONFIGURED"
-        edge = RED if slot["fault_state"] == "fault" else (GREEN if configured else BORDER)
-        fill = "#17252e" if not configured else "#143029"
-        body = QRectF(x,y,w,h)
-        item = ClickableRectItem(
+        fault = slot["fault_state"] == "fault"
+        accent = RED if fault else (GREEN if configured else "#345069")
+        body_fill = "#102a2b" if configured else "#0a1722"
+        if fault:
+            body_fill = "#2d1820"
+
+        # Physical faceplate.
+        body = rounded_path(x, y, w, h, 9)
+        scene.addPath(
             body,
-            lambda data: self.show_module(*data),
-            (slot["dlu_id"],slot["shelf"],slot["module"]),
-            f"Module {slot['module']} · {slot['card_type']}",
+            QPen(QColor(accent), 1.5),
+            QBrush(QColor(body_fill)),
         )
-        item.setBrush(QBrush(QColor(fill)))
-        item.setPen(QPen(QColor(edge),1.6))
-        self.hardware.scene_obj.addItem(item)
-        self.add_text(x+10,y+10,f"MODULE {slot['module']}",10,TEXT,True)
-        self.add_text(x+10,y+35,slot["card_type"],11,edge,True)
-        self.add_text(x+10,y+60,f"{slot['port_count']} PORTS",9,MUTED)
-        self.add_text(x+10,y+84,f"OST {slot['ost'].upper()}",8,state_color(slot["ost"]),True)
-        self.add_text(x+10,y+110,"FAULT" if slot["fault_state"]=="fault" else "NORMAL",8,RED if slot["fault_state"]=="fault" else GREEN,True)
+        scene.addRoundedRect(
+            QRectF(x + 7, y + 7, w - 14, 26),
+            5, 5,
+            QPen(QColor("#29465e"), 0.8),
+            QBrush(QColor("#0b1e2e")),
+        )
+        add_rack_rivets(scene, x + 10, y + 12, w - 20, 2)
+
+        self.add_text(x + 12, y + 12, f"M{slot['module']}", 8, CYAN, True)
+        self.add_text(
+            x + 12, y + 42,
+            slot["card_type"] if configured else "EMPTY MODULE",
+            10, accent if configured else MUTED, True
+        )
+        self.add_text(x + 12, y + 62, f"{slot['port_count']} PORTS", 8, TEXT, True)
+
+        # Small status cluster.
+        self.add_text(
+            x + 12, y + 83,
+            slot["ost"].upper(),
+            7, state_color(slot["ost"]), True
+        )
+        scene.addEllipse(
+            QRectF(x + w - 28, y + 81, 8, 8),
+            QPen(QColor(state_color(slot["ost"]))),
+            QBrush(QColor(state_color(slot["ost"]))),
+        )
+        scene.addEllipse(
+            QRectF(x + w - 16, y + 81, 8, 8),
+            QPen(QColor(RED if fault else "#314b60")),
+            QBrush(QColor(RED if fault else "#314b60")),
+        )
 
         max_ports = min(slot["port_count"], 64)
-        mini_cols = 8 if max_ports > 16 else 4
-        mini_gap_x = 12 if max_ports > 16 else 24
-        mini_gap_y = 18 if max_ports > 16 else 24
+        mini_cols = 4 if max_ports <= 16 else 4
         for port in range(max_ports):
-            px = x+10+(port%mini_cols)*mini_gap_x
-            py = y+140+(port//mini_cols)*mini_gap_y
-            sub = self.db.get_port_subscriber(slot["dlu_id"],slot["shelf"],slot["module"],port)
-            col = state_color(sub["line_state"]) if sub else STEEL
-            self.hardware.scene_obj.addEllipse(
-                QRectF(px,py,12,12), QPen(QColor(col)), QBrush(QColor(col))
+            px = x + 12 + (port % mini_cols) * 23
+            py = y + 112 + (port // mini_cols) * 18
+            sub = self.db.get_port_subscriber(
+                slot["dlu_id"], slot["shelf"], slot["module"], port
             )
-            self.add_text(px-1,py+12,str(port),6,MUTED)
+            color = state_color(sub["line_state"]) if sub else STEEL
+            scene.addRoundedRect(
+                QRectF(px, py, 16, 11),
+                3, 3,
+                QPen(QColor("#35516d"), 0.8),
+                QBrush(QColor("#0a1420")),
+            )
+            scene.addEllipse(
+                QRectF(px + 5, py + 3, 5, 5),
+                QPen(QColor(color)),
+                QBrush(QColor(color)),
+            )
+            self.add_text(px + 1, py + 10, str(port), 5, MUTED)
+
+        item = ClickableRectItem(
+            QRectF(x, y, w, h),
+            lambda data: self.show_module(*data),
+            (slot["dlu_id"], slot["shelf"], slot["module"]),
+            f"Module {slot['module']} · {slot['card_type']} · {slot['port_count']} ports",
+            on_double_click=lambda data: self.show_module(*data),
+            on_context=lambda data: self.open_hardware_context(data),
+        )
+        item.setBrush(Qt.NoBrush)
+        item.setPen(Qt.NoPen)
+        scene.addItem(item)
+
 
     def show_module(self, dlu_id: int, shelf: int, module: int):
         self._sync_location(dlu_id,shelf,module)
