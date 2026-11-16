@@ -1653,6 +1653,8 @@ class DluSimulatorWindow(QMainWindow):
     def reset_demo(self):
         self.db.reset_demo()
         self.call_engine.repo.reset_demo()
+        if hasattr(self, "call_lab"):
+            self.call_lab.reset()
         self.terminal.append(
             "<span style='color:#f0c75e'>"
             "[RESET] Source-backed hardware restored; subscriber demo state cleared."
