@@ -26,6 +26,10 @@ jobs:
           $files = @("main.py") + (Get-ChildItem dlu_app -Filter *.py -File | ForEach-Object { $_.FullName }) + (Get-ChildItem tests -Filter *.py -File | ForEach-Object { $_.FullName })
           python -m py_compile $files
 
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+
       - name: Tests
         shell: pwsh
         run: python -m pytest -q tests
