@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QBrush, QFont, QPainter, QPen
+from PySide6.QtCore import QEvent, QRectF, Qt
+from PySide6.QtGui import QColor, QBrush, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -77,7 +77,13 @@ class ClickableRectItem(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and self.on_click:
-            self.on_click(self.data)
+            callback = self.on_click
+            data = self.data
+            callback(data)
+            # The callback may rebuild the scene and delete this QGraphicsItem.
+            # Never call into the C++ base object after that point.
+            event.accept()
+            return
         super().mousePressEvent(event)
 
 
@@ -672,7 +678,7 @@ class DluSimulatorWindow(QMainWindow):
 
     def add_text(self, x, y, text, size=12, color=TEXT, bold=False):
         item = self.hardware.scene_obj.addText(text)
-        font = QFont("Segoe UI", size)
+        font = QFont("Segoe UI", max(1, int(size)))
         font.setBold(bold)
         item.setFont(font)
         item.setDefaultTextColor(QColor(color))
@@ -850,9 +856,10 @@ class DluSimulatorWindow(QMainWindow):
             ("PORT", 930, 110, "PORT / EQN"),
         ]
         for kind, x, y, label in nodes:
-            self.hardware.scene_obj.addRoundedRect(
-                QRectF(x, y, 160, 72),
-                8, 8,
+            node_path = QPainterPath()
+            node_path.addRoundedRect(QRectF(x, y, 160, 72), 8, 8)
+            self.hardware.scene_obj.addPath(
+                node_path,
                 QPen(QColor("#365168"), 1.6),
                 QBrush(QColor("#13232e")),
             )
@@ -1396,6 +1403,8 @@ class DluSimulatorWindow(QMainWindow):
             self.show_hardware_home()
 
     def refresh_status(self):
+        if not hasattr(self, "hardware") or self.hardware.scene() is None:
+            return
         current=self.db.get_dlu(self.hardware.current_dlu)
         if current:
             act=current["dluc0_state"]=="act" or current["dluc1_state"]=="act"
