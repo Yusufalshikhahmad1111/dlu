@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, QMimeData, QRectF, Qt
+from PySide6.QtCore import QEvent, QMimeData, QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QBrush, QDrag, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QApplication,
@@ -1947,7 +1947,7 @@ class DluSimulatorWindow(QMainWindow):
             details["MML"]=f"> disp dlupport: eqn={eqn};"
         self._set_details(details)
         self.terminal.append(
-            f"<span style='color:#59a6ff'>Selected {eqn}</span>"
+            f"<span style='color:{CYAN}'>Selected {eqn}</span>"
         )
 
     def _set_details(self, details: dict):
@@ -2051,7 +2051,7 @@ class DluSimulatorWindow(QMainWindow):
             self.terminal.append(
                 f"<pre style='color:#8fb2cf'>{pretty}</pre>"
             )
-        self.focus_result(result)
+        QTimer.singleShot(0, lambda result=result: self.focus_result(result))
         self.refresh_status()
 
     def copy_selected_mml(self):
