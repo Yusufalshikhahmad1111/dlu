@@ -663,6 +663,18 @@ class CallEngine:
         )
         return CallPath(call["call_type"], nodes, edges)
 
+    def describe_call(self, call_id: str) -> dict | None:
+        call = self.repo.get_call(call_id)
+        if not call:
+            return None
+        path = self.path_for(call_id)
+        used, capacity = self.resource_usage()
+        return {
+            "call": call,
+            "path": path.labels() if path else [],
+            "pdc": {"used": used, "capacity": capacity},
+        }
+
     def resource_usage(self) -> tuple[int, int]:
         return self.repo.resource_usage()
 
