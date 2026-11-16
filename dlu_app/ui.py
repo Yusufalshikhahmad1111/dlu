@@ -978,13 +978,6 @@ class DluSimulatorWindow(QMainWindow):
                 self.db.clear_active_alarms("DLU 10")
 
     def run_macro(self, commands: list[str]):
-        labels = {
-            8: "8-Line",
-            2: "CMRL",
-            3: "Diag Guard",
-            2: "Inspect",
-        }
-
         if commands and commands[0].startswith("> cr sub: dn=223350"):
             scenario_name = "8-Line"
         elif commands and commands[0].startswith("> cr sub: dn=2250500"):
@@ -1020,6 +1013,24 @@ class DluSimulatorWindow(QMainWindow):
             )
 
     def refresh_status(self):
+        current = self.db.get_dlu(self.hardware.current_dlu)
+        if current:
+            system_state = (
+                "ACT"
+                if current["dluc0_state"] == "act"
+                or current["dluc1_state"] == "act"
+                else "DEGRADED"
+            )
+            chip_color = GREEN if system_state == "ACT" else YELLOW
+            self.status_chip.setText(
+                f"DLU {current['dlu_id']} · SYSTEM {system_state}"
+            )
+            self.status_chip.setStyleSheet(
+                f"background:#163c2f; color:{chip_color}; "
+                f"border:1px solid {chip_color}; border-radius:12px; "
+                "padding:4px 10px; font-weight:700;"
+            )
+
         rows = list(
             self.db.conn.execute(
                 """
