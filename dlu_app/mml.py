@@ -378,15 +378,17 @@ class MmlEngine:
         dn = params["dn"]
         sub_type = params.get("type", params.get("class", "ms")).lower()
 
-        if slot.subscriber_type and sub_type not in {
-            slot.subscriber_type,
-            "ms" if slot.subscriber_type == "ms" else sub_type,
-        }:
-            if slot.card_type == "CMRL" and sub_type != "cmrl":
+        card_ref = self.db.get_card_reference(slot.card_type)
+        required_type = card_ref.subscriber_type if card_ref else None
+        if required_type:
+            accepted = {required_type}
+            if required_type == "ms":
+                accepted.add("main-station")
+            if sub_type not in accepted:
                 return MmlResult(
                     False,
                     "CARD-INCOMPATIBLE",
-                    "CMRL requires type=cmrl",
+                    f"{slot.card_type} requires type={required_type}",
                 )
 
         if self.db.get_subscriber(dn, params["lac"]):
