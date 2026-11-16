@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QMimeData, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QBrush, QDrag, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QBrush, QDrag, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -1843,7 +1843,7 @@ class DluSimulatorWindow(QMainWindow):
     def draw_port_grid(self, dlu_id, shelf, module, slot, x, y):
         scene = self.hardware.scene_obj
         slot = self._slot_mapping(slot)
-        capacity = int(slot.port_count or 0)
+        capacity = int(slot.get("port_count") or 0)
 
         if capacity >= 32:
             cols, cell_w = 8, 92
@@ -2112,13 +2112,15 @@ class DluSimulatorWindow(QMainWindow):
     def open_selected_reference(self):
         card = None
         if self.current_view == "module":
-            slot=self.db.get_slot(
-                self.hardware.current_dlu,
-                self.hardware.current_shelf,
-                self.hardware.current_module
+            slot = self._slot_mapping(
+                self.db.get_slot(
+                    self.hardware.current_dlu,
+                    self.hardware.current_shelf,
+                    self.hardware.current_module
+                )
             )
             if slot:
-                card=slot.card_type
+                card = slot.get("card_type")
         if card:
             ref=self.db.get_card_reference(card)
             if ref:
@@ -2185,15 +2187,17 @@ class DluSimulatorWindow(QMainWindow):
             QMessageBox.warning(self,"Remove Card",str(exc))
 
     def install_card_at(self, dlu: int, shelf: int, module: int, card_type: str):
-        slot = self.db.get_slot(dlu, shelf, module)
-        if slot is None:
+        slot = self._slot_mapping(
+            self.db.get_slot(dlu, shelf, module)
+        )
+        if not slot:
             QMessageBox.warning(self, "Install Card", "Target module does not exist.")
             return
-        if slot.card_type != "UNCONFIGURED":
+        if slot.get("card_type") != "UNCONFIGURED":
             QMessageBox.warning(
                 self,
                 "Install Card",
-                f"Module {dlu}-{shelf}-{module} already contains {slot.card_type}.",
+                f"Module {dlu}-{shelf}-{module} already contains {slot.get('card_type')}.",
             )
             return
         ref = self.db.get_card_reference(card_type)
