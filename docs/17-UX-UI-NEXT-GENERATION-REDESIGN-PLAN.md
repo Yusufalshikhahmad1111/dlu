@@ -204,6 +204,220 @@ SLMA8
 ### Ports
 Port 0..7 أو حسب السعة، بحجم يمكن قراءته في العرض الصفّي.
 
+## 12.5 DLU Visual Hardware Redesign — Appearance Only
+
+هذه المرحلة مخصصة حصريًا لتطوير **الشكل البصري للعتاد** دون حذف أو إعادة تعريف أي عنصر موجود.
+
+### الهدف
+
+تحويل تمثيل:
+- DLU
+- Shelf / Rack
+- Module / Card
+- Port area
+
+من مجموعة مستطيلات ومربعات مسطحة إلى **رسم هندسي بصري أقرب إلى جهاز اتصالات حقيقي ومختبر جامعي حديث**.
+
+### قاعدة أساسية
+
+**Appearance-only change.**
+
+ممنوع في هذا البند:
+- حذف أي DLU.
+- حذف أي Shelf.
+- حذف أي Module.
+- حذف أي Port.
+- تغيير أرقام DLU/Shelf/Module/Port.
+- تغيير EQN.
+- تغيير Card Capacity.
+- تغيير MML.
+- تغيير Call Engine.
+- تغيير navigation أو click behavior.
+- تغيير source-backed hardware rules.
+
+كل ما هو موجود حاليًا يبقى موجودًا؛ الذي يتغير هو طريقة الرسم والعرض فقط.
+
+### DLU Frame
+
+بدل صندوق كبير مسطح، يُرسم DLU كـ **rack / chassis** هندسي:
+
+- outer frame واضح.
+- top identification plate.
+- side rails.
+- screw/bolt details بسيطة.
+- ventilation/technical panel details خفيفة.
+- controller area مميزة بصريًا.
+- shelf bays مرتبة داخل الـrack.
+- status lights صغيرة.
+- depth/shadow وهمية خفيفة لإعطاء إحساس ثلاثي الأبعاد بدون تحويله إلى 3D engine.
+
+الـDLU ID يبقى بارزًا مثل:
+
+DLU 50
+DIGITAL LINE UNIT
+SYSTEM ACT
+
+### Shelf / Rack
+
+كل Shelf يجب أن يبدو كـ **rack drawer / equipment bay** بدل صف مستطيلات.
+
+لكل Shelf:
+- frame معدني بصري.
+- رقم Shelf على left rail.
+- inner mounting area.
+- separators بين module positions.
+- subtle depth/shadow.
+- active/inactive visual state.
+
+Shelf 0..7 تبقى كلها كما هي.
+
+### Module / Card
+
+الموديول لا يبقى مجرد مربع مكتوب داخله SLMA8.
+
+بدله يصبح **front faceplate** هندسية:
+
+- top label strip.
+- card identifier.
+- screw/fastener details.
+- connector region.
+- status LED cluster.
+- port bank.
+- small technical markings.
+- تختلف faceplate بصريًا حسب family/card type بدون تغيير أي capacity أو behavior.
+
+أمثلة:
+
+SLMA8:
+- faceplate أوضح.
+- 8 port indicators مرتبة كـconnector bank.
+- card name + 8P.
+
+SLMA16:
+- نفس الهوية البصرية.
+- 16 ports مرتبة بشكل مناسب.
+
+SLMA64:
+- dense professional port bank.
+- layout يستغل المساحة بدل 64 مربعًا كبيرًا.
+
+CMRL:
+- شكل faceplate مختلف بصريًا عن SLMA.
+- 6 ports فقط.
+- إبراز نوع البطاقة، لا اختراع شكل hardware جديد غير موثق.
+
+### Port Rendering
+
+المنافذ تتحول من مربعات صغيرة متشابهة إلى **connector/LED units**:
+
+- numbered port.
+- status LED.
+- tiny line/connector graphic.
+- hover glow.
+- selected state ring.
+- BUSY pulse.
+- BLOCKED warning marker.
+- EMPTY/UNASSIGNED appearance.
+
+الرقم يبقى واضحًا، لكن visual object يصبح أكثر واقعية.
+
+### Visual Depth
+
+استخدام:
+- layered panels.
+- bevel-like borders.
+- soft inner shadows.
+- thin highlights.
+- metallic gradients خفيفة.
+- cyan/blue signal accents.
+
+بدون:
+- photo-realistic fake PCB.
+- مبالغة 3D.
+- heavy neon.
+- animation دائم.
+
+### Physical Relationships
+
+الرسم يجب أن يجعل الطالب يرى بصريًا:
+
+DLU
+↓
+SHELF
+↓
+MODULE / CARD
+↓
+PORTS
+
+مع الحفاظ على نفس click/drill-down الموجود.
+
+### Logical Mode
+
+لا يتغير المنطق.
+
+نفس العناصر والعلاقات الحالية تبقى موجودة، لكن الخطوط والعقد تصبح أكثر أناقة:
+
+- controller node.
+- DIUD node.
+- SLM/card node.
+- port endpoints.
+- signal traces.
+
+المسار يصبح أقرب إلى **technical system diagram** بدل boxes عادية.
+
+### Hardware Interaction Preservation
+
+كل interaction الحالي يجب أن يبقى:
+
+- click.
+- double click.
+- context menu.
+- drag/drop card installation.
+- selected module.
+- selected port.
+- OMT focus.
+- reference viewer.
+- maintenance actions.
+
+التغيير البصري لا يجوز أن يكسر أي منها.
+
+### Performance Rule
+
+الرسم الجديد يجب أن يبقى Qt Graphics View-friendly.
+
+يجب تجنب:
+- آلاف العناصر الزخرفية غير الضرورية.
+- animations مستمرة لكل port.
+- heavy image assets لكل module.
+- real-time effects التي تضعف الأداء.
+
+### Visual QA
+
+لكل مستوى يتم فحص:
+
+1. DLU frame.
+2. Shelf rack.
+3. Module faceplate.
+4. Port bank.
+5. selected state.
+6. busy state.
+7. blocked state.
+8. maintenance state.
+9. drag/drop target.
+10. logical mode.
+
+### Success Test
+
+عند النظر إلى الواجهة يجب أن يشعر الطالب أنه ينظر إلى:
+
+**equipment rack → shelf → telecom card → ports**
+
+وليس:
+
+**grid of rectangles**.
+
+وفي جميع الحالات تبقى نفس البيانات، نفس الوظائف، نفس العناوين، ونفس السلوك؛ الاختلاف هو **visual representation فقط**.
+
 ## 13. Port State Language
 
 لا نعتمد على اللون وحده.
