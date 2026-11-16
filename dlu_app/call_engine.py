@@ -641,6 +641,20 @@ class CallEngine:
         path = self.path_for(call_id)
         return CallResult(True, "CALL-RELEASED", f"Call {call_id} released", call_id, path)
 
+    @staticmethod
+    def _path_label(node_type: str, node_id: str) -> str:
+        if node_type == "DLU" and node_id.startswith("DLU-"):
+            return node_id.replace("DLU-", "DLU ", 1)
+        if node_type == "LTG":
+            return "LTG"
+        if node_type == "GATEWAY":
+            return "International Gateway"
+        if node_type == "SERVICE" and node_id:
+            return f"SERVICE {node_id}"
+        if node_type == "CPT":
+            return "CPT / BLOCKED"
+        return node_id
+
     def path_for(self, call_id: str) -> CallPath | None:
         call = self.repo.get_call(call_id)
         if not call:
@@ -649,7 +663,11 @@ class CallEngine:
         if not legs:
             return None
         nodes = tuple(
-            CallNode(leg["node_type"], leg["node_id"], leg["node_id"])
+            CallNode(
+                leg["node_type"],
+                leg["node_id"],
+                self._path_label(leg["node_type"], leg["node_id"]),
+            )
             for leg in legs
         )
         edges = tuple(
