@@ -854,6 +854,18 @@ class DluSimulatorWindow(QMainWindow):
                 color:{MUTED};
                 padding:3px 6px;
             }}
+            QPushButton#ThemeToggle {{
+                background:{PANEL3};
+                color:{TEXT};
+                border:1px solid {CYAN};
+                border-radius:9px;
+                padding:8px 11px;
+                font-weight:900;
+            }}
+            QPushButton#ThemeToggle:hover {{
+                background:{CARD};
+                border-color:{AMBER};
+            }}
             QLabel#StatusChip {{
                 background:#092e28;
                 color:{GREEN};
@@ -1787,22 +1799,18 @@ class DluSimulatorWindow(QMainWindow):
             )
 
         # Port bank gets its own visible work area.
-        if configured:
-            self.draw_port_grid(
-                dlu_id, shelf, module, slot,
-                panel_x, panel_y
-            )
-
         panel = rounded_path(panel_x - 12, panel_y, panel_w, 700, 16)
         scene.addPath(
             panel,
             QPen(QColor(BORDER), 1.5),
             QBrush(QColor(PANEL)),
         )
-        # Move the panel behind the already-created port items by assigning negative Z.
-        for item in scene.items():
-            if item.data(9001) == "PORT_PANEL":
-                item.setZValue(-3)
+
+        if configured:
+            self.draw_port_grid(
+                dlu_id, shelf, module, slot,
+                panel_x, panel_y
+            )
 
         scene.setSceneRect(
             0,
@@ -2363,8 +2371,8 @@ class DluSimulatorWindow(QMainWindow):
                 f"DLU {current['dlu_id']} · SYSTEM {'ACT' if act else 'DEGRADED'}"
             )
             self.status_chip.setStyleSheet(
-                f"background:#163c2f;color:{color};border:1px solid {color};"
-                "border-radius:12px;padding:4px 10px;font-weight:700;"
+                f"background:{PANEL3};color:{color};border:1px solid {color};"
+                "border-radius:14px;padding:6px 12px;font-weight:900;"
             )
         counts={}
         for row in self.db.list_active_alarms():
