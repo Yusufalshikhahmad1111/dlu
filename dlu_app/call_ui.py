@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QColor, QBrush, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QBrush, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QComboBox,
     QFrame,
@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (
 )
 
 from .call_engine import CallEngine, CallPath, CallResult
+from .theme import THEMES
+from .ui_utils import make_font
 
 
 BG = "#050914"
@@ -32,52 +34,25 @@ MUTED = "#8fa6bd"
 GREEN = "#39e6a5"
 YELLOW = "#ffc857"
 RED = "#ff6577"
-THEMES = {
-    "ivory": {
-        "BG": "#f3eadc",
-        "PANEL": "#fffaf1",
-        "PANEL2": "#eee3d2",
-        "PANEL3": "#e4d5c0",
-        "BORDER": "#bda98f",
-        "TEXT": "#2f271f",
-        "MUTED": "#746658",
-        "GREEN": "#2f8a68",
-        "YELLOW": "#b67825",
-        "RED": "#bd4f4f",
-        "BLUE": "#806b5c",
-        "CYAN": "#b66f42",
-        "VIOLET": "#765e50",
-    },
-    "silver": {
-        "BG": "#292825",
-        "PANEL": "#3a3834",
-        "PANEL2": "#2f2e2b",
-        "PANEL3": "#47443f",
-        "BORDER": "#766f65",
-        "TEXT": "#f3efe8",
-        "MUTED": "#c4bfb7",
-        "GREEN": "#66c39b",
-        "YELLOW": "#d2a35b",
-        "RED": "#df7777",
-        "BLUE": "#b2a79b",
-        "CYAN": "#c08b63",
-        "VIOLET": "#a58f84",
-    },
-}
-
+THEME_NAME = "ivory"
 
 def apply_theme_palette(name: str):
     global BG, PANEL, PANEL2, PANEL3, BORDER, TEXT, MUTED
     global GREEN, YELLOW, RED, BLUE, CYAN, VIOLET
     palette = THEMES.get(name, THEMES["ivory"])
-    for key, value in palette.items():
-        globals()[key] = value
+    for key in palette.__dataclass_fields__:
+        if key in globals():
+            globals()[key] = getattr(palette, key)
+    globals()["THEME_NAME"] = name
 
 
 apply_theme_palette("ivory")
-
-
 class CallPathView(QGraphicsView):
+    def set_theme(self, name: str):
+        apply_theme_palette(name)
+        self.setBackgroundBrush(QColor(BG))
+        self.viewport().update()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.scene_obj = QGraphicsScene(self)
@@ -114,25 +89,25 @@ class CallPathView(QGraphicsView):
             self.scene_obj.addPath(
                 body,
                 QPen(QColor(color), 2),
-                QBrush(QColor("#0a1724")),
+                QBrush(QColor(PANEL2)),
             )
 
             header = QPainterPath()
             header.addRoundedRect(QRectF(x + 7, y0 + 7, box_w - 14, 22), 7, 7)
             self.scene_obj.addPath(
                 header,
-                QPen(QColor("#294a63"), 1),
-                QBrush(QColor("#0f2638")),
+                QPen(QColor(BORDER), 1),
+                QBrush(QColor(PANEL3)),
             )
 
             tag = self.scene_obj.addText(node.node_type)
             tag.setDefaultTextColor(QColor(color))
-            tag.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+            tag.setFont(make_font(8, bold=True))
             tag.setPos(x + 14, y0 + 10)
 
             label = self.scene_obj.addText(node.label)
             label.setDefaultTextColor(QColor(TEXT))
-            label.setFont(QFont("Segoe UI", 10, QFont.Weight.Bold))
+            label.setFont(make_font(10, bold=True))
             label.setPos(x + 12, y0 + 41)
 
             self.scene_obj.addEllipse(
@@ -178,6 +153,13 @@ class CallLabWidget(QWidget):
     def set_theme(self, name: str):
         apply_theme_palette(name)
         self._restyle()
+        if hasattr(self, "path_view"):
+            self.path_view.set_theme(name)
+            self.path_view.show_path(
+                self.engine.path_for(self.current_call_id)
+                if self.current_call_id else None,
+                active=bool(self.current_call_id),
+            )
 
     def _restyle(self):
         self.setStyleSheet(
@@ -241,10 +223,10 @@ class CallLabWidget(QWidget):
         controls.setStyleSheet(
             f"QFrame {{background:{PANEL};border:1px solid {BORDER};border-radius:12px;}}"
             f" QLabel {{color:{MUTED};font-weight:700;}}"
-            f" QPushButton {{background:#0f2133;border:1px solid #2d4e69;"
+            f" QPushButton {{background:{PANEL2};border:1px solid {BORDER};"
             f"border-radius:8px;padding:8px 12px;color:{TEXT};font-weight:800;}}"
-            f" QPushButton:hover {{background:#16334b;border-color:{CYAN};}}"
-            f" QLineEdit,QComboBox {{background:#061421;border:1px solid #2f5875;"
+            f" QPushButton:hover {{background:{PANEL3};border-color:{CYAN};}}"
+            f" QLineEdit,QComboBox {{background:{DEEP};border:1px solid {BORDER};"
             f"border-radius:8px;padding:8px;color:{TEXT};}}"
         )
         form = QVBoxLayout(controls)
@@ -294,7 +276,7 @@ class CallLabWidget(QWidget):
         self.status = QLabel("IDLE · No active call")
         self.status.setStyleSheet(
             f"padding:10px;border:1px solid {BORDER};"
-            f"border-radius:9px;background:#091a2a;color:{GREEN};font-weight:800;"
+            f"border-radius:9px;background:{PANEL2};color:{GREEN};font-weight:800;"
         )
         root.addWidget(self.status)
 
