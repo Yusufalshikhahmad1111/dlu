@@ -1,81 +1,94 @@
 # 01 — Architecture
 
-## 1. Stack المختار
+## 1. Stack المعتمد
 
-### React + TypeScript + Tauri 2 + SQLite
+### Python 3 + PySide6 + SQLite
 
-هذا هو الخيار الوحيد المعتمد للمشروع.
+بعد إعادة تقييم خيار React/Tauri مقابل طبيعة المشروع الجامعية والمطلوب التعليمي، نعتمد Python + PySide6 + SQLite.
 
-السبب: التطبيق يحتاج واجهة رسومية كثيفة التفاعل (DLU/Shelves/Slots/LEDs + OMT + SYP) وفي الوقت نفسه يحتاج تطبيق Windows محليًا قابلًا للتوزيع. Tauri يتيح إنشاء MSI أو setup.exe على Windows، وإضافة SQL الرسمية تدعم SQLite. كما أن واجهة React تمنحنا SVG/Canvas طبيعيًا للرسم التفاعلي.
+السبب: نحتاج واجهة DLU/رفوف/Modules/Ports وOMT وSYP، لكن نريد أيضًا أن يبقى المشروع بسيطًا وOffline ومن لغة واحدة في parser وFSM وقواعد DLU وSQLite ومختبرات الإشارات.
 
-المتطلبات الحالية في توثيق Tauri تشمل بيئة Windows مع Microsoft C++ Build Tools وWebView2، وإضافة SQL الحالية تتطلب Rust حديثًا، لذلك سنثبت نسخة Rust مستقرة مناسبة عند إنشاء المشروع الفعلي بدل hard-code نسخة قديمة.
+PySide6 يوفر Qt Widgets وGraphics View المناسبة للرسم التفاعلي، وQt for Python يوفر أداة pyside6-deploy لبناء نسخة Windows executable. توثيق Qt الحالي يوصي بها للتوزيع، ويمكنها إخراج standalone أو onefile على Windows. citeturn152249search0turn152249search2
 
-المراجع الرسمية:
-- https://tauri.app/distribute/windows-installer/
-- https://v2.tauri.app/plugin/sql/
-- https://tauri.app/start/prerequisites/
+## 2. القرار الأهم: لا نخترع عتادًا
 
-## 2. الطبقات
+الواجهة ليست رسمًا خياليًا لـ DLU.
 
-### A. Presentation
+التسلسل الذي نعتمد عليه هو:
 
-React + TypeScript + SVG/Canvas
+DLU → Shelf → Module/Board → Port → Subscriber
 
-المسؤوليات:
-- DLU visualizer.
-- Shelf/Slot/Card/Port panels.
-- OMT terminal.
-- SYP.
-- call path animation.
-- labs.
-- macros.
+المراجع التي تم فحصها تصف:
+- الـ DLU كوحدة إنهاء وتجميع خطوط المشتركين.
+- Shelf بترقيم 0..7 في أمثلة EWSD.
+- Module بترقيم 0..15 داخل Shelf في أمثلة EWSD.
+- EQN بصيغة DLU-Shelf-Module-Port.
+- وحدات SLMA تقليدية ذات 8 دوائر، مع أنواع أخرى ذات 16 منفذًا.
+- بطاقات وأنواع أخرى لها سعات مختلفة.
+
+لذلك:
+- SLMA8 هي البطاقة التعليمية المرئية الأساسية: Ports 0..7.
+- SLMA16 تعرض Ports 0..15.
+- CMRL لا نعرض لها 8 منافذ كقاعدة عامة؛ السعة تأتي من نوع البطاقة والمرجع.
+- لا نضع بطاقة في موضع لمجرد ملء الفراغ.
+
+## 3. الطبقات
+
+### A. Presentation — PySide6
+
+مسؤولياتها:
+- DLU View
+- Shelf View
+- Module/Card View
+- Port/LED View
+- Subscriber details
+- OMT Terminal
+- SYP
+- Call Path
+- Teaching Labs
+- Scenarios
 
 ممنوع:
-- تنفيذ SQL مباشر من مكوّن UI.
-- اتخاذ قرارات تشغيلية محلية.
-- نسخ حالة subscriber داخل component ثم اعتبارها الحقيقة.
+- تنفيذ SQL من Widget
+- كتابة قواعد EQN داخل الواجهة
+- افتراض أن كل Card لها 8 ports
+- إنشاء نسخة حالة Subscriber مختلفة عن SQLite
 
 ### B. Application Layer
 
-Use-cases:
-
-- CreateSubscriber
-- CancelSubscriber
-- ModifySubscriber
-- DisplaySubscriber
-- DisplayRange
-- StatSubscriber
-- TestSubscriber
-- ConfigureDlu
-- DiagnoseDlu
-- CreateCommandFile
-- ExecuteCommandFile
-- SimulateCall
-
-هذه الطبقة تدير transaction boundaries ونتائج الأوامر.
+Use cases:
+- create_subscriber
+- cancel_subscriber
+- modify_subscriber
+- display_subscriber
+- display_range
+- stat_subscriber
+- test_subscriber
+- configure_dlu
+- diagnose_dlu
+- create_command_file
+- execute_command_file
+- simulate_call
 
 ### C. Domain Core
 
-المكونات الأساسية:
-
-- MmlLexer
-- MmlParser
-- MmlCommandModel
-- MmlValidator
-- DluStateMachine
-- EqnAddress
-- CardCapacityPolicy
-- CptRouter
-- CallPathEngine
-- AlarmEngine
-- CommandFileEngine
-
-هذه الطبقة لا تعرف React أو Tauri.
+Python modules مستقلة عن PySide6:
+- mml/lexer.py
+- mml/parser.py
+- mml/normalizer.py
+- mml/validator.py
+- mml/dispatcher.py
+- domain/eqn.py
+- domain/card_capacity.py
+- domain/dlu_state.py
+- domain/cpt.py
+- domain/call_path.py
+- domain/alarms.py
+- domain/events.py
 
 ### D. Persistence
 
 SQLite repositories:
-
 - ExchangeRepository
 - DluRepository
 - SlotRepository
@@ -85,94 +98,105 @@ SQLite repositories:
 - CommandFileRepository
 - EventLogRepository
 
-### E. Tauri Shell
+### E. Packaging
 
-المسؤوليات:
-- فتح/حفظ database file.
-- filesystem paths.
-- packaging.
-- native window commands.
-- future export/import.
+الهدف النهائي:
+- Windows .exe
+- ويمكن لاحقًا إضافة installer
 
-لا نضع MML parser في Rust.
+نستخدم pyside6-deploy بدل إدخال سلسلة أدوات غير ضرورية. Qt توضح أنه يبني تطبيق PySide6 لسطح المكتب ويخرج .exe على Windows، مع standalone كالوضع الافتراضي الحالي وonefile كخيار صريح. citeturn152249search0turn152249search2
 
-## 3. تدفق تنفيذ الأمر
+## 4. تدفق MML
 
-Input → Lexer → Parser → Normalizer → Validator → FSM/Use-case → Transaction → Event → UI
+OMT Input → Lexer → Parser → Normalizer → Validator → Use Case → SQLite Transaction → Domain Event → UI
 
-مثال الأمر:
-
-~~~text
+مثال:
 > cr sub: dn=2233500, eqn=50-1-5-0, lac=021, class=ms, c/s=PB;
-~~~
 
-1. Lexer يجزئ النص.
-2. Parser يبني command AST.
-3. Normalizer يوحد case وaliases.
-4. Validator يتحقق من DN/EQN/card/port.
-5. Use-case يتحقق من business rules.
-6. SQLite transaction تنفذ.
-7. Event يصدر SubscriberCreated.
-8. UI تعيد query للحالة.
-9. LED يصبح أخضر.
-10. OMT يعرض response structured/raw.
+بعد النجاح:
+1. ينشأ subscriber.
+2. يرتبط DN بالـ EQN.
+3. يصبح Port 0 في Module 5 بالحالة idle.
+4. تتحدث LED.
+5. يظهر الأمر في OMT output.
+6. يسجل event.
 
-## 4. حالة DLU
+## 5. نموذج الرسم الصحيح
 
-لكل DLU:
+لا نرسم DLU كمجموعة مربعات بلا معنى.
 
-- dluc0: act | standby | mbl
-- dluc1: act | standby | mbl
-- is_isolated: boolean
+### Level 1 — DLU
+- DLU ID
+- controller state
+- shelves
+- alarms
 
-قاعدة المصافحة التعليمية:
+### Level 2 — Shelf
+- Modules بمواقعها
+- أرقام Module واضحة 0..15 عندما يكون هذا هو ترقيم المرجع
 
-- يوجد جانب واحد Active على الأقل في الحالة الطبيعية.
-- تحويل Active إلى mbl يستلزم رفع الجانب الآخر إلى Active إذا كان صالحًا.
-- إذا انتهت الوحدة بلا جانب Active، ينشأ CRITICAL alarm.
+### Level 3 — Module/Card
+- اسم البطاقة
+- نوعها
+- السعة
+- الحالة
 
-## 5. الأحداث
+### Level 4 — Ports
+في SLMA8:
+- Port 0
+- Port 1
+- ...
+- Port 7
 
-- SubscriberCreated
-- SubscriberCancelled
-- SubscriberModified
-- DluStateChanged
-- CardStateChanged
-- AlarmRaised
-- AlarmCleared
-- CallStarted
-- CallEnded
-- CommandFileStatusChanged
+كل Port يمثل خط مشترك واحد.
 
-## 6. الوحدات البصرية
+عند النقر على Port تظهر:
+- DN
+- EQN
+- LAC
+- Line State
+- Services
+- Blocking
+- Events
 
-DLU renderer ليس صورة ثابتة.
+## 6. الألوان
 
-كل عنصر مرسوم ناتج عن بيانات:
+اللون يصف الحالة وليس نوع البطاقة:
+- Gray = unassigned
+- Green = idle
+- Busy = active call
+- Yellow = blocked / maintenance
+- Red alarm marker = alarm
 
-DLU → Side → Shelf → Slot → Card → Port
+نوع البطاقة يظهر باسمها، وليس بلونها.
 
-وبالتالي:
-- تغيير slot.card_type يغير بطاقة الواجهة.
-- تغيير subscriber.line_state يغير LED.
-- تغيير blk_reason يغير اللون.
-- تغيير ost يغير حالة الوحدة.
+## 7. لا نستخدم صور PCB مزيفة
 
-## 7. لماذا ليس Electron؟
+في النسخة الأولى نرسم representation هندسيًا مبسطًا.
 
-Electron خيار صالح تقنيًا، وهو رسميًا يعتمد على Chromium وNode ويُعبأ عبر Electron Forge. لكنه يحمل runtime أكبر، بينما مشروعنا لا يحتاج Node في زمن التشغيل إلا إذا اخترناه عمدًا.
+لا ندعي أن الرسم صورة PCB حقيقية.
 
-نحن نريد أن تكون طبقة التشغيل المحلية أقرب لتطبيق Windows، مع بقاء كل منطق المادة في TypeScript. لذلك اخترنا Tauri.
+يمكن لاحقًا عرض صورة مرجعية حقيقية للبطاقة في صفحة معلومات مستقلة، مع ذكر المصدر والترخيص.
 
-مرجع Electron الرسمي:
-https://www.electronjs.org/docs/latest/tutorial/application-distribution
+## 8. لماذا Python الآن؟
 
-## 8. سياسة الاستمرارية
+الهدف هو محاكي جامعي Offline قابل للفهم والصيانة، وليس منتج SaaS.
 
-قاعدة البيانات تُحفظ في مسار بيانات التطبيق المحلي، وليس داخل مجلد source عند التشغيل النهائي.
+Python + PySide6 يعطي:
+- لغة واحدة للمشروع.
+- SQLite مباشرة.
+- بيئة مناسبة للـ parser والاختبارات.
+- Qt Graphics للرسم.
+- توافقًا طبيعيًا مع NumPy/Matplotlib عند بناء مختبر الإشارات.
+- مسارًا رسميًا للتوزيع عبر pyside6-deploy. citeturn152249search0turn152249search3
 
-سنضيف لاحقًا:
-- Reset Demo State.
-- Export Database.
-- Import Backup.
-- Seed Dataset Version.
+هذا أبسط من Tauri للمشروع الحالي مع الحفاظ على نفس المبدأ: Domain Core واحد والواجهة مجرد View للحالة.
+
+## 9. سياسة الاستمرارية
+
+SQLite هي مصدر الحقيقة.
+
+أي تغيير:
+MML / Scenario / Maintenance Action → DB → Event → UI
+
+والنسخة النهائية تحفظ قاعدة البيانات في App Data مع Reset وBackup وRestore وSeed Version.
