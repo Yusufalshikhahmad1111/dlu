@@ -46,6 +46,8 @@
 
 ## Stage 2 — Hardware Fidelity + MML Core
 
+**الحالة: Implemented — CI/manual validation pending final Windows run**
+
 المخرجات:
 - Hardware Dataset + source registry.
 - DLU frame/shelf/module/port renderer.
@@ -61,7 +63,7 @@
 - cr/can/mod/disp/stat/test/conf/diag.
 
 Definition of Done:
-السيناريوهات الأكاديمية الأساسية تعمل بدون UI.
+Hardware hierarchy + source-backed cards + Physical/Logical modes + maintenance replacement + OMT hardware linking are implemented.
 
 ## Stage 3 — DLU Visualizer
 
