@@ -44,9 +44,15 @@
 
 **ممنوع في هذه المرحلة:** رسم DLU النهائي قبل إثبات صحة dataset.
 
-## Stage 2 — MML Core
+## Stage 2 — Hardware Fidelity + MML Core
 
 المخرجات:
+- Hardware Dataset + source registry.
+- DLU frame/shelf/module/port renderer.
+- Physical + Logical modes.
+- Source viewer.
+- Card install/replace workflow.
+- OMT ↔ hardware highlighting.
 - Lexer.
 - Parser.
 - Normalizer.
