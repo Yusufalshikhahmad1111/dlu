@@ -744,72 +744,185 @@ class DluSimulatorWindow(QMainWindow):
                 font-family:Segoe UI;
                 font-size:13px;
             }}
-            QFrame#Header,QFrame#SYP,QFrame#Navigator,QFrame#ScenarioBar {{
+            QMainWindow {{
+                background:{BG};
+            }}
+            QFrame#Header {{
+                background:qlineargradient(x1:0,y1:0,x2:1,y2:0,
+                    stop:0 {PANEL}, stop:0.62 {PANEL3}, stop:1 #0d2034);
+                border:1px solid #31516d;
+                border-radius:12px;
+            }}
+            QFrame#SYP, QFrame#Navigator, QFrame#ScenarioBar, QFrame#WorkbenchHeader,
+            QFrame#CommandDock {{
                 background:{PANEL};
                 border:1px solid {BORDER};
-                border-radius:8px;
+                border-radius:10px;
             }}
             QLabel#Title {{
-                font-size:24px;
+                font-size:26px;
+                font-weight:900;
+                letter-spacing:1px;
+            }}
+            QLabel#Breadcrumb {{
+                color:{TEXT};
+                font-size:14px;
                 font-weight:800;
+                padding-left:6px;
             }}
-            QLabel#Breadcrumb,QLabel#SectionTitle {{
-                font-weight:700;
+            QLabel#NavigatorTitle {{
+                color:{CYAN};
+                font-weight:900;
+                letter-spacing:1px;
             }}
-            QFrame#ScenarioBar QLabel {{
-                color:{AMBER};
-                font-weight:800;
-            }}
-            QFrame#ScenarioBar QPushButton {{
-                background:#1b2c38;
-                border:1px solid #3b596b;
-                min-width:86px;
-                font-weight:700;
-            }}
-            QFrame#ScenarioBar QPushButton:hover {{
-                background:#294452;
+            QLabel#ScenarioTitle {{
+                color:{CYAN};
+                font-weight:900;
+                letter-spacing:1px;
             }}
             QLabel#Legend {{
                 color:{MUTED};
+                padding:3px 6px;
             }}
             QLabel#StatusChip {{
-                background:#163c2f;
+                background:#092e28;
                 color:{GREEN};
-                border:1px solid #2d7157;
-                border-radius:12px;
-                padding:4px 10px;
+                border:1px solid #31b989;
+                border-radius:14px;
+                padding:6px 12px;
+                font-weight:900;
+            }}
+            QLabel#CommandPrompt {{
+                color:{CYAN};
+                font-size:18px;
+                font-weight:900;
+            }}
+            QFrame#WorkbenchHeader QLabel {{
+                color:{MUTED};
                 font-weight:700;
             }}
-            QPushButton {{
-                background:#15232d;
-                border:1px solid {BORDER};
-                border-radius:6px;
-                padding:7px 10px;
+            QFrame#WorkbenchHeader QLabel:first-child {{
+                color:{TEXT};
+                font-size:16px;
+                font-weight:900;
             }}
-            QPushButton:hover {{ background:#203543; }}
-            QComboBox,QLineEdit,QTextEdit,QTableWidget,QListWidget {{
-                background:{PANEL2};
-                border:1px solid {BORDER};
-                border-radius:6px;
+            QFrame#CommandDock {{
+                background:#091a2a;
+                border:1px solid #3b79a5;
+            }}
+            QPushButton, QToolButton {{
+                background:#0f2133;
+                border:1px solid #2d4e69;
+                border-radius:8px;
+                padding:8px 12px;
+                color:{TEXT};
+                font-weight:700;
+            }}
+            QPushButton:hover, QToolButton:hover {{
+                background:#16334b;
+                border-color:{CYAN};
+            }}
+            QPushButton:pressed, QToolButton:pressed {{
+                background:#1a3f5c;
+            }}
+            QPushButton:disabled {{
+                color:#536a7d;
+                background:#0a151f;
+                border-color:#1b3042;
+            }}
+            QPushButton#PrimaryScenario {{
+                background:qlineargradient(x1:0,y1:0,x2:1,y2:0,
+                    stop:0 #12354d, stop:1 #19385a);
+                border:1px solid {CYAN};
+                min-width:120px;
+                padding:10px 14px;
+                font-weight:900;
+            }}
+            QPushButton#PrimaryScenario:hover {{
+                background:#1a4864;
+            }}
+            QPushButton#CommandSend {{
+                background:#123e55;
+                border:1px solid {CYAN};
+                min-width:88px;
+                font-weight:900;
+            }}
+            QComboBox {{
+                background:#091b2b;
+                border:1px solid #2e4f69;
+                border-radius:8px;
+                padding:7px 9px;
+                min-height:28px;
+            }}
+            QComboBox:hover {{
+                border-color:{CYAN};
+            }}
+            QLineEdit {{
+                background:#061421;
+                border:1px solid #2f5875;
+                border-radius:8px;
+                padding:8px 10px;
+                color:{TEXT};
+            }}
+            QLineEdit:focus {{
+                border:2px solid {CYAN};
+                background:#071a2b;
+            }}
+            QComboBox, QLineEdit, QTextEdit, QTableWidget, QListWidget {{
+                selection-background-color:#164764;
+                selection-color:{WHITE};
             }}
             QTextEdit#Terminal {{
-                font-family:Consolas;
+                background:#061421;
+                border:1px solid #203d56;
+                border-radius:9px;
+                font-family:Cascadia Mono, Consolas, monospace;
                 font-size:12px;
-                padding:8px;
+                padding:10px;
+            }}
+            QTableWidget {{
+                background:#081723;
+                border:1px solid {BORDER};
+                gridline-color:#1e3548;
             }}
             QHeaderView::section {{
-                background:#172733;
+                background:#10283b;
                 color:{TEXT};
                 border:0;
-                padding:6px;
+                padding:7px;
+                font-weight:800;
+            }}
+            QTabWidget::pane {{
+                background:{PANEL2};
+                border:1px solid {BORDER};
+                border-radius:9px;
             }}
             QTabBar::tab {{
-                background:#13212b;
-                border:1px solid {BORDER};
-                padding:8px 12px;
+                background:#0b1a29;
+                color:{MUTED};
+                border:1px solid #233f57;
+                border-bottom:0;
+                padding:9px 16px;
+                margin-right:3px;
+                border-top-left-radius:8px;
+                border-top-right-radius:8px;
+                font-weight:800;
             }}
             QTabBar::tab:selected {{
-                background:#1b3140;
+                background:#12344a;
+                color:{TEXT};
+                border-color:{CYAN};
+            }}
+            QMenu {{
+                background:#0b1724;
+                color:{TEXT};
+                border:1px solid {BORDER};
+            }}
+            QMenu::item:selected {{
+                background:#12364c;
+            }}
+            QSplitter::handle {{
+                background:#091522;
             }}
             """
         )
