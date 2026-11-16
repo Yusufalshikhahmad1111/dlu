@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "philosophy": "Source-backed educational dataset. Unknown physical placement stays UNCONFIGURED.",
+  "sources": [
+    {
+      "id": "PEU-CO-52",
+      "title": "PEU Principles of Communication — DLU components",
+      "source_type": "course_lecture",
+      "page": 52,
+      "note": "DLU components: SLMA, SLMD, TU, BDE, BDCG, DLUC, RGMG, DCC; duplicated control with Active/Standby handshake."
+    },
+    {
+      "id": "PEU-CO-54",
+      "title": "PEU Principles of Communication — SLM components",
+      "source_type": "course_lecture",
+      "page": 54,
+      "note": "SLMA/COS 8 ports; CMRL 6 ports."
+    },
+    {
+      "id": "PEU-CO-60",
+      "title": "PEU Principles of Communication — SLM types",
+      "source_type": "course_lecture",
+      "page": 60,
+      "note": "CMRL 6 ports; SLMA 8 ports; SLMA 16 ports; SLMA 64 ports."
+    },
+    {
+      "id": "PEU-CO-59",
+      "title": "PEU Principles of Communication — EQN example",
+      "source_type": "course_lecture",
+      "page": 59,
+      "note": "EQN format DLU-Shelf-Module-Port and worked example 50-0-15-0..7."
+    },
+    {
+      "id": "PEU-CO-62",
+      "title": "PEU Principles of Communication — replacement workflow",
+      "source_type": "course_lecture",
+      "page": 62,
+      "note": "Maintenance replacement sequence: mbl, diagnose, remove, insert replacement, activate, verify."
+    }
+  ],
+  "models": [
+    {
+      "code": "UNCONFIGURED",
+      "name": "Unconfigured",
+      "family": "empty",
+      "role": "Empty slot",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-59",
+      "verified": true
+    },
+    {
+      "code": "SLMA8",
+      "name": "SLMA / COS — 8 Port",
+      "family": "subscriber",
+      "role": "Analog subscriber line module",
+      "port_count": 8,
+      "port_start": 0,
+      "port_end": 7,
+      "subscriber_type": "ms",
+      "source_id": "PEU-CO-54",
+      "verified": true
+    },
+    {
+      "code": "SLMA16",
+      "name": "SLMA — 16 Port",
+      "family": "subscriber",
+      "role": "Analog subscriber line module",
+      "port_count": 16,
+      "port_start": 0,
+      "port_end": 15,
+      "subscriber_type": "ms",
+      "source_id": "PEU-CO-60",
+      "verified": true
+    },
+    {
+      "code": "SLMA64",
+      "name": "SLMA — 64 Port",
+      "family": "subscriber",
+      "role": "Analog subscriber line module",
+      "port_count": 64,
+      "port_start": 0,
+      "port_end": 63,
+      "subscriber_type": "ms",
+      "source_id": "PEU-CO-60",
+      "verified": true
+    },
+    {
+      "code": "CMRL",
+      "name": "SLMA CMRL — 6 Port",
+      "family": "subscriber",
+      "role": "Coin/metering subscriber module",
+      "port_count": 6,
+      "port_start": 0,
+      "port_end": 5,
+      "subscriber_type": "cmrl",
+      "source_id": "PEU-CO-60",
+      "verified": true
+    },
+    {
+      "code": "SLMD",
+      "name": "SLMD / ISDN",
+      "family": "subscriber",
+      "role": "Digital subscriber line module",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": "digital",
+      "source_id": "PEU-CO-52",
+      "verified": true
+    },
+    {
+      "code": "TU",
+      "name": "Test Unit",
+      "family": "service",
+      "role": "Test unit",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-52",
+      "verified": true
+    },
+    {
+      "code": "BDE",
+      "name": "Bus Distribution Extension",
+      "family": "service",
+      "role": "Bus distribution",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-52",
+      "verified": true
+    },
+    {
+      "code": "BDCG",
+      "name": "Bus Distribution Clock Generation",
+      "family": "service",
+      "role": "Bus distribution / clock generation",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-52",
+      "verified": true
+    },
+    {
+      "code": "DLUC",
+      "name": "Digital Line Unit Controller",
+      "family": "control",
+      "role": "DLU controller",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-52",
+      "verified": true
+    },
+    {
+      "code": "DIUD",
+      "name": "Digital Interface Unit",
+      "family": "control",
+      "role": "DLU digital interface toward LTG",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-52",
+      "verified": true
+    },
+    {
+      "code": "RGMG",
+      "name": "Ring Generation & Measuring",
+      "family": "service",
+      "role": "Ring generation and measuring",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-52",
+      "verified": true
+    },
+    {
+      "code": "DCC",
+      "name": "DC Current Supply",
+      "family": "power",
+      "role": "DC power supply",
+      "port_count": 0,
+      "port_start": 0,
+      "port_end": -1,
+      "subscriber_type": null,
+      "source_id": "PEU-CO-52",
+      "verified": true
+    }
+  ],
+  "placements": [
+    {
+      "dlu": 50,
+      "shelf": 0,
+      "module": 15,
+      "card": "SLMA8",
+      "source_id": "PEU-CO-59",
+      "note": "Directly supported by the worked 8-port expansion example."
+    },
+    {
+      "dlu": 10,
+      "shelf": 1,
+      "module": 7,
+      "card": "CMRL",
+      "source_id": "PEU-CO-60",
+      "note": "Directly supported by the CMRL worked example."
+    }
+  ]
+}
