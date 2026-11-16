@@ -1370,27 +1370,6 @@ class DluSimulatorWindow(QMainWindow):
                 self.hardware.current_module
             )
 
-    def show_shelf(self,dlu_id:int,shelf:int):
-        self._sync_location(dlu_id,shelf)
-        self.current_view="shelf"
-        self.clear_scene()
-        self.back_btn.setEnabled(True)
-        self.breadcrumb.setText(f"DLU {dlu_id} / Shelf {shelf}")
-        self.add_text(24,18,f"DLU {dlu_id} · SHELF {shelf}",22,TEXT,True)
-        self.add_text(24,52,"Physical shelf · 16 module positions",11,MUTED)
-        frame=QRectF(20,90,1120,730)
-        self.hardware.scene_obj.addRect(
-            frame,QPen(QColor("#3b5569"),2),QBrush(QColor("#0d1820"))
-        )
-        slots=self.db.list_shelf(dlu_id,shelf)
-        for i,slot in enumerate(slots):
-            x=55+(i%8)*135
-            y=125+(i//8)*320
-            self.draw_full_module_slot(slot,x,y,118,275)
-        self.hardware.scene_obj.setSceneRect(0,0,1170,850)
-        self.hardware.reset_zoom()
-        self._set_details({"DLU":dlu_id,"Shelf":shelf,"Modules":"0..15","View":"Physical"})
-
     def eventFilter(self,watched,event):
         if watched is self.input and event.type()==QEvent.Type.KeyPress:
             if event.key()==Qt.Key_Up and self.history:
