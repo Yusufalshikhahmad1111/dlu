@@ -288,14 +288,6 @@ class CallRepository:
             return 0, 0
         return int(row["used"]), int(row["capacity"])
 
-    def list_subscribers(self) -> list[dict]:
-        return [
-            dict(row)
-            for row in self.db.conn.execute(
-                "SELECT * FROM subscribers ORDER BY lac, CAST(dn AS INTEGER)"
-            ).fetchall()
-        ]
-
     def get_call(self, call_id: str) -> dict | None:
         row = self.db.conn.execute(
             "SELECT * FROM call_sessions WHERE call_id=?", (call_id,)
@@ -695,6 +687,14 @@ class CallEngine:
 
     def resource_usage(self) -> tuple[int, int]:
         return self.repo.resource_usage()
+
+    def list_subscribers(self) -> list[dict]:
+        return [
+            dict(row)
+            for row in self.db.conn.execute(
+                "SELECT * FROM subscribers ORDER BY lac, CAST(dn AS INTEGER)"
+            ).fetchall()
+        ]
 
     def active_call_count(self) -> int:
         row = self.db.conn.execute(
