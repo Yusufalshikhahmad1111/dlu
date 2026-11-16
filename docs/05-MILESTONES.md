@@ -67,7 +67,7 @@ Hardware hierarchy + source-backed cards + Physical/Logical modes + maintenance 
 
 ## Stage 3 — Call Engine + CPT + Call Path
 
-**الحالة: Implemented — final Windows manual audit is the release gate**
+**الحالة: مكتملة — Windows manual QA passed**
 
 المخرجات:
 - deterministic CPT exact/prefix/range resolver.
@@ -80,10 +80,15 @@ Hardware hierarchy + source-backed cards + Physical/Logical modes + maintenance 
 - INTERNATIONAL path: DLU → LTG → SN → International Gateway.
 - EVAL=NO blocking before resource reservation.
 - CALL ENGINE · CPT · CALL PATH teaching tab.
-- Stage 3 automated tests and Windows QA checklist.
+- OMT TEST/STAT/DISP CALL integration.
+- Stage 3 automated tests.
+- Final Windows manual runtime verification.
 
 Definition of Done:
 Call decisions, resource state, subscriber busy state, DB session state, and visual Call Path agree.
+
+Closeout:
+docs/16-STAGE-03-CLOSEOUT.md
 
 ## Stage 4 — Command Files
 
@@ -104,12 +109,12 @@ Call decisions, resource state, subscriber busy state, DB session state, and vis
 
 ## Stage 6 — Teaching Scenarios
 
-1. Aleppo 8-line expansion.
-2. CMRL capacity limit.
-3. DLU/card maintenance.
-4. Billing block.
-5. International blacklist.
-6. Command file overnight run.
+- Aleppo 8-line expansion.
+- CMRL capacity limit.
+- DLU/card maintenance.
+- Billing block.
+- International blacklist.
+- Command file overnight run.
 
 كل Scenario يعرض:
 - commands.
@@ -119,31 +124,6 @@ Call decisions, resource state, subscriber busy state, DB session state, and vis
 - PASS/FAIL.
 
 ## Stage 7 — Packaging & Final Audit
-
-- Windows executable.
-- optional installer.
-- reset/backup/restore.
-- screenshots.
-- user manual.
-- final academic test report.
-
-## Stage 9 — Teaching Scenarios
-
-1. Aleppo 8-line expansion.
-2. CMRL capacity limit.
-3. DLU/card maintenance.
-4. Billing block.
-5. International blacklist.
-6. Command file overnight run.
-
-كل Scenario يعرض:
-- commands.
-- affected EQN.
-- expected result.
-- actual result.
-- PASS/FAIL.
-
-## Stage 10 — Packaging & Final Audit
 
 - Windows executable.
 - optional installer.
