@@ -34,6 +34,8 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
 )
 
+from .call_engine import CallEngine
+from .call_ui import CallLabWidget
 from .db import CardReference, Database
 from .mml import MmlEngine, MmlResult
 
@@ -415,6 +417,7 @@ class DluSimulatorWindow(QMainWindow):
         super().__init__()
         self.db = Database(db_path)
         self.mml = MmlEngine(self.db)
+        self.call_engine = CallEngine(self.db)
         self.history: list[str] = []
         self.history_index = 0
         self.current_view = "home"
@@ -609,6 +612,13 @@ class DluSimulatorWindow(QMainWindow):
         # Teaching scenarios are hosted in the persistent left-side Scenario Bar.
         self.omt_tab.setLayout(olt)
         right.addTab(self.omt_tab, "OMT")
+
+        self.call_lab = CallLabWidget(
+            self.call_engine,
+            on_state_changed=self._on_call_state_changed,
+            parent=self,
+        )
+        right.addTab(self.call_lab, "Call Path")
 
         info_tab = QWidget()
         info_layout = QVBoxLayout(info_tab)
@@ -1628,14 +1638,21 @@ class DluSimulatorWindow(QMainWindow):
         self.crit_label.setText(f"CRITICAL {counts.get('CRITICAL',0)}")
         self.major_label.setText(f"MAJOR {counts.get('MAJOR',0)}")
         self.minor_label.setText(f"MINOR {counts.get('MINOR',0)}")
-        busy=self.db.conn.execute(
-            "SELECT COUNT(*) AS n FROM subscribers WHERE line_state='busy'"
-        ).fetchone()["n"]
-        self.traffic_label.setText(f"PDC {busy}/120")
-        self.path_label.setText("PATH ACTIVE" if busy else "PATH —")
+        used, capacity = self.call_engine.resource_usage()
+        active_calls = self.call_engine.active_call_count()
+        self.traffic_label.setText(f"PDC {used}/{capacity}")
+        self.path_label.setText("PATH ACTIVE" if active_calls else "PATH —")
+
+    def _on_call_state_changed(self):
+        if hasattr(self, "call_lab"):
+            self.call_lab.refresh_subscribers()
+        self.refresh_status()
+        if getattr(self, "current_view", "home") == "module":
+            self._refresh_current_view()
 
     def reset_demo(self):
         self.db.reset_demo()
+        self.call_engine.repo.reset_demo()
         self.terminal.append(
             "<span style='color:#f0c75e'>"
             "[RESET] Source-backed hardware restored; subscriber demo state cleared."
