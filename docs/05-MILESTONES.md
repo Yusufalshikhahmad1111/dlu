@@ -65,47 +65,27 @@
 Definition of Done:
 Hardware hierarchy + source-backed cards + Physical/Logical modes + maintenance replacement + OMT hardware linking are implemented.
 
-## Stage 3 — DLU Visualizer
+## Stage 3 — Call Engine + CPT + Call Path
+
+**الحالة: Implemented — final Windows manual audit is the release gate**
 
 المخرجات:
-- DLU overview.
-- Shelf view.
-- Module/Card view.
-- Port 0..N حسب card type.
-- subscriber ↔ EQN view.
-- LEDs/state indicators.
-- click drill-down.
+- deterministic CPT exact/prefix/range resolver.
+- number analysis.
+- LOCAL / NATIONAL / INTERNATIONAL / SERVICE call classification.
+- persistent call sessions and call legs.
+- PDC voice resource capacity 120 with reservation/release.
+- LOCAL path: DLU → SN → DLU.
+- NATIONAL path: DLU → LTG → SN → LTG → logical remote DLU/LAC.
+- INTERNATIONAL path: DLU → LTG → SN → International Gateway.
+- EVAL=NO blocking before resource reservation.
+- CALL ENGINE · CPT · CALL PATH teaching tab.
+- Stage 3 automated tests and Windows QA checklist.
 
 Definition of Done:
-الطالب يرى العلاقة DLU → Shelf → Module → Port → DN بوضوح.
+Call decisions, resource state, subscriber busy state, DB session state, and visual Call Path agree.
 
-## Stage 4 — OMT + SYP
-
-- terminal.
-- raw/structured output.
-- command history.
-- macros.
-- alarms.
-- traffic indicators.
-
-## Stage 5 — Hardware Operations
-
-- mbl/act.
-- DLUC behavior.
-- diag guards.
-- card replacement.
-- maintenance workflow.
-
-## Stage 6 — Call Engine + CPT
-
-- local route.
-- national route.
-- international route.
-- blocked route.
-- channel usage.
-- call path animation.
-
-## Stage 7 — Command Files
+## Stage 4 — Command Files
 
 - file parser.
 - scheduling.
@@ -113,7 +93,7 @@ Definition of Done:
 - Accepted/Started/Finished/Executed.
 - failure reporting.
 
-## Stage 8 — Communications Labs
+## Stage 5 — Communications Labs
 
 - OSI.
 - TCP/UDP.
@@ -121,6 +101,31 @@ Definition of Done:
 - PAM/PWM/PPM/PCM.
 - ASK/FSK/PSK/QPSK/QAM.
 - constellation/BER basics.
+
+## Stage 6 — Teaching Scenarios
+
+1. Aleppo 8-line expansion.
+2. CMRL capacity limit.
+3. DLU/card maintenance.
+4. Billing block.
+5. International blacklist.
+6. Command file overnight run.
+
+كل Scenario يعرض:
+- commands.
+- affected EQN.
+- expected result.
+- actual result.
+- PASS/FAIL.
+
+## Stage 7 — Packaging & Final Audit
+
+- Windows executable.
+- optional installer.
+- reset/backup/restore.
+- screenshots.
+- user manual.
+- final academic test report.
 
 ## Stage 9 — Teaching Scenarios
 
