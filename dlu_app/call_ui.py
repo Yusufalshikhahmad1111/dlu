@@ -32,9 +32,49 @@ MUTED = "#8fa6bd"
 GREEN = "#39e6a5"
 YELLOW = "#ffc857"
 RED = "#ff6577"
-BLUE = "#66a8ff"
-CYAN = "#40d9ff"
-VIOLET = "#9b7bff"
+THEMES = {
+    "ivory": {
+        "BG": "#f3eadc",
+        "PANEL": "#fffaf1",
+        "PANEL2": "#eee3d2",
+        "PANEL3": "#e4d5c0",
+        "BORDER": "#bda98f",
+        "TEXT": "#2f271f",
+        "MUTED": "#746658",
+        "GREEN": "#2f8a68",
+        "YELLOW": "#b67825",
+        "RED": "#bd4f4f",
+        "BLUE": "#806b5c",
+        "CYAN": "#b66f42",
+        "VIOLET": "#765e50",
+    },
+    "silver": {
+        "BG": "#292825",
+        "PANEL": "#3a3834",
+        "PANEL2": "#2f2e2b",
+        "PANEL3": "#47443f",
+        "BORDER": "#766f65",
+        "TEXT": "#f3efe8",
+        "MUTED": "#c4bfb7",
+        "GREEN": "#66c39b",
+        "YELLOW": "#d2a35b",
+        "RED": "#df7777",
+        "BLUE": "#b2a79b",
+        "CYAN": "#c08b63",
+        "VIOLET": "#a58f84",
+    },
+}
+
+
+def apply_theme_palette(name: str):
+    global BG, PANEL, PANEL2, PANEL3, BORDER, TEXT, MUTED
+    global GREEN, YELLOW, RED, BLUE, CYAN, VIOLET
+    palette = THEMES.get(name, THEMES["ivory"])
+    for key, value in palette.items():
+        globals()[key] = value
+
+
+apply_theme_palette("ivory")
 
 
 class CallPathView(QGraphicsView):
@@ -133,6 +173,55 @@ class CallLabWidget(QWidget):
         self.on_state_changed = on_state_changed
         self.current_call_id: str | None = None
         self._build()
+        self._restyle()
+
+    def set_theme(self, name: str):
+        apply_theme_palette(name)
+        self._restyle()
+
+    def _restyle(self):
+        self.setStyleSheet(
+            f"""
+            QWidget {{
+                color:{TEXT};
+                font-family:Segoe UI;
+            }}
+            QFrame {{
+                background:{PANEL};
+            }}
+            QLabel {{
+                color:{TEXT};
+            }}
+            QLineEdit,QComboBox,QTextEdit {{
+                background:{PANEL2};
+                color:{TEXT};
+                border:1px solid {BORDER};
+                border-radius:8px;
+                padding:8px;
+            }}
+            QPushButton {{
+                background:{PANEL2};
+                color:{TEXT};
+                border:1px solid {BORDER};
+                border-radius:8px;
+                padding:8px 12px;
+                font-weight:800;
+            }}
+            QPushButton:hover {{
+                border-color:{CYAN};
+            }}
+            """
+        )
+        if hasattr(self, "status"):
+            self.status.setStyleSheet(
+                f"padding:10px;border:1px solid {BORDER};"
+                f"border-radius:9px;background:{PANEL2};color:{GREEN};font-weight:800;"
+            )
+        if hasattr(self, "details"):
+            self.details.setStyleSheet(
+                f"background:{PANEL2};border:1px solid {BORDER};"
+                f"border-radius:9px;font-family:Cascadia Mono,Consolas;color:{TEXT};"
+            )
 
     def _build(self):
         root = QVBoxLayout(self)
