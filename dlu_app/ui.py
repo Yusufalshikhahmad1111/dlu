@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMainWindow,
     QMessageBox,
+    QMenu,
     QPushButton,
     QSplitter,
     QTabWidget,
@@ -66,16 +67,32 @@ def state_color(state: str) -> str:
 
 
 class ClickableRectItem(QGraphicsRectItem):
-    def __init__(self, rect: QRectF, on_click, data=None, tooltip=""):
+    def __init__(
+        self,
+        rect: QRectF,
+        on_click,
+        data=None,
+        tooltip="",
+        on_double_click=None,
+        on_context=None,
+    ):
         super().__init__(rect)
         self.on_click = on_click
         self.data = data
+        self.on_double_click = on_double_click
+        self.on_context = on_context
         self.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         if tooltip:
             self.setToolTip(tooltip)
 
     def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton and self.on_context:
+            callback = self.on_context
+            data = self.data
+            callback(data)
+            event.accept()
+            return
         if event.button() == Qt.LeftButton and self.on_click:
             callback = self.on_click
             data = self.data
@@ -85,6 +102,15 @@ class ClickableRectItem(QGraphicsRectItem):
             event.accept()
             return
         super().mousePressEvent(event)
+
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.LeftButton and self.on_double_click:
+            callback = self.on_double_click
+            data = self.data
+            callback(data)
+            event.accept()
+            return
+        super().mouseDoubleClickEvent(event)
 
 
 class HardwareView(QGraphicsView):
@@ -750,6 +776,29 @@ class DluSimulatorWindow(QMainWindow):
                     break
         self.sync_header_dlu()
 
+    def open_hardware_context(self, data):
+        if not isinstance(data, tuple):
+            return
+        if len(data) == 3:
+            dlu, shelf, module = data
+            menu = QMenu(self)
+            display_action = menu.addAction("Display Module")
+            reference_action = menu.addAction("Reference")
+            maintenance_action = menu.addAction("Maintenance")
+            action = menu.exec(self.hardware.mapToGlobal(self.hardware.mapFromScene(
+                self.hardware.mapToScene(self.hardware.mapFromGlobal(self.cursor().pos()))
+            )))
+            if action is display_action:
+                self.show_module(dlu, shelf, module)
+            elif action is reference_action:
+                self.show_module(dlu, shelf, module)
+                self.open_selected_reference()
+            elif action is maintenance_action:
+                self.show_module(dlu, shelf, module)
+                self.run_maintenance_demo()
+        elif len(data) == 4:
+            self.port_context(*data)
+
     def show_dlu(self, dlu_id: int):
         self._sync_location(dlu_id)
         self.current_view = "dlu"
@@ -836,6 +885,8 @@ class DluSimulatorWindow(QMainWindow):
                 lambda data: self.show_module(*data),
                 (dlu_id, shelf, slot["module"]),
                 f"{dlu_id}-{shelf}-{slot['module']} · {slot['card_type']} · {slot['port_count']} ports",
+                on_double_click=lambda data: self.show_module(*data),
+                on_context=lambda data: self.open_hardware_context(data),
             )
             item.setBrush(QBrush(QColor(fill)))
             item.setPen(QPen(QColor(edge), 1.1))
@@ -941,10 +992,13 @@ class DluSimulatorWindow(QMainWindow):
         self.add_text(x+10,y+84,f"OST {slot['ost'].upper()}",8,state_color(slot["ost"]),True)
         self.add_text(x+10,y+110,"FAULT" if slot["fault_state"]=="fault" else "NORMAL",8,RED if slot["fault_state"]=="fault" else GREEN,True)
 
-        max_ports = min(slot["port_count"], 16)
+        max_ports = min(slot["port_count"], 64)
+        mini_cols = 8 if max_ports > 16 else 4
+        mini_gap_x = 12 if max_ports > 16 else 24
+        mini_gap_y = 18 if max_ports > 16 else 24
         for port in range(max_ports):
-            px = x+10+(port%4)*24
-            py = y+140+(port//4)*24
+            px = x+10+(port%mini_cols)*mini_gap_x
+            py = y+140+(port//mini_cols)*mini_gap_y
             sub = self.db.get_port_subscriber(slot["dlu_id"],slot["shelf"],slot["module"],port)
             col = state_color(sub["line_state"]) if sub else STEEL
             self.hardware.scene_obj.addEllipse(
@@ -1008,7 +1062,18 @@ class DluSimulatorWindow(QMainWindow):
                     8,MUTED
                 )
 
-        self.hardware.scene_obj.setSceneRect(0,0,1120,820)
+        rows_for_card = (
+            ((slot.port_count + 7) // 8)
+            if slot.port_count >= 32
+            else ((slot.port_count + 3) // 4)
+            if slot.port_count > 16
+            else ((slot.port_count + 1) // 2)
+            if slot.port_count
+            else 1
+        )
+        scene_height = max(820, 280 + rows_for_card * 68)
+        scene_width = 1120 if slot.port_count <= 16 else 1240
+        self.hardware.scene_obj.setSceneRect(0,0,scene_width,scene_height)
         self.hardware.reset_zoom()
 
         self._set_details({
@@ -1026,11 +1091,20 @@ class DluSimulatorWindow(QMainWindow):
         self.refresh_event_log()
 
     def draw_port_grid(self,dlu_id,shelf,module,slot,x,y):
-        cols = 4 if slot.port_count > 16 else 2
+        if slot.port_count >= 32:
+            cols = 8
+            cell_w = 96
+        elif slot.port_count > 16:
+            cols = 4
+            cell_w = 156
+        else:
+            cols = 2
+            cell_w = 160
         rows = (slot.port_count + cols - 1)//cols
         for port in range(slot.port_count):
-            px = x + (port%cols)*175
-            py = y + (port//cols)*68
+            cell_h = 52
+            px = x + (port % cols) * cell_w
+            py = y + (port // cols) * (cell_h + 10)
             sub = self.db.get_port_subscriber(dlu_id,shelf,module,port)
             if not sub:
                 color = STEEL
@@ -1041,7 +1115,7 @@ class DluSimulatorWindow(QMainWindow):
                 if sub["blk_reason"]:
                     color = YELLOW
             item = ClickableRectItem(
-                QRectF(px,py,160,56),
+                QRectF(px,py,cell_w-6,cell_h),
                 lambda data: self.select_port(*data),
                 (dlu_id,shelf,module,port),
                 f"EQN {dlu_id}-{shelf}-{module}-{port}",
@@ -1056,6 +1130,21 @@ class DluSimulatorWindow(QMainWindow):
             self.add_text(px+35,py+7,f"PORT {port}",8,TEXT,True)
             self.add_text(px+35,py+24,label,8,color,True)
             self.add_text(px+35,py+40,f"{dlu_id}-{shelf}-{module}-{port}",6,MUTED)
+
+    def port_context(self, dlu_id,shelf,module,port):
+        eqn = f"{dlu_id}-{shelf}-{module}-{port}"
+        menu = QMenu(self)
+        inspect_action = menu.addAction("Inspect Port")
+        copy_action = menu.addAction("Copy MML")
+        action = menu.exec(self.cursor().pos())
+        if action is inspect_action:
+            self.show_module(dlu_id,shelf,module)
+            self.select_port(dlu_id,shelf,module,port)
+        elif action is copy_action:
+            self.selected_eqn = eqn
+            sub = self.db.get_port_subscriber(dlu_id,shelf,module,port)
+            self.selected_dn = sub["dn"] if sub else None
+            self.copy_selected_mml()
 
     def select_port(self,dlu_id,shelf,module,port):
         eqn = f"{dlu_id}-{shelf}-{module}-{port}"
