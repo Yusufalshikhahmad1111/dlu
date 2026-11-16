@@ -132,13 +132,16 @@ class Database:
         self.conn.execute(
             "INSERT OR IGNORE INTO exchanges(exchange_code,lac,city_name,status) VALUES ('ALE1','021','Aleppo','act')"
         )
-        for dlu_id in (10, 50):
+        # The course/reference numbering uses DLU identifiers in multiples of 10.
+        # We expose 10..250 as selectable DLU units; only explicitly backed demo
+        # positions receive cards. The rest remain UNCONFIGURED.
+        for dlu_id in range(10, 251, 10):
             self.conn.execute(
                 "INSERT OR IGNORE INTO dlus(dlu_id,exchange_code,dluc0_state,dluc1_state) VALUES (?,?,?,?)",
                 (dlu_id, "ALE1", "act", "standby"),
             )
 
-        for dlu_id in (10, 50):
+        for dlu_id in range(10, 251, 10):
             for shelf in range(8):
                 for module in range(16):
                     self.conn.execute(
@@ -274,6 +277,28 @@ class Database:
         self.conn.execute(
             "UPDATE alarms SET active=0 WHERE unit_ref=? AND active=1", (unit_ref,)
         )
+
+    def reset_demo(self) -> None:
+        """Reset only seeded/demo state, keeping the hardware dataset."""
+        with self.conn:
+            self.conn.execute("DELETE FROM subscribers")
+            self.conn.execute("DELETE FROM alarms")
+            self.conn.execute("DELETE FROM event_log")
+            self.conn.execute("DELETE FROM command_files")
+            self.conn.execute(
+                "UPDATE dlus SET dluc0_state='act', dluc1_state='standby', is_isolated=0"
+            )
+            self.conn.execute(
+                "UPDATE slots SET ost='act', card_type='UNCONFIGURED'"
+            )
+            self.conn.execute(
+                "UPDATE slots SET card_type='SLMA8' "
+                "WHERE dlu_id=50 AND shelf=1 AND module=5"
+            )
+            self.conn.execute(
+                "UPDATE slots SET card_type='CMRL' "
+                "WHERE dlu_id=10 AND shelf=1 AND module=7"
+            )
 
     def close(self) -> None:
         self.conn.close()
