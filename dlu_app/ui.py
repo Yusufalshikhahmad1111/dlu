@@ -43,22 +43,25 @@ from .theme import THEMES
 from .ui_utils import make_font
 
 
-BG = "#050914"
-PANEL = "#0c1728"
-PANEL2 = "#08111f"
-PANEL3 = "#102033"
-STEEL = "#718aa2"
-TEXT = "#f3f8ff"
-MUTED = "#8fa6bd"
-BORDER = "#28435e"
-GREEN = "#39e6a5"
-YELLOW = "#ffc857"
-RED = "#ff6577"
-BLUE = "#66a8ff"
-CYAN = "#40d9ff"
-VIOLET = "#9b7bff"
-AMBER = "#ffc857"
-WHITE = "#f7fbff"
+_PALETTE = THEMES["ivory"]
+BG = _PALETTE.BG
+PANEL = _PALETTE.PANEL
+PANEL2 = _PALETTE.PANEL2
+PANEL3 = _PALETTE.PANEL3
+STEEL = _PALETTE.STEEL
+TEXT = _PALETTE.TEXT
+MUTED = _PALETTE.MUTED
+BORDER = _PALETTE.BORDER
+GREEN = _PALETTE.GREEN
+YELLOW = _PALETTE.YELLOW
+RED = _PALETTE.RED
+BLUE = _PALETTE.BLUE
+CYAN = _PALETTE.CYAN
+VIOLET = _PALETTE.VIOLET
+AMBER = _PALETTE.AMBER
+WHITE = _PALETTE.WHITE
+CARD = _PALETTE.CARD
+DEEP = _PALETTE.DEEP
 
 
 THEME_NAME = "ivory"
@@ -1224,21 +1227,21 @@ class DluSimulatorWindow(QMainWindow):
         chassis = rounded_path(24, 86, 1060, 790, 18)
         scene.addPath(
             chassis,
-            QPen(QColor("#35516c"), 2.2),
-            QBrush(QColor("#091521")),
+            QPen(QColor("{BORDER}"), 2.2),
+            QBrush(QColor("{DEEP}")),
         )
         # Rack rails.
         self.add_scene_rounded_rect(
             QRectF(36, 102, 12, 754),
             5, 5,
-            QPen(QColor("#304c64")),
-            QBrush(QColor("#13263a")),
+            QPen(QColor("{BORDER}")),
+            QBrush(QColor("{PANEL3}")),
         )
         self.add_scene_rounded_rect(
             QRectF(1060, 102, 12, 754),
             5, 5,
-            QPen(QColor("#304c64")),
-            QBrush(QColor("#13263a")),
+            QPen(QColor("{BORDER}")),
+            QBrush(QColor("{PANEL3}")),
         )
         add_rack_rivets(scene, 54, 98, 1010, 4)
 
@@ -1246,8 +1249,8 @@ class DluSimulatorWindow(QMainWindow):
         plate = rounded_path(62, 108, 360, 78, 10)
         scene.addPath(
             plate,
-            QPen(QColor("#3a5e7c"), 1.4),
-            QBrush(QColor("#0e2132")),
+            QPen(QColor("{BORDER}"), 1.4),
+            QBrush(QColor("{PANEL3}")),
         )
         self.add_text(82, 122, f"DLU {dlu_id} · SYSTEM RACK", 14, TEXT, True)
         self.add_text(82, 148, "SIEMENS EWSD TRAINING CHASSIS", 9, CYAN, True)
@@ -1284,7 +1287,7 @@ class DluSimulatorWindow(QMainWindow):
             shell = rounded_path(x, 126, 64, 44, 6)
             scene.addPath(
                 shell,
-                QPen(QColor("#29455d"), 1),
+                QPen(QColor("{BORDER}"), 1),
                 QBrush(QColor(DEEP)),
             )
             self.add_text(x + 7, 138, name, 7, BLUE if name.startswith("DIUD") else MUTED, True)
@@ -1399,7 +1402,7 @@ class DluSimulatorWindow(QMainWindow):
         backdrop = rounded_path(26, 88, 1100, 430, 18)
         scene.addPath(
             backdrop,
-            QPen(QColor("#29465f"), 1.5),
+            QPen(QColor("{BORDER}"), 1.5),
             QBrush(QColor(DEEP)),
         )
 
@@ -1492,8 +1495,8 @@ class DluSimulatorWindow(QMainWindow):
         rack = rounded_path(24, 88, 1055, 735, 18)
         scene.addPath(
             rack,
-            QPen(QColor("#35516c"), 2.2),
-            QBrush(QColor("#081622")),
+            QPen(QColor("{BORDER}"), 2.2),
+            QBrush(QColor("{DEEP}")),
         )
 
         # Metal top rail + rack depth.
@@ -2326,7 +2329,7 @@ class DluSimulatorWindow(QMainWindow):
         )
         if result.data is not None:
             self.terminal.append(
-                f"<pre style='color:#8fb2cf'>{json.dumps(result.data,ensure_ascii=False,indent=2,default=str)}</pre>"
+                f"<pre style='color:{MUTED}'>{json.dumps(result.data,ensure_ascii=False,indent=2,default=str)}</pre>"
             )
         self.focus_result(result)
 
