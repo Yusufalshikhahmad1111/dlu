@@ -819,8 +819,8 @@ class DluSimulatorWindow(QMainWindow):
             }}
             QFrame#Header {{
                 background:qlineargradient(x1:0,y1:0,x2:1,y2:0,
-                    stop:0 {PANEL}, stop:0.62 {PANEL3}, stop:1 #0d2034);
-                border:1px solid #31516d;
+                    stop:0 {PANEL}, stop:0.62 {PANEL3}, stop:1 {PANEL3});
+                border:1px solid {BORDER};
                 border-radius:12px;
             }}
             QFrame#SYP, QFrame#Navigator, QFrame#ScenarioBar, QFrame#WorkbenchHeader,
@@ -867,9 +867,9 @@ class DluSimulatorWindow(QMainWindow):
                 border-color:{AMBER};
             }}
             QLabel#StatusChip {{
-                background:#092e28;
+                background:{PANEL3};
                 color:{GREEN};
-                border:1px solid #31b989;
+                border:1px solid {GREEN};
                 border-radius:14px;
                 padding:6px 12px;
                 font-weight:900;
