@@ -996,45 +996,99 @@ class DluSimulatorWindow(QMainWindow):
         self.current_view = "home"
         self.clear_scene()
         self.back_btn.setEnabled(False)
-        self.breadcrumb.setText("Hardware Selection")
-        self.add_text(24, 20, "EWSD HARDWARE LAB", 24, TEXT, True)
+        self.breadcrumb.setText("HARDWARE FLEET")
+        self.add_text(30, 18, "EWSD HARDWARE LAB", 26, TEXT, True)
         self.add_text(
-            24, 56,
-            "Select a DLU first, then inspect Shelf → Module → Port.",
+            30, 54,
+            "Choose a DLU chassis, then explore Shelf → Module → Port.",
             12, MUTED
         )
 
-        card_w, card_h = 174, 92
-        cols = 5
-        x0, y0 = 24, 100
+        scene = self.hardware.scene_obj
+        # Subtle space texture.
+        for i in range(38):
+            x = 25 + ((i * 137) % 1060)
+            y = 92 + ((i * 83) % 590)
+            size = 2 + (i % 3)
+            scene.addEllipse(
+                QRectF(x, y, size, size),
+                QPen(QColor("#183249")),
+                QBrush(QColor("#183249")),
+            )
+
+        card_w, card_h = 202, 126
+        cols = 4
+        x0, y0 = 30, 105
         for i, row in enumerate(self.db.list_dlus()):
-            r = i // cols
-            c = i % cols
-            x = x0 + c * (card_w + 14)
-            y = y0 + r * (card_h + 14)
-            state = "ACT" if row["dluc0_state"] == "act" or row["dluc1_state"] == "act" else "DEGRADED"
+            rr = i // cols
+            cc = i % cols
+            x = x0 + cc * (card_w + 18)
+            y = y0 + rr * (card_h + 18)
+            active = row["dluc0_state"] == "act" or row["dluc1_state"] == "act"
+            status = "SYSTEM ACT" if active else "DEGRADED"
+            accent = GREEN if active else YELLOW
+
+            # Visual rack/card shell.
+            shell = rounded_path(x, y, card_w, card_h, 12)
+            scene.addPath(
+                shell,
+                QPen(QColor("#36526d"), 1.8),
+                QBrush(QColor("#0b1a28")),
+            )
+            rail = QPainterPath()
+            rail.addRoundedRect(QRectF(x + 7, y + 9, 8, card_h - 18), 4, 4)
+            scene.addPath(
+                rail,
+                QPen(QColor(accent), 1),
+                QBrush(QColor(accent)),
+            )
+            add_rack_rivets(scene, x + 14, y + 8, card_w - 28, 4)
+
+            # Mini shelves to communicate this is hardware, not a generic card.
+            for shelf in range(4):
+                sy = y + 58 + shelf * 12
+                scene.addRoundedRect(
+                    QRectF(x + 98, sy, 82, 7),
+                    2, 2,
+                    QPen(QColor("#29465e"), 0.8),
+                    QBrush(QColor("#102435")),
+                )
+
             item = ClickableRectItem(
                 QRectF(x, y, card_w, card_h),
                 lambda value: self.show_dlu(value),
                 row["dlu_id"],
                 f"DLU {row['dlu_id']} · DLUC0 {row['dluc0_state']} · DLUC1 {row['dluc1_state']}",
             )
-            item.setBrush(QBrush(QColor("#11222e")))
-            item.setPen(QPen(QColor(GREEN if state == "ACT" else YELLOW), 1.6))
-            self.hardware.scene_obj.addItem(item)
-            self.add_text(x + 12, y + 12, f"DLU {row['dlu_id']}", 16, TEXT, True)
-            self.add_text(x + 12, y + 40, f"DLUC0 {row['dluc0_state'].upper()}", 10, GREEN if row["dluc0_state"] == "act" else YELLOW)
-            self.add_text(x + 12, y + 60, f"DLUC1 {row['dluc1_state'].upper()}", 10, MUTED)
+            item.setBrush(Qt.NoBrush)
+            item.setPen(Qt.NoPen)
+            scene.addItem(item)
+
+            self.add_text(x + 28, y + 18, f"DLU {row['dlu_id']}", 18, TEXT, True)
+            self.add_text(x + 28, y + 44, "DIGITAL LINE UNIT", 9, MUTED, True)
+            scene.addEllipse(
+                QRectF(x + 28, y + 78, 10, 10),
+                QPen(QColor(accent), 1),
+                QBrush(QColor(accent)),
+            )
+            self.add_text(x + 46, y + 72, status, 9, accent, True)
+            self.add_text(
+                x + 28, y + 95,
+                f"DLUC0 {row['dluc0_state'].upper()} · DLUC1 {row['dluc1_state'].upper()}",
+                8, MUTED,
+            )
+
         rows = (25 + cols - 1) // cols
-        self.hardware.scene_obj.setSceneRect(0, 0, 1000, y0 + rows * (card_h + 14) + 40)
+        scene.setSceneRect(0, 0, 930, y0 + rows * (card_h + 18) + 35)
         self.hardware.reset_zoom()
         self._set_details({
-            "Mode":"Physical",
-            "Hardware":"DLU inventory",
-            "DLU count":25,
-            "Range":"10..250",
-            "Hierarchy":"DLU → Shelf → Module → Port",
+            "Mode": "Physical",
+            "Hardware": "DLU fleet",
+            "DLU count": 25,
+            "Range": "10..250",
+            "Hierarchy": "DLU → Shelf → Module → Port",
         })
+
 
     def _sync_location(self, dlu: int, shelf: int | None = None, module: int | None = None):
         self.hardware.current_dlu = dlu
