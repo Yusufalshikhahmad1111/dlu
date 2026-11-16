@@ -518,6 +518,11 @@ class DluSimulatorWindow(QMainWindow):
         self.details.setHorizontalHeaderLabels(["Field", "Value"])
         self.details.horizontalHeader().setStretchLastSection(True)
         info_layout.addWidget(self.details, 1)
+        self.event_log = QTextEdit()
+        self.event_log.setReadOnly(True)
+        self.event_log.setMaximumHeight(150)
+        self.event_log.setObjectName("Terminal")
+        info_layout.addWidget(self.event_log)
 
         buttons = QHBoxLayout()
         for label, handler in (
@@ -1011,6 +1016,7 @@ class DluSimulatorWindow(QMainWindow):
             "EQN Base":f"{dlu_id}-{shelf}-{module}",
             "Source":slot.source_id or "—",
         })
+        self.refresh_event_log()
 
     def draw_port_grid(self,dlu_id,shelf,module,slot,x,y):
         cols = 4 if slot.port_count > 16 else 2
@@ -1099,6 +1105,38 @@ class DluSimulatorWindow(QMainWindow):
             if all(k in item for k in ("dlu","shelf","module")):
                 self.show_module(int(item["dlu"]),int(item["shelf"]),int(item["module"]))
                 return
+
+    def refresh_event_log(self):
+        if not hasattr(self, "event_log"):
+            return
+        if self.current_view != "module":
+            self.event_log.setPlainText("No module selected.")
+            return
+        rows = self.db.conn.execute(
+            """
+            SELECT event_type, old_card, new_card, note, created_at
+            FROM hardware_events
+            WHERE dlu_id=? AND shelf=? AND module=?
+            ORDER BY event_id DESC
+            LIMIT 12
+            """,
+            (
+                self.hardware.current_dlu,
+                self.hardware.current_shelf,
+                self.hardware.current_module,
+            ),
+        ).fetchall()
+        if not rows:
+            self.event_log.setPlainText("Maintenance timeline: no events.")
+            return
+        lines = ["MAINTENANCE TIMELINE"]
+        for row in rows:
+            lines.append(
+                f"{row['created_at']} · {row['event_type']} · "
+                f"{row['old_card'] or '—'} → {row['new_card'] or '—'} · "
+                f"{row['note'] or ''}"
+            )
+        self.event_log.setPlainText("\\n".join(lines))
 
     def execute_input(self):
         command=self.input.text().strip()
@@ -1282,6 +1320,10 @@ class DluSimulatorWindow(QMainWindow):
                 f"> cr sub: dlu={dlu}, type=cmrl, "
                 f"eqn={dlu}-{shelf}-{module}-{i}, lac=021, dn={2250500+i};"
             )
+        self._execute_command(
+            f"> cr sub: dlu={dlu}, type=cmrl, "
+            f"eqn={dlu}-{shelf}-{module}-6, lac=021, dn=2250506;"
+        )
         self.terminal.append(
             "<span style='color:#e3a83b'>CMRL guard demo: next port 6 must be rejected.</span>"
         )
