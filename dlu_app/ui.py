@@ -521,23 +521,29 @@ class DluSimulatorWindow(QMainWindow):
         ll.setContentsMargins(0, 0, 0, 0)
 
         toolbar = QHBoxLayout()
-        self.back_btn = QPushButton("← Back")
+        toolbar.setSpacing(8)
+        self.back_btn = QPushButton("←")
+        self.back_btn.setToolTip("Back to the previous hardware level")
         self.back_btn.clicked.connect(self.go_back)
         toolbar.addWidget(self.back_btn)
+
         self.breadcrumb = QLabel("Hardware Selection")
         self.breadcrumb.setObjectName("Breadcrumb")
-        toolbar.addWidget(self.breadcrumb)
-        toolbar.addStretch()
+        toolbar.addWidget(self.breadcrumb, 1)
 
-        library_btn = QPushButton("Hardware Library")
-        library_btn.clicked.connect(self.open_library)
-        toolbar.addWidget(library_btn)
+        tool_btn = QToolButton()
+        tool_btn.setText("TOOLS")
+        tool_btn.setPopupMode(QToolButton.InstantPopup)
+        tool_menu = QMenu(self)
+        library_action = tool_menu.addAction("Hardware Library")
+        library_action.triggered.connect(self.open_library)
+        reset_action = tool_menu.addAction("Reset Demo")
+        reset_action.triggered.connect(self.reset_demo)
+        tool_btn.setMenu(tool_menu)
+        toolbar.addWidget(tool_btn)
 
-        reset_btn = QPushButton("Reset Demo")
-        reset_btn.clicked.connect(self.reset_demo)
-        toolbar.addWidget(reset_btn)
-
-        fit_btn = QPushButton("Fit")
+        fit_btn = QPushButton("FIT")
+        fit_btn.setToolTip("Fit hardware to view")
         fit_btn.clicked.connect(lambda: self.hardware.reset_zoom())
         toolbar.addWidget(fit_btn)
         ll.addLayout(toolbar)
@@ -545,53 +551,84 @@ class DluSimulatorWindow(QMainWindow):
         navigator = QFrame()
         navigator.setObjectName("Navigator")
         nav = QHBoxLayout(navigator)
-        nav.setContentsMargins(8, 6, 8, 6)
-        nav.addWidget(QLabel("HARDWARE NAVIGATOR"))
-        nav.addWidget(QLabel("DLU"))
+        nav.setContentsMargins(10, 8, 10, 8)
+        nav.setSpacing(7)
+
+        nav_title = QLabel("PATH")
+        nav_title.setObjectName("NavigatorTitle")
+        nav.addWidget(nav_title)
+
         self.nav_dlu_combo = QComboBox()
         for row in self.db.list_dlus():
             self.nav_dlu_combo.addItem(str(row["dlu_id"]))
+        self.nav_dlu_combo.setToolTip("Choose DLU")
+        nav.addWidget(QLabel("DLU"))
         nav.addWidget(self.nav_dlu_combo)
+
         nav.addWidget(QLabel("SHELF"))
         self.nav_shelf_combo = QComboBox()
         self.nav_shelf_combo.addItems([str(i) for i in range(8)])
         nav.addWidget(self.nav_shelf_combo)
+
         nav.addWidget(QLabel("MODULE"))
         self.nav_module_combo = QComboBox()
         nav.addWidget(self.nav_module_combo, 1)
+
+        go_btn = QPushButton("OPEN MODULE")
+        go_btn.clicked.connect(self.open_selected_module)
+        nav.addWidget(go_btn)
+
         self.nav_dlu_combo.currentTextChanged.connect(
             lambda _: self.refresh_nav_modules()
         )
         self.nav_shelf_combo.currentTextChanged.connect(
             lambda _: self.refresh_nav_modules()
         )
-        for label, handler in (
-            ("Open DLU", self.open_selected_dlu),
-            ("Open Shelf", self.open_selected_shelf),
-            ("Open Module", self.open_selected_module),
-        ):
-            button = QPushButton(label)
-            button.clicked.connect(handler)
-            nav.addWidget(button)
+        nav_menu_btn = QToolButton()
+        nav_menu_btn.setText("NAV")
+        nav_menu_btn.setPopupMode(QToolButton.InstantPopup)
+        nav_menu = QMenu(self)
+        nav_dlu_action = nav_menu.addAction("Open DLU")
+        nav_dlu_action.triggered.connect(self.open_selected_dlu)
+        nav_shelf_action = nav_menu.addAction("Open Shelf")
+        nav_shelf_action.triggered.connect(self.open_selected_shelf)
+        nav_module_action = nav_menu.addAction("Open Module")
+        nav_module_action.triggered.connect(self.open_selected_module)
+        nav_menu_btn.setMenu(nav_menu)
+        nav.addWidget(nav_menu_btn)
+
         ll.addWidget(navigator)
         self.refresh_nav_modules()
 
         scenarios = QFrame()
         scenarios.setObjectName("ScenarioBar")
         scenario_layout = QHBoxLayout(scenarios)
-        scenario_layout.setContentsMargins(8, 6, 8, 6)
+        scenario_layout.setContentsMargins(10, 8, 10, 8)
         scenario_layout.setSpacing(8)
-        scenario_layout.addWidget(QLabel("TEACHING SCENARIOS"))
-        for label, handler in (
-            ("8-Line", self.run_8_line),
-            ("CMRL", self.run_cmrl),
-            ("Maintenance", self.run_maintenance_demo),
-            ("Inspect", self.run_inspect),
-        ):
-            button = QPushButton(label)
-            button.setMinimumHeight(32)
-            button.clicked.connect(handler)
-            scenario_layout.addWidget(button)
+
+        scenario_title = QLabel("LAB ACTIONS")
+        scenario_title.setObjectName("ScenarioTitle")
+        scenario_layout.addWidget(scenario_title)
+
+        primary8 = QPushButton("8-LINE LAB")
+        primary8.setObjectName("PrimaryScenario")
+        primary8.clicked.connect(self.run_8_line)
+        primary8.setToolTip("Create eight subscriber lines on an SLMA8")
+        scenario_layout.addWidget(primary8)
+
+        primary_cmrl = QPushButton("CMRL LAB")
+        primary_cmrl.setObjectName("PrimaryScenario")
+        primary_cmrl.clicked.connect(self.run_cmrl)
+        primary_cmrl.setToolTip("Demonstrate the six-port CMRL capacity guard")
+        scenario_layout.addWidget(primary_cmrl)
+
+        maintenance_btn = QPushButton("MAINTENANCE")
+        maintenance_btn.clicked.connect(self.run_maintenance_demo)
+        scenario_layout.addWidget(maintenance_btn)
+
+        inspect_btn = QPushButton("INSPECT")
+        inspect_btn.clicked.connect(self.run_inspect)
+        scenario_layout.addWidget(inspect_btn)
         scenario_layout.addStretch()
         ll.addWidget(scenarios)
 
@@ -611,25 +648,47 @@ class DluSimulatorWindow(QMainWindow):
         right = QTabWidget()
         self.omt_tab = QWidget()
         olt = QVBoxLayout(self.omt_tab)
+        olt.setContentsMargins(10, 10, 10, 10)
+        olt.setSpacing(8)
+
+        omt_header = QFrame()
+        omt_header.setObjectName("WorkbenchHeader")
+        omt_head = QHBoxLayout(omt_header)
+        omt_head.addWidget(QLabel("OMT"))
+        omt_head.addWidget(QLabel("Operations & Maintenance"), 1)
+        omt_head.addWidget(QLabel("LIVE"), 0, Qt.AlignRight)
+        olt.addWidget(omt_header)
+
         self.terminal = QTextEdit()
         self.terminal.setReadOnly(True)
         self.terminal.setObjectName("Terminal")
-        olt.addWidget(QLabel("OMT · Operations & Maintenance Terminal"))
+        self.terminal.setMinimumHeight(180)
         olt.addWidget(self.terminal, 1)
 
-        row = QHBoxLayout()
-        row.addWidget(QLabel(">"))
+        command_dock = QFrame()
+        command_dock.setObjectName("CommandDock")
+        command_layout = QHBoxLayout(command_dock)
+        command_layout.setContentsMargins(10, 8, 10, 8)
+        command_layout.setSpacing(8)
+
+        prompt = QLabel(">")
+        prompt.setObjectName("CommandPrompt")
+        command_layout.addWidget(prompt)
+
         self.input = QLineEdit()
-        self.input.setPlaceholderText("statport: eqn=50-0-15-0;")
+        self.input.setPlaceholderText("Type MML: > statport: eqn=50-0-15-0;")
+        self.input.setMinimumHeight(42)
         self.input.returnPressed.connect(self.execute_input)
         self.input.installEventFilter(self)
-        row.addWidget(self.input, 1)
-        execute_btn = QPushButton("EXECUTE")
-        execute_btn.clicked.connect(self.execute_input)
-        row.addWidget(execute_btn)
-        olt.addLayout(row)
+        command_layout.addWidget(self.input, 1)
 
-        # Teaching scenarios are hosted in the persistent left-side Scenario Bar.
+        execute_btn = QPushButton("SEND")
+        execute_btn.setObjectName("CommandSend")
+        execute_btn.setMinimumHeight(42)
+        execute_btn.clicked.connect(self.execute_input)
+        command_layout.addWidget(execute_btn)
+
+        olt.addWidget(command_dock)
         self.omt_tab.setLayout(olt)
         right.addTab(self.omt_tab, "OMT")
 
