@@ -154,6 +154,20 @@ CommandDispatcher يوجه إلى use-case محدد.
 
 لكن فقط بعد تحقق شرط mbl.
 
+## 9.1 Call Engine integration
+
+Stage 3 adds read/analysis commands for the educational call engine:
+
+    > test call: caller=2233500, number=2233501;
+    > stat call: call=CALL-XXXXXXXXXX;
+    > disp call: call=CALL-XXXXXXXXXX;
+
+TEST CALL is read-only and performs number analysis plus path construction without reserving resources.
+
+STAT CALL and DISP CALL are read-only views of the persisted call session, CPT result, Call Path, and current PDC usage.
+
+These commands do not create an industrial Siemens command set; they expose the simulator's Stage 3 domain state consistently through OMT.
+
 ## 10. Range parsing
 
 المشغل:
