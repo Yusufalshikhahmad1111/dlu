@@ -54,7 +54,7 @@ class VirtualClock:
 
     @staticmethod
     def _to_minutes(value: str) -> int:
-        hours, minutes = map(int, value.split(":"))
+        hours, minutes = map(int, str(value).strip().split(":"))
         return hours * 60 + minutes
 
     @staticmethod
@@ -98,40 +98,44 @@ class CommandFileEngine:
 
     def parse(self, file_name: str, raw_commands: str) -> list[CommandFileCommand]:
         name = self._normalize_name(file_name)
-        text = str(raw_commands or "").replace("\r\n", "\n").strip()
-        if not text:
+        text = str(raw_commands or "").replace("\r\n", "\n").replace("\r", "\n")
+        if not text.strip():
             raise ValueError("Command file is empty")
 
-        lines = [line.strip() for line in text.split("\n")]
-        lines = [line for line in lines if line]
-        if not lines:
+        indexed_lines = [
+            (line_no, line.strip())
+            for line_no, line in enumerate(text.split("\n"), start=1)
+            if line.strip()
+        ]
+        if not indexed_lines:
             raise ValueError("Command file is empty")
 
-        if lines[0].startswith(">") and lines[0].endswith(";"):
-            first_body = lines[0][1:-1].strip()
+        first_no, first_line = indexed_lines[0]
+        if first_line.startswith(">") and first_line.endswith(";"):
+            first_body = first_line[1:-1].strip()
             if re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*", first_body):
-                lines = lines[1:]
+                indexed_lines = indexed_lines[1:]
 
-        if lines and lines[-1].upper() == "> END FILE;":
-            lines = lines[:-1]
-        elif lines and lines[-1].upper() == "> ENDFILE;":
-            lines = lines[:-1]
+        if indexed_lines:
+            last_no, last_line = indexed_lines[-1]
+            if last_line.upper() in {"> END FILE;", "> ENDFILE;"}:
+                indexed_lines = indexed_lines[:-1]
 
-        if not lines:
+        if not indexed_lines:
             raise ValueError(f"Command file {name} contains no executable commands")
 
         commands: list[CommandFileCommand] = []
-        for idx, line in enumerate(lines, start=1):
+        for line_no, line in indexed_lines:
             if not line.startswith(">") or not line.endswith(";"):
                 raise ValueError(
-                    f"Line {idx}: command files require commands starting with '>' and ending with ';'"
+                    f"Line {line_no}: command files require commands starting with '>' and ending with ';'"
                 )
             body = line[1:-1].strip()
             if not body:
-                raise ValueError(f"Line {idx}: empty command")
+                raise ValueError(f"Line {line_no}: empty command")
             if re.match(r"(?i)^execmdfile\s*:", body):
-                raise ValueError(f"Line {idx}: nested EXECMDFILE is not allowed")
-            commands.append(CommandFileCommand(idx, line))
+                raise ValueError(f"Line {line_no}: nested EXECMDFILE is not allowed")
+            commands.append(CommandFileCommand(line_no, line))
         return commands
 
     def _row(self, file_name: str) -> dict | None:
@@ -212,7 +216,7 @@ class CommandFileEngine:
         return result
 
     def schedule(self, file_name: str, scheduled_at: str) -> CommandFile:
-        self.VirtualTime_validate(scheduled_at)
+        self._validate_schedule(scheduled_at)
         name = self._normalize_name(file_name)
         file = self.get(name)
         if not file:
@@ -226,17 +230,21 @@ class CommandFileEngine:
                 SET status='Accepted', scheduled_at=?, executed_log=NULL
                 WHERE file_name=?
                 """,
-                (scheduled_at, name),
+                (scheduled_at.strip(), name),
             )
             self.db.event(
                 "CommandFileScheduled",
                 "command_file",
                 name,
-                json.dumps({"scheduled_at": scheduled_at}),
+                json.dumps({"scheduled_at": scheduled_at.strip()}),
             )
         result = self.get(name)
         assert result is not None
         return result
+
+    @staticmethod
+    def _validate_schedule(value: str) -> None:
+        VirtualClock._validate(value)
 
     @staticmethod
     def VirtualTime_validate(value: str) -> None:
@@ -246,7 +254,13 @@ class CommandFileEngine:
         name = self._normalize_name(file_name)
         file = self.get(name)
         if not file:
-            return CommandFileRun(False, "CMD-FILE-NOT-FOUND", f"Command file {name} not found", name, "Failed")
+            return CommandFileRun(
+                False,
+                "CMD-FILE-NOT-FOUND",
+                f"Command file {name} not found",
+                name,
+                "Failed",
+            )
         try:
             commands = self.parse(name, file.raw_commands)
         except ValueError as exc:
@@ -286,7 +300,11 @@ class CommandFileEngine:
 
         with self.db.conn:
             self.db.conn.execute(
-                "UPDATE command_files SET status='Finished', executed_log=? WHERE file_name=?",
+                """
+                UPDATE command_files
+                SET status='Finished', executed_log=?, scheduled_at=NULL
+                WHERE file_name=?
+                """,
                 (json.dumps(log, ensure_ascii=False), name),
             )
             self.db.event(
@@ -321,8 +339,18 @@ class CommandFileEngine:
     def _fail(self, name: str, reason: str) -> CommandFileRun:
         with self.db.conn:
             self.db.conn.execute(
-                "UPDATE command_files SET status='Failed', executed_log=? WHERE file_name=?",
-                (json.dumps([{"ok": False, "code": "CMD-FILE-ERROR", "message": reason}]), name),
+                """
+                UPDATE command_files
+                SET status='Failed', scheduled_at=NULL, executed_log=?
+                WHERE file_name=?
+                """,
+                (
+                    json.dumps(
+                        [{"ok": False, "code": "CMD-FILE-ERROR", "message": reason}],
+                        ensure_ascii=False,
+                    ),
+                    name,
+                ),
             )
             self.db.event(
                 "CommandFileFailed",
@@ -330,23 +358,40 @@ class CommandFileEngine:
                 name,
                 json.dumps({"status": "Failed", "reason": reason}),
             )
-        return CommandFileRun(False, "CMD-FILE-ERROR", reason, name, "Failed", 0, 1)
+        return CommandFileRun(
+            False,
+            "CMD-FILE-ERROR",
+            reason,
+            name,
+            "Failed",
+            0,
+            1,
+        )
 
-    def due_files(self) -> list[CommandFile]:
+    def due_files(self, previous_minutes: int | None = None) -> list[CommandFile]:
         current_minutes = self.clock.minutes
         due: list[CommandFile] = []
         for file in self.list_files():
             if not file.scheduled_at or file.status != "Accepted":
                 continue
-            minutes = VirtualClock._to_minutes(file.scheduled_at)
-            if minutes <= current_minutes:
+            scheduled = VirtualClock._to_minutes(file.scheduled_at)
+            if previous_minutes is None:
+                is_due = scheduled <= current_minutes
+            elif previous_minutes == current_minutes:
+                is_due = False
+            elif previous_minutes < current_minutes:
+                is_due = previous_minutes < scheduled <= current_minutes
+            else:
+                is_due = scheduled > previous_minutes or scheduled <= current_minutes
+            if is_due:
                 due.append(file)
         return due
 
     def advance(self, minutes: int) -> list[CommandFileRun]:
+        previous_minutes = self.clock.minutes
         self.clock.advance(minutes)
         results: list[CommandFileRun] = []
-        for file in self.due_files():
+        for file in self.due_files(previous_minutes):
             results.append(self.execute(file.file_name))
         return results
 
