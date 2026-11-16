@@ -62,7 +62,7 @@ class MmlEngine:
         if not match:
             # STATPORT: and similar single-token objects.
             compact = re.match(
-                r"^(?P<verb>STATPORT|DISPDLUPORT|TESTDLULC)\s*:\s*(?P<params>.*)$",
+                r"^(?P<verb>STATPORT|DISPDLUPORT|DISPDLUPPORT|TESTDLULC)\s*:\s*(?P<params>.*)$",
                 body,
                 flags=re.I,
             )
@@ -87,7 +87,7 @@ class MmlEngine:
                 return self._disp_dlu(params)
             if verb == "DISP" and obj in {"DLUMOD", "MODULE"}:
                 return self._disp_module(params)
-            if verb == "DISP" and obj in {"DLUPORT", "PORT"}:
+            if verb == "DISP" and obj in {"DLUPORT", "DLUPPORT", "PORT"}:
                 return self._disp_port(params)
             if verb == "DISP" and obj == "SLOT":
                 return self._disp_module(params)
