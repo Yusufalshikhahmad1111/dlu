@@ -115,6 +115,17 @@ def test_pdc_exhaustion_does_not_create_connected_call():
     try:
         caller, _called = engine.prepare_demo_subscribers()
         with db.conn:
+            engine.repo.create_call(
+                "CALL-RESERVE",
+                caller,
+                "021",
+                "0522233500",
+                None,
+                "NATIONAL",
+                "SETUP",
+                None,
+                None,
+            )
             engine.repo.reserve("CALL-RESERVE", "PDC-VOICE", 120)
         result = engine.start_call(caller, "0522233500")
         assert not result.ok
