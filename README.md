@@ -2,53 +2,76 @@
 
 محاكي تعليمي محلي لمقسم Siemens EWSD ووحدة الخطوط الرقمية DLU، مخصص لمقرر مبادئ الاتصالات على Windows 11.
 
-> هذا المستودع يبدأ من الصفر. هذه المرحلة تثبت التصميم الهندسي قبل إدخال كود التنفيذ، حتى تبقى قاعدة البيانات، مفسر MML، الواجهة البصرية، ومسار المكالمات مبنية على نموذج واحد متماسك.
+> القاعدة الأساسية: لا نخترع شكلًا أو سعة أو ترقيمًا للعتاد. الرسم مبسط، لكن DLU/Shelf/Module/Port/EQN/Card Capacity مبنية على المراجع المعتمدة.
 
-## القرار التقني
+## التقنية المعتمدة
 
-**React + TypeScript + Tauri 2 + SQLite**
+**Python 3 + PySide6 + SQLite**
 
-- React + TypeScript: بناء واجهة DLU/Shelf/Slot/Port التفاعلية، OMT، SYP، والمختبرات.
-- Tauri 2: غلاف سطح مكتب Windows مع إخراج MSI وNSIS setup executable.
-- SQLite: الحالة المحلية الكاملة للمقسم.
-- TypeScript Domain Core: قواعد العنونة، MML parser/FSM، CPT، المكالمات، والإنذارات تبقى مستقلة عن React.
-- Rust داخل Tauri يظل طبقة منصة/تكامل فقط، وليس مكان منطق المقسم.
+- PySide6: واجهة Windows ورسوم DLU التفاعلية.
+- SQLite: الحالة المحلية للمقسم.
+- Python Domain Core: MML parser/FSM، EQN، card capacities، CPT، call paths، alarms.
+- NumPy/Matplotlib: لاحقًا لمختبر الإشارات.
+- pyside6-deploy: إخراج Windows executable.
 
-Tauri يدعم إنشاء مثبتات Windows بصيغة MSI أو setup.exe، ويوفر إضافة SQL تدعم SQLite، وهذا مناسب لطبيعة التطبيق المحلي المطلوب. راجع docs/01-ARCHITECTURE.md.
+توصي Qt حاليًا باستخدام pyside6-deploy لتوزيع تطبيقات PySide6، مع standalone أو onefile على Windows. citeturn152249search0turn152249search2
 
-## المبدأ الأهم
+## النموذج الذي يجب أن يراه الطالب
 
-**Database → Switch Core → View**
+**DLU → Shelf → Module → Port → Subscriber**
 
-لا يجوز للواجهة أن تمتلك حالة DLU مستقلة عن قاعدة البيانات. أي أمر MML يغير حالة المقسم يمر عبر نواة المقسم، ثم تُحدّث SQLite، ثم تعكس الواجهة الحالة الجديدة.
+مثال:
 
-## النطاق الأكاديمي
+DLU 50  
+Shelf 1  
+Module 5  
+SLMA8  
+Port 0..7
 
-يشمل المشروع تدريجيًا:
+ومثال ربط:
 
-1. DLU / Side 0 / Side 1 / DLUC0 / DLUC1.
-2. Shelves 0–7 وSlots 0–15.
-3. SLMA وSLMA CMRL وSLMD وبطاقات التحكم والتغذية.
-4. EQN ↔ DN مع التحقق من السعات.
-5. CPT وخطة الترقيم السورية SNNP.
-6. MML وCommand Files وFSM.
-7. SYP والإنذارات وحالة الصيانة.
-8. مسارات المكالمات المحلية/القطرية/الدولية والحظر.
-9. مختبر OSI/TCP/UDP.
-10. مختبر AM/FM/PM/PAM/PWM/PPM/PCM وASK/FSK/PSK/QPSK/QAM.
+50-1-5-0 → DN 2233500
+
+ترقيم Shelf/Module وصيغة EQN مأخوذة من مراجع EWSD التي تمت مراجعتها. citeturn608198search0turn608198search1
+
+## بطاقات المشتركين
+
+- SLMA8: Ports 0..7.
+- SLMA16: Ports 0..15.
+- الأنواع الأخرى لا تُفترض لها سعة موحدة؛ السعة تأتي من نوع البطاقة ومرجعها.
+
+لذلك لا يوجد hard-coded rule يقول إن كل Module فيه 8 مستخدمين.
+
+## المبدأ المعماري
+
+**Database → Domain Core → View**
+
+أي أمر:
+MML / Scenario / Maintenance
+→ validation
+→ SQLite
+→ event
+→ UI
+
+ولا توجد حالة مستقلة داخل الواجهة.
 
 ## وثائق المشروع
 
-- docs/00-PROJECT-CHARTER.md — الرؤية، الحدود، ومبادئ النجاح.
-- docs/01-ARCHITECTURE.md — المعمارية والـ stack وحدود كل طبقة.
-- docs/02-DATABASE-SPEC.md — نموذج SQLite والقيود.
-- docs/03-MML-SPEC.md — Lexer/Parser/FSM وقواعد الأوامر.
-- docs/04-UI-UX-WIREFRAME.md — توزيع الشاشة وتجربة الاستخدام.
-- docs/05-MILESTONES.md — مراحل التنفيذ والـ Definition of Done.
-- docs/06-ACADEMIC-TEST-CASES.md — سيناريوهات الاختبار الأساسية أمام الدكتور.
+- docs/00-PROJECT-CHARTER.md
+- docs/01-ARCHITECTURE.md
+- docs/02-DATABASE-SPEC.md
+- docs/03-MML-SPEC.md
+- docs/04-UI-UX-WIREFRAME.md
+- docs/05-MILESTONES.md
+- docs/06-ACADEMIC-TEST-CASES.md
+- docs/07-STAGE-01-IMPLEMENTATION.md
+- docs/08-HARDWARE-REFERENCE-BASIS.md
 
 ## الحالة
 
-**Stage 0 — Foundation & Specification**
+**Stage 0 — Foundation & Specification: مكتملة**
 
-المرحلة التالية بعد تثبيت هذه الوثائق هي تنفيذ SQLite schema + seed data + MML domain core واختبارها آليًا قبل بناء الواجهة.
+الخطوة التنفيذية التالية هي Stage 1:
+**Hardware Dataset + SQLite + Seed + tests**
+
+وبعد إثبات صحة النموذج نبدأ MML Core، ثم واجهة DLU.
