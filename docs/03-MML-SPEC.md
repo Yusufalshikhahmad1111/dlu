@@ -199,6 +199,28 @@ Accepted → Started → Finished → Executed
 
 مع Failed إذا تعذر تنفيذ أمر داخلي.
 
+## 11.1 Stage 4 execution lifecycle
+
+Command files are persisted in the existing command_files table.
+
+Lifecycle:
+
+Accepted → Started → Finished → Executed
+
+Any internal MML failure produces:
+
+Accepted → Started → Finished → Failed
+
+The execution log stores:
+- line number.
+- raw command.
+- result code.
+- success/failure.
+- message.
+- state changes.
+
+Scheduling uses a deterministic virtual clock. The simulator does not wait in real time; scheduled files execute when the virtual clock reaches or passes the scheduled HH:MM value.
+
 ## 12. FSM
 
 FSM الأولى صغيرة ومقيدة.
