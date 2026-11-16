@@ -2,38 +2,43 @@
 
 ## Stage 0 — Foundation & Specification
 
-**الحالة: مكتملة في هذه الخطوة**
+**الحالة: مكتملة**
 
-المخرجات:
-- tech decision.
-- architecture.
-- database specification.
+ثبتنا:
+- Python + PySide6 + SQLite.
+- المعمارية.
+- قاعدة عدم اختراع العتاد.
+- Hardware Reference Basis.
+- Database specification.
 - MML specification.
 - UI wireframe.
-- academic tests.
+- Academic tests.
 
-Definition of Done:
-- لا يوجد قرار معماري أساسي غامض.
-- يمكن بدء البرمجة دون تغيير نموذج البيانات كل يوم.
-
-## Stage 1 — SQLite + Seed Dataset
+## Stage 1 — Hardware Dataset + SQLite
 
 المخرجات:
-- Tauri + React project.
-- SQLite connection.
-- migrations/schema.
-- repositories.
+- Python/PySide6 project skeleton.
+- SQLite schema/migrations.
+- hardware dataset.
 - ALE1.
 - DLU 10 / 50.
-- shelves/slots/cards.
+- shelves 0..7.
+- module positions 0..15 حيث يدعمها المرجع.
+- card types مع capacity صريحة.
+- subscriber seed.
 - CPT seed.
 - event log.
 
-Tests:
+اختبارات:
 - EQN uniqueness.
+- shelf/module range.
 - card capacity.
+- port range.
+- DN uniqueness.
 - seed integrity.
 - transaction rollback.
+
+**ممنوع في هذه المرحلة:** رسم DLU النهائي قبل إثبات صحة dataset.
 
 ## Stage 2 — MML Core
 
@@ -46,54 +51,50 @@ Tests:
 - cr/can/mod/disp/stat/test/conf/diag.
 
 Definition of Done:
-- السيناريوهات الأساسية الأربعة تعمل عبر tests بدون UI.
+السيناريوهات الأكاديمية الأساسية تعمل بدون UI.
 
 ## Stage 3 — DLU Visualizer
 
 المخرجات:
 - DLU overview.
-- Side 0/1.
-- Shelf 0–7.
-- Slot 0–15.
-- card rendering.
-- port LEDs.
+- Shelf view.
+- Module/Card view.
+- Port 0..N حسب card type.
+- subscriber ↔ EQN view.
+- LEDs/state indicators.
 - click drill-down.
 
 Definition of Done:
-- أي تغيير في DB يظهر في الواجهة دون refresh كامل.
+الطالب يرى العلاقة DLU → Shelf → Module → Port → DN بوضوح.
 
 ## Stage 4 — OMT + SYP
 
-المخرجات:
 - terminal.
 - raw/structured output.
 - command history.
 - macros.
 - alarms.
-- traffic counter.
+- traffic indicators.
 
 ## Stage 5 — Hardware Operations
 
-المخرجات:
 - mbl/act.
-- DLUC failover.
+- DLUC behavior.
 - diag guards.
 - card replacement.
 - maintenance workflow.
 
 ## Stage 6 — Call Engine + CPT
 
-المخرجات:
 - local route.
 - national route.
 - international route.
 - blocked route.
-- 120-channel traffic indicator.
-- call animation.
+- channel usage.
+- call path animation.
 
 ## Stage 7 — Command Files
 
-المخرجات:
 - file parser.
 - scheduling.
 - virtual clock.
@@ -102,45 +103,40 @@ Definition of Done:
 
 ## Stage 8 — Communications Labs
 
-المخرجات:
-- OSI encapsulation.
-- TCP three-way handshake.
-- UDP comparison.
+- OSI.
+- TCP/UDP.
 - AM/FM/PM.
 - PAM/PWM/PPM/PCM.
 - ASK/FSK/PSK/QPSK/QAM.
 - constellation/BER basics.
 
-## Stage 9 — Scenarios & Teaching UX
+## Stage 9 — Teaching Scenarios
 
-Macros جاهزة:
 1. Aleppo 8-line expansion.
-2. CMRL six-port limit.
+2. CMRL capacity limit.
 3. DLU/card maintenance.
 4. Billing block.
 5. International blacklist.
 6. Command file overnight run.
 
-كل macro:
-- preview commands.
-- execute.
-- show affected objects.
-- show result summary.
+كل Scenario يعرض:
+- commands.
+- affected EQN.
+- expected result.
+- actual result.
+- PASS/FAIL.
 
 ## Stage 10 — Packaging & Final Audit
 
-المخرجات:
-- Windows installer.
-- portable/demo build if useful.
-- seed reset.
-- backup/import.
+- Windows executable.
+- optional installer.
+- reset/backup/restore.
 - screenshots.
 - user manual.
-- final test report.
+- final academic test report.
 
 ## قاعدة التنفيذ
 
-كل Stage لها:
 Implement → Tests → Manual Demo → Fix → Report → Commit
 
-ولا نبدأ Stage التالي قبل أن يكون الحالي قابلًا للعرض.
+ولا ننتقل للمرحلة التالية قبل إثبات السابقة.
