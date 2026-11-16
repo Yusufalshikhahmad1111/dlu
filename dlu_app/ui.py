@@ -992,6 +992,18 @@ class DluSimulatorWindow(QMainWindow):
         item.setPos(x, y)
         return item
 
+    def add_scene_rounded_rect(
+        self,
+        rect: QRectF,
+        x_radius: float,
+        y_radius: float,
+        pen: QPen,
+        brush: QBrush,
+    ):
+        path = QPainterPath()
+        path.addRoundedRect(rect, x_radius, y_radius)
+        return self.hardware.scene_obj.addPath(path, pen, brush)
+
     def show_hardware_home(self):
         self.current_view = "home"
         self.clear_scene()
@@ -1047,7 +1059,7 @@ class DluSimulatorWindow(QMainWindow):
             # Mini shelves to communicate this is hardware, not a generic card.
             for shelf in range(4):
                 sy = y + 58 + shelf * 12
-                scene.addRoundedRect(
+                self.add_scene_rounded_rect(
                     QRectF(x + 98, sy, 82, 7),
                     2, 2,
                     QPen(QColor("#29465e"), 0.8),
@@ -1161,13 +1173,13 @@ class DluSimulatorWindow(QMainWindow):
             QBrush(QColor("#091521")),
         )
         # Rack rails.
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(36, 102, 12, 754),
             5, 5,
             QPen(QColor("#304c64")),
             QBrush(QColor("#13263a")),
         )
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(1060, 102, 12, 754),
             5, 5,
             QPen(QColor("#304c64")),
@@ -1255,7 +1267,7 @@ class DluSimulatorWindow(QMainWindow):
             QPen(QColor("#314e67"), 1.2),
             QBrush(QColor("#0c1b29")),
         )
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(x + 80, y + 8, 7, 46),
             3, 3,
             QPen(QColor(label_color)),
@@ -1373,7 +1385,7 @@ class DluSimulatorWindow(QMainWindow):
         )
 
         # Metal top rail + rack depth.
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(42, 108, 1018, 44),
             8, 8,
             QPen(QColor("#2c4962"), 1.2),
@@ -1417,7 +1429,7 @@ class DluSimulatorWindow(QMainWindow):
             QPen(QColor(accent), 1.5),
             QBrush(QColor(body_fill)),
         )
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(x + 7, y + 7, w - 14, 26),
             5, 5,
             QPen(QColor("#29465e"), 0.8),
@@ -1459,7 +1471,7 @@ class DluSimulatorWindow(QMainWindow):
                 slot["dlu_id"], slot["shelf"], slot["module"], port
             )
             color = state_color(sub["line_state"]) if sub else STEEL
-            scene.addRoundedRect(
+            self.add_scene_rounded_rect(
                 QRectF(px, py, 16, 11),
                 3, 3,
                 QPen(QColor("#35516d"), 0.8),
@@ -1526,7 +1538,7 @@ class DluSimulatorWindow(QMainWindow):
             QPen(QColor(accent), 2.2),
             QBrush(QColor(face_fill)),
         )
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(card_x + 16, card_y + 16, card_w - 32, 68),
             9, 9,
             QPen(QColor("#345672"), 1),
@@ -1571,7 +1583,7 @@ class DluSimulatorWindow(QMainWindow):
                 QPen(QColor("#1d3b52"), 1),
             )
 
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(card_x + 24, card_y + 145, 128, 48),
             6, 6,
             QPen(QColor("#28445d"), 1),
@@ -1584,7 +1596,7 @@ class DluSimulatorWindow(QMainWindow):
             10, RED if fault else GREEN, True
         )
 
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(card_x + 170, card_y + 145, 140, 48),
             6, 6,
             QPen(QColor("#28445d"), 1),
@@ -1597,7 +1609,7 @@ class DluSimulatorWindow(QMainWindow):
             9, CYAN, True
         )
 
-        scene.addRoundedRect(
+        self.add_scene_rounded_rect(
             QRectF(card_x + 330, card_y + 145, 150, 48),
             6, 6,
             QPen(QColor("#28445d"), 1),
@@ -1730,7 +1742,7 @@ class DluSimulatorWindow(QMainWindow):
             )
 
             # Connector slot.
-            scene.addRoundedRect(
+            self.add_scene_rounded_rect(
                 QRectF(px + 10, py + 13, 34, 36),
                 6, 6,
                 QPen(QColor("#3b5d76"), 1),
