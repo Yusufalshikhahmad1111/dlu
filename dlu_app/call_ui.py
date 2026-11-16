@@ -198,12 +198,7 @@ class CallLabWidget(QWidget):
     def refresh_subscribers(self):
         current = self.caller_combo.currentData()
         self.caller_combo.clear()
-        rows = self.engine.db.conn.execute(
-            """
-            SELECT * FROM subscribers
-            ORDER BY lac, CAST(dn AS INTEGER)
-            """
-        ).fetchall()
+        rows = self.engine.list_subscribers()
 
         for row in rows:
             eqn = f"{row['dlu_id']}-{row['shelf']}-{row['module']}-{row['port']}"
