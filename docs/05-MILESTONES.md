@@ -14,7 +14,9 @@
 - UI wireframe.
 - Academic tests.
 
-## Stage 1 — Hardware Dataset + SQLite
+## Stage 1 — Hardware Dataset + SQLite + First Runnable GUI
+
+**الحالة: Prototype runnable implemented**
 
 المخرجات:
 - Python/PySide6 project skeleton.
@@ -28,6 +30,8 @@
 - subscriber seed.
 - CPT seed.
 - event log.
+
+المنفذ حاليًا: قاعدة البيانات + نواة MML الأساسية + أول واجهة DLU/OMT قابلة للتشغيل.
 
 اختبارات:
 - EQN uniqueness.
