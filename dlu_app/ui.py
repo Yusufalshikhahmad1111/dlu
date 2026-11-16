@@ -1805,33 +1805,45 @@ class DluSimulatorWindow(QMainWindow):
         self.refresh_event_log()
 
 
-    def draw_port_grid(self,dlu_id,shelf,module,slot,x,y):
-        if slot.port_count >= 64:
-            cols = 4
-            cell_w = 116
-        elif slot.port_count >= 32:
-            cols = 4
-            cell_w = 118
-        elif slot.port_count > 16:
-            cols = 4
-            cell_w = 118
-        else:
-            cols = 2
-            cell_w = 218
-
-        cell_h = 62
-        rows = (slot.port_count + cols - 1) // cols
+    def draw_port_grid(self, dlu_id, shelf, module, slot, x, y):
         scene = self.hardware.scene_obj
+        capacity = int(slot.port_count or 0)
 
+        if capacity >= 48:
+            cols, cell_w = 4, 116
+        elif capacity > 16:
+            cols, cell_w = 4, 118
+        elif capacity >= 8:
+            cols, cell_w = 4, 108
+        else:
+            cols, cell_w = 3, 145
+
+        cell_h = 70
+        rows = (capacity + cols - 1) // cols
+
+        # A visible connector bank makes small cards such as CMRL readable at a glance.
+        bank_w = max(430, cols * cell_w + 10)
+        bank_h = max(120, rows * (cell_h + 10) + 58)
+        bank = rounded_path(x, y, bank_w, bank_h, 12)
+        scene.addPath(
+            bank,
+            QPen(QColor(BORDER), 1.2),
+            QBrush(QColor(PANEL2)),
+        )
         self.add_text(
-            x, y - 28,
-            f"PORT BANK · {slot.port_count} CHANNELS",
-            9, CYAN, True
+            x + 18, y + 12,
+            f"PORT BANK · {capacity} CHANNELS",
+            10, CYAN, True
+        )
+        self.add_text(
+            x + bank_w - 98, y + 12,
+            f"{capacity}P",
+            10, AMBER, True
         )
 
-        for port in range(slot.port_count):
-            px = x + (port % cols) * cell_w
-            py = y + (port // cols) * (cell_h + 9)
+        for port in range(capacity):
+            px = x + 12 + (port % cols) * cell_w
+            py = y + 42 + (port // cols) * (cell_h + 10)
 
             sub = self.db.get_port_subscriber(
                 dlu_id, shelf, module, port
@@ -1848,55 +1860,44 @@ class DluSimulatorWindow(QMainWindow):
                     color = YELLOW
                     state_label = "BLOCKED"
 
-            socket = rounded_path(px, py, cell_w - 8, cell_h, 8)
+            socket = rounded_path(px, py, cell_w - 10, cell_h, 9)
             scene.addPath(
                 socket,
-                QPen(QColor("#29475f"), 1),
+                QPen(QColor(BORDER), 1),
                 QBrush(QColor(DEEP)),
             )
 
-            # Connector slot.
-            self.add_scene_rounded_rect(
-                QRectF(px + 10, py + 13, 34, 36),
-                6, 6,
-                QPen(QColor("#3b5d76"), 1),
-                QBrush(QColor(DEEP)),
+            connector = rounded_path(px + 10, py + 15, 38, 40, 7)
+            scene.addPath(
+                connector,
+                QPen(QColor(STEEL), 1),
+                QBrush(QColor(BG)),
             )
+
             for pin in range(3):
                 scene.addEllipse(
-                    QRectF(px + 18 + pin * 8, py + 19, 5, 5),
+                    QRectF(px + 18 + pin * 9, py + 22, 5, 5),
                     QPen(QColor(color)),
                     QBrush(QColor(color)),
                 )
+
             scene.addEllipse(
-                QRectF(px + cell_w - 29, py + 12, 8, 8),
+                QRectF(px + cell_w - 30, py + 12, 9, 9),
                 QPen(QColor(color)),
                 QBrush(QColor(color)),
             )
 
+            self.add_text(px + 58, py + 9, f"PORT {port}", 9, TEXT, True)
+            self.add_text(px + 58, py + 29, label, 9, color, True)
+            self.add_text(px + 58, py + 48, state_label, 7, color, True)
             self.add_text(
-                px + 54, py + 9,
-                f"PORT {port}",
-                8, TEXT, True
-            )
-            self.add_text(
-                px + 54, py + 26,
-                label,
-                9, color, True
-            )
-            self.add_text(
-                px + 54, py + 43,
-                state_label,
-                7, color, True
-            )
-            self.add_text(
-                px + cell_w - 76, py + 44,
+                px + cell_w - 78, py + 49,
                 f"{dlu_id}-{shelf}-{module}-{port}",
                 6, MUTED
             )
 
             item = ClickableRectItem(
-                QRectF(px, py, cell_w - 8, cell_h),
+                QRectF(px, py, cell_w - 10, cell_h),
                 lambda data: self.select_port(*data),
                 (dlu_id, shelf, module, port),
                 f"EQN {dlu_id}-{shelf}-{module}-{port}",
@@ -1905,8 +1906,6 @@ class DluSimulatorWindow(QMainWindow):
             item.setBrush(Qt.NoBrush)
             item.setPen(Qt.NoPen)
             scene.addItem(item)
-
-
 
     def port_context(self, dlu_id,shelf,module,port):
         eqn = f"{dlu_id}-{shelf}-{module}-{port}"
