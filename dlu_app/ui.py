@@ -7,7 +7,10 @@ from PySide6.QtCore import QEvent, QRectF, Qt
 from PySide6.QtGui import QColor, QBrush, QFont, QPainter, QPen
 from PySide6.QtWidgets import (
     QComboBox,
+    QDialog,
+    QDialogButtonBox,
     QFrame,
+    QFormLayout,
     QGraphicsItem,
     QGraphicsRectItem,
     QGraphicsScene,
@@ -83,6 +86,97 @@ class HardwareView(QGraphicsView):
         self.fitInView(rect, Qt.KeepAspectRatio)
 
 
+
+
+class HardwareSelectorDialog(QDialog):
+    """Teaching-oriented DLU -> Shelf -> Module selector."""
+
+    def __init__(self, db: Database, parent=None, card_type: str | None = None):
+        super().__init__(parent)
+        self.db = db
+        self.card_type = card_type
+        self.selected: tuple[int, int, int] | None = None
+        title = "Select Hardware"
+        if card_type:
+            title += f" · {card_type}"
+        self.setWindowTitle(title)
+        self.setModal(True)
+        self.resize(430, 260)
+
+        layout = QVBoxLayout(self)
+        heading = QLabel(
+            "Select DLU, Shelf and Module"
+            if not card_type
+            else f"Select a {card_type} module"
+        )
+        heading.setObjectName("SectionTitle")
+        layout.addWidget(heading)
+
+        form = QFormLayout()
+        self.dlu_combo = QComboBox()
+        self.shelf_combo = QComboBox()
+        self.module_combo = QComboBox()
+        form.addRow("DLU", self.dlu_combo)
+        form.addRow("Shelf", self.shelf_combo)
+        form.addRow("Module", self.module_combo)
+        layout.addLayout(form)
+
+        hint = QLabel(
+            "Module choices update with the selected Shelf."
+            if not card_type
+            else "Only modules containing this card type are listed."
+        )
+        hint.setObjectName("Legend")
+        layout.addWidget(hint)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+        for row in self.db.list_dlus():
+            self.dlu_combo.addItem(str(row["dlu_id"]))
+        self.shelf_combo.addItems([str(i) for i in range(8)])
+
+        self.dlu_combo.currentTextChanged.connect(self._refresh_modules)
+        self.shelf_combo.currentTextChanged.connect(self._refresh_modules)
+        self._refresh_modules()
+
+    def _refresh_modules(self):
+        if not self.dlu_combo.currentText() or not self.shelf_combo.currentText():
+            return
+        dlu = int(self.dlu_combo.currentText())
+        shelf = int(self.shelf_combo.currentText())
+        current = self.module_combo.currentData()
+
+        self.module_combo.blockSignals(True)
+        self.module_combo.clear()
+        for row in self.db.list_shelf(dlu, shelf):
+            if self.card_type and row["card_type"] != self.card_type:
+                continue
+            label = f"{row['module']} · {row['card_type']} · {row['port_count']}P"
+            self.module_combo.addItem(label, row["module"])
+        if current is not None:
+            for i in range(self.module_combo.count()):
+                if self.module_combo.itemData(i) == current:
+                    self.module_combo.setCurrentIndex(i)
+                    break
+        self.module_combo.blockSignals(False)
+
+    def accept(self):
+        module = self.module_combo.currentData()
+        if module is None:
+            return
+        self.selected = (
+            int(self.dlu_combo.currentText()),
+            int(self.shelf_combo.currentText()),
+            int(module),
+        )
+        super().accept()
+
+
 class DluSimulatorWindow(QMainWindow):
     def __init__(self, db_path: str | Path):
         super().__init__()
@@ -98,7 +192,7 @@ class DluSimulatorWindow(QMainWindow):
 
         self._build_ui()
         self._apply_style()
-        self.show_dlu(50)
+        self.show_hardware_home()
         self.refresh_status()
         self.terminal.append(
             "<span style='color:#7f95a8'>DLU Lab ready. "
@@ -194,6 +288,54 @@ class DluSimulatorWindow(QMainWindow):
 
         left_layout.addLayout(toolbar)
 
+
+        nav = QFrame()
+        nav.setObjectName("Navigator")
+        nav_layout = QHBoxLayout(nav)
+        nav_layout.setContentsMargins(8, 6, 8, 6)
+
+        nav_title = QLabel("HARDWARE NAVIGATOR")
+        nav_title.setObjectName("SectionTitle")
+        nav_layout.addWidget(nav_title)
+
+        nav_layout.addWidget(QLabel("DLU"))
+        self.nav_dlu_combo = QComboBox()
+        for row in self.db.list_dlus():
+            self.nav_dlu_combo.addItem(str(row["dlu_id"]))
+        nav_layout.addWidget(self.nav_dlu_combo)
+
+        nav_layout.addWidget(QLabel("SHELF"))
+        self.nav_shelf_combo = QComboBox()
+        self.nav_shelf_combo.addItems([str(i) for i in range(8)])
+        nav_layout.addWidget(self.nav_shelf_combo)
+
+        nav_layout.addWidget(QLabel("MODULE"))
+        self.nav_module_combo = QComboBox()
+        nav_layout.addWidget(self.nav_module_combo, 1)
+
+        self.nav_dlu_combo.currentTextChanged.connect(
+            lambda _: self._refresh_nav_modules()
+        )
+        self.nav_shelf_combo.currentTextChanged.connect(
+            lambda _: self._refresh_nav_modules()
+        )
+
+        open_dlu = QPushButton("Open DLU")
+        open_dlu.clicked.connect(self.open_selected_dlu)
+        nav_layout.addWidget(open_dlu)
+
+        open_shelf = QPushButton("Open Shelf")
+        open_shelf.clicked.connect(self.open_selected_shelf)
+        nav_layout.addWidget(open_shelf)
+
+        open_module = QPushButton("Open Module")
+        open_module.clicked.connect(self.open_selected_module)
+        nav_layout.addWidget(open_module)
+
+        left_layout.addWidget(nav)
+        self._refresh_nav_modules()
+
+
         self.hardware = HardwareView()
         left_layout.addWidget(self.hardware, 1)
 
@@ -246,23 +388,8 @@ class DluSimulatorWindow(QMainWindow):
 
         macros = QHBoxLayout()
         macro_defs = [
-            (
-                "8-Line",
-                [
-                    f"> cr sub: dn={2233500 + i}, eqn=50-1-5-{i}, "
-                    "lac=021, class=ms, c/s=PB;"
-                    for i in range(8)
-                ],
-            ),
-            (
-                "CMRL",
-                [
-                    "> cr sub: dn=2250500, eqn=10-1-7-0, "
-                    "lac=021, class=cmrl, c/s=PB;",
-                    "> cr sub: dn=2250506, eqn=10-1-7-6, "
-                    "lac=021, class=cmrl, c/s=PB;",
-                ],
-            ),
+            ("8-Line", None),
+            ("CMRL", None),
             (
                 "Diag Guard",
                 [
@@ -283,7 +410,7 @@ class DluSimulatorWindow(QMainWindow):
         for label, commands in macro_defs:
             button = QPushButton(label)
             button.clicked.connect(
-                lambda _, cmds=commands: self.run_macro(cmds)
+                lambda _, label=label, cmds=commands: self.run_macro(cmds, label)
             )
             macros.addWidget(button)
 
@@ -299,6 +426,122 @@ class DluSimulatorWindow(QMainWindow):
         splitter.setSizes([980, 520])
         self.hardware.controller = self
 
+    def _refresh_nav_modules(self):
+        if not getattr(self, "nav_dlu_combo", None):
+            return
+        if not self.nav_dlu_combo.currentText() or not self.nav_shelf_combo.currentText():
+            return
+        dlu_id = int(self.nav_dlu_combo.currentText())
+        shelf = int(self.nav_shelf_combo.currentText())
+        current = self.nav_module_combo.currentData()
+
+        self.nav_module_combo.blockSignals(True)
+        self.nav_module_combo.clear()
+        for row in self.db.list_shelf(dlu_id, shelf):
+            label = f"{row['module']} · {row['card_type']} · {row['port_count']}P"
+            self.nav_module_combo.addItem(label, row["module"])
+        if current is not None:
+            for i in range(self.nav_module_combo.count()):
+                if self.nav_module_combo.itemData(i) == current:
+                    self.nav_module_combo.setCurrentIndex(i)
+                    break
+        self.nav_module_combo.blockSignals(False)
+
+    def open_selected_dlu(self):
+        if self.nav_dlu_combo.currentText():
+            self.show_dlu(int(self.nav_dlu_combo.currentText()))
+
+    def open_selected_shelf(self):
+        if self.nav_dlu_combo.currentText() and self.nav_shelf_combo.currentText():
+            self.show_shelf(
+                int(self.nav_dlu_combo.currentText()),
+                int(self.nav_shelf_combo.currentText()),
+            )
+
+    def open_selected_module(self):
+        if (
+            self.nav_dlu_combo.currentText()
+            and self.nav_shelf_combo.currentText()
+            and self.nav_module_combo.currentData() is not None
+        ):
+            self.show_module(
+                int(self.nav_dlu_combo.currentText()),
+                int(self.nav_shelf_combo.currentText()),
+                int(self.nav_module_combo.currentData()),
+            )
+
+    def show_hardware_home(self):
+        self.current_view = "home"
+        self.hardware.current_dlu = int(self.nav_dlu_combo.currentText()) if self.nav_dlu_combo.currentText() else 10
+        self.hardware.current_shelf = None
+        self.hardware.current_module = None
+        self.clear_scene()
+        self.back_btn.setEnabled(False)
+        self.breadcrumb.setText("Hardware Selection")
+
+        self.add_text(24, 18, "EWSD HARDWARE SELECTOR", 22, TEXT, True)
+        self.add_text(
+            24, 52,
+            "Choose a DLU first. Then choose a Shelf and Module.",
+            11, MUTED
+        )
+
+        dlus = self.db.list_dlus()
+        card_w, card_h = 150, 82
+        cols = 5
+        start_x, start_y = 24, 100
+
+        for index, dlu in enumerate(dlus):
+            row = index // cols
+            col = index % cols
+            x = start_x + col * (card_w + 14)
+            y = start_y + row * (card_h + 14)
+            state = (
+                "ACT"
+                if dlu["dluc0_state"] == "act"
+                or dlu["dluc1_state"] == "act"
+                else "DEGRADED"
+            )
+            item = ClickableRectItem(
+                QRectF(x, y, card_w, card_h),
+                lambda value: self.show_dlu(value),
+                dlu["dlu_id"],
+            )
+            item.setBrush(QBrush(QColor("#14222d")))
+            item.setPen(
+                QPen(QColor(GREEN if state == "ACT" else YELLOW), 1.4)
+            )
+            self.hardware.scene_obj.addItem(item)
+            self.add_text(x + 12, y + 10, f"DLU {dlu['dlu_id']}", 14, TEXT, True)
+            self.add_text(
+                x + 12, y + 36,
+                f"DLUC0 {dlu['dluc0_state'].upper()}",
+                9,
+                GREEN if dlu["dluc0_state"] == "act" else YELLOW,
+            )
+            self.add_text(
+                x + 12, y + 53,
+                f"DLUC1 {dlu['dluc1_state'].upper()}",
+                9,
+                MUTED,
+            )
+
+        rows = (len(dlus) + cols - 1) // cols
+        self.hardware.scene_obj.setSceneRect(
+            0, 0,
+            cols * (card_w + 14) + 40,
+            start_y + rows * (card_h + 14) + 50,
+        )
+        self.hardware.reset_zoom()
+        self._set_details(
+            {
+                "Mode": "Hardware Selection",
+                "DLUs": len(dlus),
+                "Range": "10..250",
+                "Next": "Choose DLU → Shelf → Module",
+            }
+        )
+
     def hardware_reset_zoom(self):
         self.hardware.reset_zoom()
 
@@ -311,7 +554,7 @@ class DluSimulatorWindow(QMainWindow):
                 font-family: Segoe UI;
                 font-size: 13px;
             }}
-            QFrame#Header, QFrame#SYP {{
+            QFrame#Header, QFrame#SYP, QFrame#Navigator {{
                 background: {PANEL};
                 border: 1px solid {BORDER};
                 border-radius: 8px;
@@ -407,8 +650,10 @@ class DluSimulatorWindow(QMainWindow):
             )
         elif self.current_view == "shelf":
             self.show_dlu(self.hardware.current_dlu)
+        elif self.current_view == "dlu":
+            self.show_hardware_home()
         else:
-            self.show_dlu(self.hardware.current_dlu)
+            self.show_hardware_home()
 
     def clear_scene(self):
         self.hardware.scene_obj.clear()
@@ -436,6 +681,11 @@ class DluSimulatorWindow(QMainWindow):
         self.hardware.current_shelf = None
         self.hardware.current_module = None
         self.current_view = "dlu"
+        if getattr(self, "nav_dlu_combo", None):
+            self.nav_dlu_combo.blockSignals(True)
+            self.nav_dlu_combo.setCurrentText(str(dlu_id))
+            self.nav_dlu_combo.blockSignals(False)
+        self._refresh_nav_modules()
 
         self.clear_scene()
         self.breadcrumb.setText(f"DLU {dlu_id}")
@@ -600,6 +850,15 @@ class DluSimulatorWindow(QMainWindow):
         self.hardware.current_shelf = shelf
         self.hardware.current_module = None
         self.current_view = "shelf"
+        if getattr(self, "nav_dlu_combo", None):
+            self.nav_dlu_combo.blockSignals(True)
+            self.nav_dlu_combo.setCurrentText(str(dlu_id))
+            self.nav_dlu_combo.blockSignals(False)
+        if getattr(self, "nav_shelf_combo", None):
+            self.nav_shelf_combo.blockSignals(True)
+            self.nav_shelf_combo.setCurrentText(str(shelf))
+            self.nav_shelf_combo.blockSignals(False)
+        self._refresh_nav_modules()
 
         self.clear_scene()
         self.back_btn.setEnabled(True)
@@ -710,6 +969,19 @@ class DluSimulatorWindow(QMainWindow):
         self.hardware.current_shelf = shelf
         self.hardware.current_module = module
         self.current_view = "module"
+        if getattr(self, "nav_dlu_combo", None):
+            self.nav_dlu_combo.blockSignals(True)
+            self.nav_dlu_combo.setCurrentText(str(dlu_id))
+            self.nav_dlu_combo.blockSignals(False)
+        if getattr(self, "nav_shelf_combo", None):
+            self.nav_shelf_combo.blockSignals(True)
+            self.nav_shelf_combo.setCurrentText(str(shelf))
+            self.nav_shelf_combo.blockSignals(False)
+        self._refresh_nav_modules()
+        for i in range(self.nav_module_combo.count()):
+            if self.nav_module_combo.itemData(i) == module:
+                self.nav_module_combo.setCurrentIndex(i)
+                break
 
         self.clear_scene()
         self.back_btn.setEnabled(True)
@@ -966,10 +1238,16 @@ class DluSimulatorWindow(QMainWindow):
     def _prepare_macro(self, name: str) -> None:
         if name == "8-Line":
             for dn in range(2233500, 2233508):
-                self.db.conn.execute("DELETE FROM subscribers WHERE lac='021' AND dn=?", (str(dn),))
+                self.db.conn.execute(
+                    "DELETE FROM subscribers WHERE lac='021' AND dn=?",
+                    (str(dn),),
+                )
         elif name == "CMRL":
             for dn in range(2250500, 2250507):
-                self.db.conn.execute("DELETE FROM subscribers WHERE lac='021' AND dn=?", (str(dn),))
+                self.db.conn.execute(
+                    "DELETE FROM subscribers WHERE lac='021' AND dn=?",
+                    (str(dn),),
+                )
         elif name == "Diag Guard":
             with self.db.conn:
                 self.db.conn.execute(
@@ -977,24 +1255,44 @@ class DluSimulatorWindow(QMainWindow):
                 )
                 self.db.clear_active_alarms("DLU 10")
 
-    def run_macro(self, commands: list[str]):
-        if commands and commands[0].startswith("> cr sub: dn=223350"):
-            scenario_name = "8-Line"
-        elif commands and commands[0].startswith("> cr sub: dn=2250500"):
-            scenario_name = "CMRL"
-        elif commands and commands[0].startswith("> diag dlu: dlu=10"):
-            scenario_name = "Diag Guard"
-        else:
-            scenario_name = "Inspect"
+    def run_macro(self, commands: list[str] | None, name: str):
+        if name == "8-Line":
+            dialog = HardwareSelectorDialog(self.db, self, card_type="SLMA8")
+            if dialog.exec() != QDialog.Accepted or dialog.selected is None:
+                return
+            dlu, shelf, module = dialog.selected
+            self._prepare_macro("8-Line")
+            self.show_module(dlu, shelf, module)
+            commands = [
+                f"> cr sub: dn={2233500 + i}, eqn={dlu}-{shelf}-{module}-{i}, "
+                "lac=021, class=ms, c/s=PB;"
+                for i in range(8)
+            ]
 
-        self._prepare_macro(scenario_name)
+        elif name == "CMRL":
+            dialog = HardwareSelectorDialog(self.db, self, card_type="CMRL")
+            if dialog.exec() != QDialog.Accepted or dialog.selected is None:
+                return
+            dlu, shelf, module = dialog.selected
+            self._prepare_macro("CMRL")
+            self.show_module(dlu, shelf, module)
+            commands = [
+                f"> cr sub: dn=2250500, eqn={dlu}-{shelf}-{module}-0, "
+                "lac=021, class=cmrl, c/s=PB;",
+                f"> cr sub: dn=2250506, eqn={dlu}-{shelf}-{module}-6, "
+                "lac=021, class=cmrl, c/s=PB;",
+            ]
+
+        elif commands and commands[0].startswith("> diag dlu: dlu=10"):
+            self._prepare_macro("Diag Guard")
+
         self.terminal.append(
-            f"<span style='color:#59a6ff'>-- {scenario_name} start --</span>"
+            f"<span style='color:#59a6ff'>-- {name} start --</span>"
         )
-        for command in commands:
+        for command in commands or []:
             self._execute_command(command)
         self.terminal.append(
-            f"<span style='color:#59a6ff'>-- {scenario_name} end --</span>"
+            f"<span style='color:#59a6ff'>-- {name} end --</span>"
         )
 
     def _refresh_current_view(self):
