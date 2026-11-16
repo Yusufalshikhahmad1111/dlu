@@ -1028,8 +1028,8 @@ class DluSimulatorWindow(QMainWindow):
                 QBrush(QColor("#183249")),
             )
 
-        card_w, card_h = 202, 126
-        cols = 4
+        card_w, card_h = 182, 126
+        cols = 5
         x0, y0 = 30, 105
         for i, row in enumerate(self.db.list_dlus()):
             rr = i // cols
