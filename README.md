@@ -4,74 +4,92 @@
 
 > القاعدة الأساسية: لا نخترع شكلًا أو سعة أو ترقيمًا للعتاد. الرسم مبسط، لكن DLU/Shelf/Module/Port/EQN/Card Capacity مبنية على المراجع المعتمدة.
 
-## التقنية المعتمدة
+## التقنية
 
-**Python 3 + PySide6 + SQLite**
+**Python 3.12 + PySide6 + SQLite**
 
-- PySide6: واجهة Windows ورسوم DLU التفاعلية.
-- SQLite: الحالة المحلية للمقسم.
-- Python Domain Core: MML parser/FSM، EQN، card capacities، CPT، call paths، alarms.
-- NumPy/Matplotlib: لاحقًا لمختبر الإشارات.
-- pyside6-deploy: إخراج Windows executable.
+Qt توثق PySide6 كربط Python الرسمي مع Qt، وتوفر أدوات سطح المكتب للرسم التفاعلي. وللتوزيع على Windows نستخدم pyside6-deploy.
 
-توصي Qt حاليًا باستخدام pyside6-deploy لتوزيع تطبيقات PySide6، مع standalone أو onefile على Windows. citeturn152249search0turn152249search2
-
-## النموذج الذي يجب أن يراه الطالب
+## النموذج الذي يراه الطالب
 
 **DLU → Shelf → Module → Port → Subscriber**
 
 مثال:
 
-DLU 50  
-Shelf 1  
-Module 5  
-SLMA8  
-Port 0..7
+- DLU 50
+- Shelf 1
+- Module 5
+- SLMA8
+- Port 0..7
 
-ومثال ربط:
+وربط مثال:
 
-50-1-5-0 → DN 2233500
+`50-1-5-0 → DN 2233500`
 
-ترقيم Shelf/Module وصيغة EQN مأخوذة من مراجع EWSD التي تمت مراجعتها. citeturn608198search0turn608198search1
+ترقيم Shelf/Module وصيغة EQN مأخوذة من مراجع EWSD التي تم توثيقها في `docs/08-HARDWARE-REFERENCE-BASIS.md`.
 
-## بطاقات المشتركين
+## ما يعمل الآن
 
-- SLMA8: Ports 0..7.
-- SLMA16: Ports 0..15.
-- الأنواع الأخرى لا تُفترض لها سعة موحدة؛ السعة تأتي من نوع البطاقة ومرجعها.
+- SQLite محلية تُنشأ تلقائيًا في %LOCALAPPDATA%\DLULab\dlu_lab.sqlite3.
+- ALE1 مع DLU 10 وDLU 50.
+- 8 Shelves لكل DLU.
+- 16 Module positions لكل Shelf.
+- مواضع غير موثقة تبقى UNCONFIGURED.
+- SLMA8, SLMA16, CMRL, SLMD كأنواع بطاقة مع سعة صريحة.
+- DLU overview.
+- Shelf drill-down.
+- Module/card drill-down.
+- Port 0..N حسب نوع البطاقة.
+- DN ↔ EQN inspection.
+- OMT terminal.
+- DISP, STAT, TEST, CR, CAN, MOD, CONF, DIAG.
+- case-insensitive MML.
+- compact command aliases مثل CRSUB: وDISPSUB:.
+- quick scenarios.
+- history بالأسهم Up/Down.
+- basic SYP indicators.
+- regression tests للنواة.
 
-لذلك لا يوجد hard-coded rule يقول إن كل Module فيه 8 مستخدمين.
+## التشغيل على Windows 11
 
-## المبدأ المعماري
+يفضل Python 3.12.
 
-**Database → Domain Core → View**
+التشغيل الأسهل:
 
-أي أمر:
-MML / Scenario / Maintenance
-→ validation
-→ SQLite
-→ event
-→ UI
+    run.bat
 
-ولا توجد حالة مستقلة داخل الواجهة.
+أو يدويًا:
 
-## وثائق المشروع
+    py -3.12 -m venv .venv
+    .venv\Scripts\activate
+    python -m pip install --upgrade pip
+    python -m pip install -r requirements.txt
+    python main.py
 
-- docs/00-PROJECT-CHARTER.md
-- docs/01-ARCHITECTURE.md
-- docs/02-DATABASE-SPEC.md
-- docs/03-MML-SPEC.md
-- docs/04-UI-UX-WIREFRAME.md
-- docs/05-MILESTONES.md
-- docs/06-ACADEMIC-TEST-CASES.md
-- docs/07-STAGE-01-IMPLEMENTATION.md
-- docs/08-HARDWARE-REFERENCE-BASIS.md
+اختبارات النواة:
+
+    python -m pip install pytest
+    python -m pytest -q tests
+
+## أوامر أول تجربة
+
+    > disp dlu: dlu=50;
+    > disp slot: dlu=50, shelf=1, module=5;
+    > cr sub: dn=2233500, eqn=50-1-5-0, lac=021, class=ms, c/s=PB;
+    > disp sub: dn=2233500;
+    > stat sub: dn=2233500;
+    > mod sub: dn=2233500, line=busy;
+    > mod sub: dn=2233500, line=idle;
+    > can sub: lac=021, dn=2233500;
+
+اختبار شرط التشخيص:
+
+    > diag dlu: dlu=10;
+    > conf dlu: dlu=10, dluc0=y, ost=mbl;
+    > diag dlu: dlu=10;
 
 ## الحالة
 
-**Stage 0 — Foundation & Specification: مكتملة**
+**Stage 1 — first runnable GUI/core: implemented**
 
-الخطوة التنفيذية التالية هي Stage 1:
-**Hardware Dataset + SQLite + Seed + tests**
-
-وبعد إثبات صحة النموذج نبدأ MML Core، ثم واجهة DLU.
+النسخة الحالية هي أول Prototype تشغيلي حقيقي. الخطوة التالية هي توسيع Hardware Dataset وفق المصادر قبل إضافة مؤثرات بصرية أو بطاقات غير موثقة، ثم توسيع MML وSYP وCall Path.
