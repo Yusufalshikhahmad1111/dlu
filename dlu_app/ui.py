@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, QRectF, Qt
-from PySide6.QtGui import QColor, QBrush, QDrag, QFont, QPainter, QPainterPath, QPen, QMimeData
+from PySide6.QtCore import QEvent, QMimeData, QRectF, Qt
+from PySide6.QtGui import QColor, QBrush, QDrag, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
