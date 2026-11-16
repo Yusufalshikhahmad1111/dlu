@@ -6,6 +6,7 @@ import re
 import sqlite3
 
 from .call_engine import CallEngine
+from .command_files import CommandFileEngine
 from .db import Database
 
 
@@ -23,6 +24,7 @@ class MmlEngine:
     def __init__(self, db: Database):
         self.db = db
         self.call_engine = CallEngine(db)
+        self.command_files = CommandFileEngine(db, self)
 
     def execute(self, raw: str) -> MmlResult:
         text = raw.strip()
@@ -38,7 +40,7 @@ class MmlEngine:
             return MmlResult(
                 True,
                 "OK",
-                "Commands: DISP, STAT, TEST, CR, CAN, MOD, CONF, DIAG",
+                "Commands: DISP, STAT, TEST, CR, CAN, MOD, CONF, DIAG, EXECMDFILE",
                 {
                     "examples": [
                         "> stat dlu: dlu=50;",
@@ -149,6 +151,8 @@ class MmlEngine:
                 return self._diag_dlu(params)
             if verb == "DIAG" and obj in {"DLUMOD", "MODULE"}:
                 return self._diag_module(params)
+            if verb == "EXECMDFILE" or (verb == "EXEC" and obj == "MDFILE"):
+                return self._execmdfile(params)
 
             return MmlResult(
                 False,
@@ -712,6 +716,39 @@ class MmlEngine:
             ),
         ).fetchall()
         return MmlResult(True, "OK", f"{len(rows)} CPT route(s)", [dict(row) for row in rows])
+
+    def _execmdfile(self, params: dict[str, str]) -> MmlResult:
+        self._required(params, "file")
+        file_name = params["file"]
+        scheduled_at = params.get("time") or params.get("scheduled_at")
+        if scheduled_at:
+            try:
+                file = self.command_files.schedule(file_name, scheduled_at)
+            except ValueError as exc:
+                return MmlResult(False, "CMD-FILE-INVALID", str(exc))
+            return MmlResult(
+                True,
+                "CMD-FILE-ACCEPTED",
+                f"Command file {file.file_name} scheduled for {file.scheduled_at}",
+                {
+                    "file": file.file_name,
+                    "status": file.status,
+                    "scheduled_at": file.scheduled_at,
+                },
+            )
+        result = self.command_files.execute(file_name)
+        return MmlResult(
+            result.ok,
+            result.code,
+            result.message,
+            {
+                "file": result.file_name,
+                "status": result.status,
+                "executed": result.executed,
+                "failed": result.failed,
+                "log": result.log or [],
+            },
+        )
 
     def _disp_call(self, params: dict[str, str]) -> MmlResult:
         self._required(params, "call")
