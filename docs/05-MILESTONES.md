@@ -90,6 +90,30 @@ Call decisions, resource state, subscriber busy state, DB session state, and vis
 Closeout:
 docs/16-STAGE-03-CLOSEOUT.md
 
+## Stage 3.5 — Next-Generation UX/UI + Hardware Visual Redesign
+
+**الحالة: Implemented — Windows visual QA is the release gate**
+
+المخرجات:
+- Space telecommunications visual system.
+- permanent OMT command dock.
+- simplified navigation and secondary Tools menu.
+- redesigned teaching action hierarchy.
+- DLU fleet rack-card visuals.
+- DLU chassis / Shelf equipment bay / Module faceplate / Port connector visuals.
+- redesigned Logical signal map.
+- redesigned Call Path visual treatment.
+- no intentional change to Stage 1–3 domain behavior.
+
+Definition of Done:
+Visual hierarchy, readability, hardware representation, MML visibility, and classroom usability are improved without breaking existing functionality.
+
+QA checklist:
+docs/19-STAGE-03_5-WINDOWS-QA.md
+
+Implementation report:
+docs/18-STAGE-03_5-UX-UI-IMPLEMENTATION.md
+
 ## Stage 4 — Command Files
 
 - file parser.
