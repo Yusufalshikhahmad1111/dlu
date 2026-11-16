@@ -1120,8 +1120,8 @@ class DluSimulatorWindow(QMainWindow):
             size = 2 + (i % 3)
             scene.addEllipse(
                 QRectF(x, y, size, size),
-                QPen(QColor({BORDER})),
-                QBrush(QColor({BORDER})),
+                QPen(QColor(BORDER)),
+                QBrush(QColor(BORDER)),
             )
 
         card_w, card_h = 182, 126
@@ -1140,7 +1140,7 @@ class DluSimulatorWindow(QMainWindow):
             shell = rounded_path(x, y, card_w, card_h, 12)
             scene.addPath(
                 shell,
-                QPen(QColor({BORDER}), 1.8),
+                QPen(QColor(BORDER), 1.8),
                 QBrush(QColor(CARD)),
             )
             rail = QPainterPath()
@@ -1158,8 +1158,8 @@ class DluSimulatorWindow(QMainWindow):
                 self.add_scene_rounded_rect(
                     QRectF(x + 98, sy, 82, 7),
                     2, 2,
-                    QPen(QColor({BORDER}), 0.8),
-                    QBrush(QColor({PANEL2})),
+                    QPen(QColor(BORDER), 0.8),
+                    QBrush(QColor(PANEL2)),
                 )
 
             item = ClickableRectItem(
@@ -1360,8 +1360,8 @@ class DluSimulatorWindow(QMainWindow):
         base = rounded_path(x + 72, y, 970, 62, 8)
         scene.addPath(
             base,
-            QPen(QColor({BORDER}), 1.2),
-            QBrush(QColor({PANEL2})),
+            QPen(QColor(BORDER), 1.2),
+            QBrush(QColor(PANEL2)),
         )
         self.add_scene_rounded_rect(
             QRectF(x + 80, y + 8, 7, 46),
@@ -1389,7 +1389,7 @@ class DluSimulatorWindow(QMainWindow):
             )
             scene.addLine(
                 mx + 7, y + 18, mx + 45, y + 18,
-                QPen(QColor({BORDER}), 1),
+                QPen(QColor(BORDER), 1),
             )
             scene.addEllipse(
                 QRectF(mx + 7, y + 28, 6, 6),
@@ -1441,7 +1441,7 @@ class DluSimulatorWindow(QMainWindow):
         scene.addPath(
             backdrop,
             QPen(QColor("#29465f"), 1.5),
-            QBrush(QColor({DEEP})),
+            QBrush(QColor(DEEP)),
         )
 
         nodes = [
@@ -1458,12 +1458,12 @@ class DluSimulatorWindow(QMainWindow):
             scene.addPath(
                 path,
                 QPen(QColor(accent), 1.8),
-                QBrush(QColor({PANEL})),
+                QBrush(QColor(PANEL)),
             )
             self.add_scene_rounded_rect(
                 QRectF(x + 8, y + 8, w - 16, 22),
                 6, 6,
-                QPen(QColor({BORDER}), 1),
+                QPen(QColor(BORDER), 1),
                 QBrush(QColor(PANEL3)),
             )
             self.add_text(x + 16, y + 11, kind, 8, accent, True)
@@ -1541,8 +1541,8 @@ class DluSimulatorWindow(QMainWindow):
         self.add_scene_rounded_rect(
             QRectF(42, 108, 1018, 44),
             8, 8,
-            QPen(QColor({BORDER}), 1.2),
-            QBrush(QColor({PANEL3})),
+            QPen(QColor(BORDER), 1.2),
+            QBrush(QColor(PANEL3)),
         )
         self.add_text(62, 121, f"DLU {dlu_id} / SHELF {shelf}", 13, CYAN, True)
         self.add_text(62, 140, "MODULE FRONT PANELS", 8, MUTED, True)
@@ -1585,7 +1585,7 @@ class DluSimulatorWindow(QMainWindow):
         self.add_scene_rounded_rect(
             QRectF(x + 7, y + 7, w - 14, 26),
             5, 5,
-            QPen(QColor({BORDER}), 0.8),
+            QPen(QColor(BORDER), 0.8),
             QBrush(QColor(DEEP)),
         )
         add_rack_rivets(scene, x + 10, y + 12, w - 20, 2)
@@ -1634,7 +1634,7 @@ class DluSimulatorWindow(QMainWindow):
             self.add_scene_rounded_rect(
                 QRectF(px, py, 16, 11),
                 3, 3,
-                QPen(QColor({BORDER}), 0.8),
+                QPen(QColor(BORDER), 0.8),
                 QBrush(QColor(DEEP)),
             )
             scene.addEllipse(
