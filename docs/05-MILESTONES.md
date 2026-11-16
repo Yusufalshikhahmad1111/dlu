@@ -116,11 +116,28 @@ docs/18-STAGE-03_5-UX-UI-IMPLEMENTATION.md
 
 ## Stage 4 — Command Files
 
-- file parser.
-- scheduling.
-- virtual clock.
-- Accepted/Started/Finished/Executed.
-- failure reporting.
+**الحالة: Implemented — Windows manual QA is the release gate**
+
+المخرجات:
+- command-file parser.
+- persistent command file records.
+- Accepted / Started / Finished / Executed / Failed lifecycle.
+- fail-fast execution logging.
+- HH:MM scheduling.
+- deterministic virtual clock.
+- due-file execution through MML.
+- OMT EXECMDFILE integration.
+- Command Files teaching workbench.
+- automated Stage 4 tests.
+
+Definition of Done:
+Command files use the existing MML engine, persist their lifecycle/log, execute deterministically, and scheduled files run when the virtual clock reaches their target time.
+
+QA:
+docs/22-STAGE-04-WINDOWS-QA.md
+
+Report:
+docs/21-STAGE-04-IMPLEMENTATION-REPORT.md
 
 ## Stage 5 — Communications Labs
 
