@@ -384,7 +384,9 @@ class CallEngine:
         state: str = "ACTIVE",
     ) -> CallPath:
         caller_node = CallNode("DLU", f"DLU-{caller['dlu_id']}", f"DLU {caller['dlu_id']}")
-        if analysis.number_type == "LOCAL":
+        if analysis.cpt and analysis.cpt.eval.upper() == "NO":
+            nodes = (caller_node, CallNode("CPT", "CPT", "CPT / BLOCKED"))
+        elif analysis.number_type == "LOCAL":
             target_dlu = target["dlu_id"] if target else caller["dlu_id"]
             nodes = (
                 caller_node,
@@ -412,8 +414,6 @@ class CallEngine:
                 CallNode("SN", "SN", "SN"),
                 CallNode("SERVICE", analysis.normalized, f"SERVICE {analysis.normalized}"),
             )
-        elif analysis.cpt and analysis.cpt.eval.upper() == "NO":
-            nodes = (caller_node, CallNode("CPT", "CPT", "CPT / BLOCKED"))
         else:
             nodes = (caller_node, CallNode("CPT", "CPT", "CPT / NO ROUTE"))
 
