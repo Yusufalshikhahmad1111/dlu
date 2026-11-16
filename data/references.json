@@ -1,0 +1,27 @@
+{
+  "PEU-CO-52": {
+    "pages": "52",
+    "topic": "DLU components",
+    "source": "PEU Principles of Communication course"
+  },
+  "PEU-CO-54": {
+    "pages": "54",
+    "topic": "SLMA and CMRL",
+    "source": "PEU Principles of Communication course"
+  },
+  "PEU-CO-59": {
+    "pages": "59",
+    "topic": "SLMA8 expansion and EQN",
+    "source": "PEU Principles of Communication course"
+  },
+  "PEU-CO-60": {
+    "pages": "60",
+    "topic": "SLM capacities",
+    "source": "PEU Principles of Communication course"
+  },
+  "PEU-CO-62": {
+    "pages": "62",
+    "topic": "SLMA replacement workflow",
+    "source": "PEU Principles of Communication course"
+  }
+}
