@@ -188,6 +188,10 @@ class DluSimulatorWindow(QMainWindow):
         fit_btn.clicked.connect(self.hardware_reset_zoom)
         toolbar.addWidget(fit_btn)
 
+        reset_btn = QPushButton("Reset Demo")
+        reset_btn.clicked.connect(self.reset_demo)
+        toolbar.addWidget(reset_btn)
+
         left_layout.addLayout(toolbar)
 
         self.hardware = HardwareView()
@@ -574,8 +578,8 @@ class DluSimulatorWindow(QMainWindow):
             self.add_text(
                 module_x + 4,
                 y + 22,
-                label.replace("SLMA", "A"),
-                8,
+                label,
+                7,
                 edge,
                 True,
             )
@@ -959,16 +963,45 @@ class DluSimulatorWindow(QMainWindow):
                 f"<pre style='color:#8fb2cf'>{pretty}</pre>"
             )
 
+    def _prepare_macro(self, name: str) -> None:
+        if name == "8-Line":
+            for dn in range(2233500, 2233508):
+                self.db.conn.execute("DELETE FROM subscribers WHERE lac='021' AND dn=?", (str(dn),))
+        elif name == "CMRL":
+            for dn in range(2250500, 2250507):
+                self.db.conn.execute("DELETE FROM subscribers WHERE lac='021' AND dn=?", (str(dn),))
+        elif name == "Diag Guard":
+            with self.db.conn:
+                self.db.conn.execute(
+                    "UPDATE dlus SET dluc0_state='act', dluc1_state='standby' WHERE dlu_id=10"
+                )
+                self.db.clear_active_alarms("DLU 10")
+
     def run_macro(self, commands: list[str]):
+        labels = {
+            8: "8-Line",
+            2: "CMRL",
+            3: "Diag Guard",
+            2: "Inspect",
+        }
+
+        if commands and commands[0].startswith("> cr sub: dn=223350"):
+            scenario_name = "8-Line"
+        elif commands and commands[0].startswith("> cr sub: dn=2250500"):
+            scenario_name = "CMRL"
+        elif commands and commands[0].startswith("> diag dlu: dlu=10"):
+            scenario_name = "Diag Guard"
+        else:
+            scenario_name = "Inspect"
+
+        self._prepare_macro(scenario_name)
         self.terminal.append(
-            "<span style='color:#59a6ff'>"
-            "-- Scenario start --</span>"
+            f"<span style='color:#59a6ff'>-- {scenario_name} start --</span>"
         )
         for command in commands:
             self._execute_command(command)
         self.terminal.append(
-            "<span style='color:#59a6ff'>"
-            "-- Scenario end --</span>"
+            f"<span style='color:#59a6ff'>-- {scenario_name} end --</span>"
         )
 
     def _refresh_current_view(self):
@@ -1023,6 +1056,17 @@ class DluSimulatorWindow(QMainWindow):
         self.path_label.setText(
             "PATH —" if not busy else "PATH ACTIVE"
         )
+
+    def reset_demo(self):
+        self.db.reset_demo()
+        self.terminal.append(
+            "<span style='color:#f2c94c'>"
+            "[RESET] Demo state restored: all subscribers removed, "
+            "DLUC0=ACT, DLUC1=STANDBY"
+            "</span>"
+        )
+        self._refresh_current_view()
+        self.refresh_status()
 
     def closeEvent(self, event):
         self.db.close()
