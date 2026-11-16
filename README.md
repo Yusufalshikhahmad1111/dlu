@@ -2,94 +2,121 @@
 
 محاكي تعليمي محلي لمقسم Siemens EWSD ووحدة الخطوط الرقمية DLU، مخصص لمقرر مبادئ الاتصالات على Windows 11.
 
-> القاعدة الأساسية: لا نخترع شكلًا أو سعة أو ترقيمًا للعتاد. الرسم مبسط، لكن DLU/Shelf/Module/Port/EQN/Card Capacity مبنية على المراجع المعتمدة.
+> القاعدة الأساسية: لا نخترع شكلًا أو سعة أو ترقيمًا للعتاد. الرسم مبسط، لكن DLU/Shelf/Module/Port/EQN/Card Capacity مبنية على Dataset موثق.
 
 ## التقنية
 
-**Python 3.12 + PySide6 + SQLite**
+Python 3.12 + PySide6 + SQLite
 
-Qt توثق PySide6 كربط Python الرسمي مع Qt، وتوفر أدوات سطح المكتب للرسم التفاعلي. وللتوزيع على Windows نستخدم pyside6-deploy.
+## Hardware-first Training Lab
 
-## النموذج الذي يراه الطالب
+المسار البصري والوظيفي:
 
-**DLU → Shelf → Module → Port → Subscriber**
+Exchange → DLU → Side/Controller → Shelf → Module/Card → Port → Subscriber → MML
 
-مثال:
+### Physical Mode
+- DLU frame
+- DLUC0 / DLUC1
+- DIUD/PDC training area
+- Shelf 0..7
+- Module 0..15
+- Card faceplates
+- Port LEDs
 
-- DLU 50
-- Shelf 1
-- Module 5
-- SLMA8
-- Port 0..7
+### Logical Mode
+DLU → Controller → DIUD → SLM → Port → DN
 
-وربط مثال:
+## Hardware Dataset
 
-`50-1-5-0 → DN 2233500`
+البيانات منفصلة عن الواجهة:
 
-ترقيم Shelf/Module وصيغة EQN مأخوذة من مراجع EWSD التي تم توثيقها في `docs/08-HARDWARE-REFERENCE-BASIS.md`.
+- data/hardware_seed.json
+- data/references.json
+- Source Registry داخل SQLite
 
-## ما يعمل الآن
+### Registry الحالي
+- SLMA8 — 8 ports
+- SLMA16 — 16 ports
+- SLMA64 — 64 ports
+- CMRL — 6 ports
+- SLMD — digital subscriber module
+- TU
+- BDE
+- BDCG
+- DLUC
+- DIUD
+- RGMG
+- DCC
 
-- SQLite محلية تُنشأ تلقائيًا في %LOCALAPPDATA%\DLULab\dlu_lab.sqlite3.
-- ALE1 مع DLU 10 وDLU 50.
-- 8 Shelves لكل DLU.
-- 16 Module positions لكل Shelf.
-- مواضع غير موثقة تبقى UNCONFIGURED.
-- SLMA8, SLMA16, CMRL, SLMD كأنواع بطاقة مع سعة صريحة.
-- DLU overview.
-- Shelf drill-down.
-- Module/card drill-down.
-- Port 0..N حسب نوع البطاقة.
-- DN ↔ EQN inspection.
-- OMT terminal.
-- DISP, STAT, TEST, CR, CAN, MOD, CONF, DIAG.
-- case-insensitive MML.
-- compact command aliases مثل CRSUB: وDISPSUB:.
-- quick scenarios.
-- history بالأسهم Up/Down.
-- basic SYP indicators.
-- regression tests للنواة.
+إذا لم يكن Placement موثقًا يبقى UNCONFIGURED.
+
+## Seed الأكاديمي
+
+- DLU 50 / Shelf 0 / Module 15 → SLMA8
+- DLU 10 / Shelf 1 / Module 7 → CMRL
+- كل DLU يملك Shelf 0..7 وModule 0..15
+
+## OMT ↔ Hardware
+
+أمثلة:
+
+> stat dlu: dlu=50;
+> disp dlumod: dlu=50, shelf=0, module=15;
+> disp dlupport: eqn=50-0-15-0;
+> statport: eqn=50-0-15-0;
+> cr sub: dlu=50, type=ms, eqn=50-0-15-0, lac=021, dn=2233500;
+> stat sub: lac=021, dn=2233500;
+> test sub: lac=021, dn=2233500;
+> can sub: lac=021, dn=2233500;
+
+نتيجة MML التي تحتوي EQN أو DLU/Shelf/Module تربط مباشرة بالمجسم.
+
+## Maintenance
+
+FAULT → MBL → DIAG → REMOVE → INSTALL → ACTIVATE → VERIFY
+
+مع سجل hardware_events وMaintenance Timeline داخل الواجهة.
+
+## Hardware Library / Reference Viewer
+
+يعرض النوع والوظيفة والسعة والـport range ومصدره وصفحة المرجع وحالة التحقق.
+
+## Scenarios
+
+### 8-Line
+يطلب DLU → Shelf → Module ثم ينفذ 8 أوامر CR SUB على Ports 0..7.
+
+### CMRL
+ينشئ Ports 0..5 ثم يحاول Port 6 ويعرض CARD-INCOMPATIBLE/رفض السعة.
+
+### Maintenance
+حقن fault ثم mbl/diag/remove/install/activate مع تتبع زمني.
 
 ## التشغيل على Windows 11
 
-يفضل Python 3.12.
+```bat
+run.bat
+```
 
-التشغيل الأسهل:
+أو:
 
-    run.bat
+```bat
+py -3.12 -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python main.py
+```
 
-أو يدويًا:
+الاختبارات:
 
-    py -3.12 -m venv .venv
-    .venv\Scripts\activate
-    python -m pip install --upgrade pip
-    python -m pip install -r requirements.txt
-    python main.py
-
-اختبارات النواة:
-
-    python -m pip install pytest
-    python -m pytest -q tests
-
-## أوامر أول تجربة
-
-    > disp dlu: dlu=50;
-    > disp slot: dlu=50, shelf=1, module=5;
-    > cr sub: dn=2233500, eqn=50-1-5-0, lac=021, class=ms, c/s=PB;
-    > disp sub: dn=2233500;
-    > stat sub: dn=2233500;
-    > mod sub: dn=2233500, line=busy;
-    > mod sub: dn=2233500, line=idle;
-    > can sub: lac=021, dn=2233500;
-
-اختبار شرط التشخيص:
-
-    > diag dlu: dlu=10;
-    > conf dlu: dlu=10, dluc0=y, ost=mbl;
-    > diag dlu: dlu=10;
+```bat
+python -m pip install -r requirements-dev.txt
+python -m pytest -q tests
+```
 
 ## الحالة
 
-**Stage 1 — first runnable GUI/core: implemented**
+Stage 2 — Hardware Fidelity + MML Core: implemented
 
-النسخة الحالية هي أول Prototype تشغيلي حقيقي. الخطوة التالية هي توسيع Hardware Dataset وفق المصادر قبل إضافة مؤثرات بصرية أو بطاقات غير موثقة، ثم توسيع MML وSYP وCall Path.
+التالي: Call Engine + CPT/Call Path، ثم Command Files، ثم Communication Labs وPackaging.
