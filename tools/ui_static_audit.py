@@ -14,7 +14,7 @@ def main() -> int:
 
     for path in FILES:
         text = path.read_text(encoding="utf-8")
-        if "#" in text:
+        if re.search(r"#[0-9a-fA-F]{6}", text):
             errors.append(f"{path}: hardcoded hex/design color literal found")
 
         tree = ast.parse(text, filename=str(path))
