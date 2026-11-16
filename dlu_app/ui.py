@@ -39,6 +39,8 @@ from .call_engine import CallEngine
 from .call_ui import CallLabWidget
 from .db import CardReference, Database
 from .mml import MmlEngine, MmlResult
+from .theme import THEMES
+from .ui_utils import make_font
 
 
 BG = "#050914"
@@ -59,64 +61,22 @@ AMBER = "#ffc857"
 WHITE = "#f7fbff"
 
 
-THEMES = {
-    "ivory": {
-        "BG": "#f3eadc",
-        "PANEL": "#fffaf1",
-        "PANEL2": "#eee3d2",
-        "PANEL3": "#e4d5c0",
-        "STEEL": "#7d6e5f",
-        "TEXT": "#2f271f",
-        "MUTED": "#746658",
-        "BORDER": "#bda98f",
-        "GREEN": "#2f8a68",
-        "YELLOW": "#b67825",
-        "RED": "#bd4f4f",
-        "BLUE": "#806b5c",
-        "CYAN": "#b66f42",
-        "VIOLET": "#765e50",
-        "AMBER": "#b67825",
-        "WHITE": "#fffdf8",
-        "CARD": "#f0e5d5",
-        "DEEP": "#e6d8c5",
-    },
-    "silver": {
-        "BG": "#292825",
-        "PANEL": "#3a3834",
-        "PANEL2": "#2f2e2b",
-        "PANEL3": "#47443f",
-        "STEEL": "#aaa49a",
-        "TEXT": "#f3efe8",
-        "MUTED": "#c4bfb7",
-        "BORDER": "#766f65",
-        "GREEN": "#66c39b",
-        "YELLOW": "#d2a35b",
-        "RED": "#df7777",
-        "BLUE": "#b2a79b",
-        "CYAN": "#c08b63",
-        "VIOLET": "#a58f84",
-        "AMBER": "#d2a35b",
-        "WHITE": "#fffdf8",
-        "CARD": "#3f3d39",
-        "DEEP": "#262522",
-    },
-}
-
 THEME_NAME = "ivory"
+
+
 
 
 def apply_theme_palette(name: str):
     global BG, PANEL, PANEL2, PANEL3, STEEL, TEXT, MUTED, BORDER
-    global GREEN, YELLOW, RED, BLUE, CYAN, VIOLET, AMBER, WHITE
+    global GREEN, YELLOW, RED, BLUE, CYAN, VIOLET, AMBER, WHITE, CARD, DEEP
     global THEME_NAME
     palette = THEMES.get(name, THEMES["ivory"])
-    for key, value in palette.items():
-        globals()[key] = value
+    for key in palette.__dataclass_fields__:
+        globals()[key] = getattr(palette, key)
     THEME_NAME = name
 
 
 apply_theme_palette("ivory")
-
 def state_color(state: str) -> str:
     value = (state or "").lower()
     if value in {"act", "idle"}:
@@ -1014,6 +974,7 @@ class DluSimulatorWindow(QMainWindow):
 
     def set_theme(self, name: str):
         apply_theme_palette(name)
+        self.hardware.setBackgroundBrush(QColor(BG))
         if hasattr(self, "theme_btn"):
             self.theme_btn.setText(
                 "THEME: IVORY" if name == "ivory" else "THEME: SILVER"
@@ -1081,14 +1042,7 @@ class DluSimulatorWindow(QMainWindow):
 
     def add_text(self, x, y, text, size=12, color=TEXT, bold=False):
         item = self.hardware.scene_obj.addText(str(text))
-        try:
-            point_size = max(1, int(float(size)))
-        except (TypeError, ValueError):
-            point_size = 12
-        font = QFont("Segoe UI")
-        font.setPointSize(point_size)
-        font.setBold(bool(bold))
-        item.setFont(font)
+        item.setFont(make_font(size, bold=bold))
         item.setDefaultTextColor(QColor(str(color)))
         item.setPos(x, y)
         return item
@@ -1573,6 +1527,7 @@ class DluSimulatorWindow(QMainWindow):
 
     def draw_full_module_slot(self, slot, x, y, w, h):
         scene = self.hardware.scene_obj
+        slot = self._slot_mapping(slot)
         configured = slot["card_type"] != "UNCONFIGURED"
         fault = slot["fault_state"] == "fault"
         accent = RED if fault else (GREEN if configured else BORDER)
@@ -1662,19 +1617,34 @@ class DluSimulatorWindow(QMainWindow):
         scene.addItem(item)
 
 
+    @staticmethod
+    def _slot_mapping(slot) -> dict:
+        if slot is None:
+            return {}
+        if isinstance(slot, dict):
+            return slot
+        if hasattr(slot, "keys"):
+            try:
+                return {key: slot[key] for key in slot.keys()}
+            except Exception:
+                pass
+        fields = (
+            "dlu_id", "shelf", "module", "card_type", "ost",
+            "port_count", "role", "family", "fault_state", "source_id",
+        )
+        return {field: getattr(slot, field, None) for field in fields}
+
     def show_module(self, dlu_id: int, shelf: int, module: int):
         self._sync_location(dlu_id, shelf, module)
         self.current_view = "module"
         self.clear_scene()
         self.back_btn.setEnabled(True)
 
-        slot = self.db.get_slot(dlu_id, shelf, module)
-        if slot is not None and not isinstance(slot, dict):
-            slot = (
-                slot.__dict__
-                if hasattr(slot, "__dict__")
-                else dict(slot)
-            )
+        slot = self._slot_mapping(
+            self.db.get_slot(dlu_id, shelf, module)
+        )
+        if not slot:
+            slot = {}
         self.breadcrumb.setText(
             f"DLU {dlu_id}  /  SHELF {shelf}  /  MODULE {module}"
         )
@@ -1708,7 +1678,8 @@ class DluSimulatorWindow(QMainWindow):
         scene = self.hardware.scene_obj
         card_x, card_y, card_w, card_h = 34, 96, 450, 700
         panel_x, panel_y = 520, 96
-        panel_w = 760 if int(slot["port_count"] or 0) >= 32 else 560
+        port_count = int(slot.get("port_count") or 0)
+        panel_w = 760 if port_count >= 32 else 560
 
         # Physical telecom faceplate.
         face = rounded_path(card_x, card_y, card_w, card_h, 16)
@@ -1848,7 +1819,7 @@ class DluSimulatorWindow(QMainWindow):
         scene.setSceneRect(
             0,
             0,
-            max(1120 if slot["port_count"] <= 16 else 1280, panel_x + panel_w + 40),
+            max(1120 if port_count <= 16 else 1280, panel_x + panel_w + 40),
             max(840, card_y + card_h + 50),
         )
         self.hardware.reset_zoom()
@@ -1871,6 +1842,7 @@ class DluSimulatorWindow(QMainWindow):
 
     def draw_port_grid(self, dlu_id, shelf, module, slot, x, y):
         scene = self.hardware.scene_obj
+        slot = self._slot_mapping(slot)
         capacity = int(slot.port_count or 0)
 
         if capacity >= 32:
@@ -2109,7 +2081,7 @@ class DluSimulatorWindow(QMainWindow):
 
     def _execute_command(self,command:str):
         self.terminal.append(
-            f"<span style='color:#dce8f2'>&gt; {command[1:].strip()}</span>"
+            f"<span style='color:{TEXT}'>&gt; {command[1:].strip()}</span>"
         )
         result=self.mml.execute(command)
         color=GREEN if result.ok else RED
@@ -2119,7 +2091,7 @@ class DluSimulatorWindow(QMainWindow):
         if result.data is not None:
             pretty=json.dumps(result.data,ensure_ascii=False,indent=2,default=str)
             self.terminal.append(
-                f"<pre style='color:#8fb2cf'>{pretty}</pre>"
+                f"<pre style='color:{MUTED}'>{pretty}</pre>"
             )
         QTimer.singleShot(0, lambda result=result: self.focus_result(result))
         self.refresh_status()
@@ -2323,7 +2295,7 @@ class DluSimulatorWindow(QMainWindow):
             f"eqn={dlu}-{shelf}-{module}-6, lac=021, dn=2250506;"
         )
         self.terminal.append(
-            "<span style='color:#e3a83b'>CMRL guard demo: next port 6 must be rejected.</span>"
+            f"<span style='color:{AMBER}'>CMRL guard demo: next port 6 must be rejected.</span>"
         )
 
     def run_maintenance_demo(self):
@@ -2431,7 +2403,7 @@ class DluSimulatorWindow(QMainWindow):
         if hasattr(self, "call_lab"):
             self.call_lab.reset()
         self.terminal.append(
-            "<span style='color:#f0c75e'>"
+            f"<span style='color:{YELLOW}'>"
             "[RESET] Source-backed hardware restored; subscriber demo state cleared."
             "</span>"
         )
