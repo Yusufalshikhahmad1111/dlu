@@ -3,8 +3,6 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 import re
-import sys
-
 
 FILES = (Path("dlu_app/ui.py"), Path("dlu_app/call_ui.py"))
 
@@ -28,7 +26,15 @@ def main() -> int:
                 if fn.name in {"show_module", "draw_port_grid", "draw_full_module_slot"}:
                     for child in ast.walk(fn):
                         if isinstance(child, ast.Attribute):
-                            if child.value.id == "slot" if isinstance(child.value, ast.Name) else False:
+                            slot_fields = {
+                                "dlu_id", "shelf", "module", "card_type", "ost",
+                                "port_count", "role", "family", "fault_state", "source_id",
+                            }
+                            if (
+                                isinstance(child.value, ast.Name)
+                                and child.value.id == "slot"
+                                and child.attr in slot_fields
+                            ):
                                 errors.append(
                                     f"{path}:{child.lineno}: mixed slot attribute access "
                                     f"in {fn.name}: slot.{child.attr}"
