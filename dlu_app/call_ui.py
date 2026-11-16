@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QColor, QBrush, QFont, QPainter, QPen
+from PySide6.QtGui import QColor, QBrush, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QComboBox,
     QFrame,
@@ -65,10 +65,14 @@ class CallPathView(QGraphicsView):
         for idx, node in enumerate(path.nodes):
             x = x0 + idx * (box_w + gap)
             color = colors.get(node.node_type, MUTED)
-            self.scene_obj.addRoundedRect(
+            rounded = QPainterPath()
+            rounded.addRoundedRect(
                 QRectF(x, y0, box_w, box_h),
                 10,
                 10,
+            )
+            self.scene_obj.addPath(
+                rounded,
                 QPen(QColor(color), 2),
                 QBrush(QColor("#101d27")),
             )
