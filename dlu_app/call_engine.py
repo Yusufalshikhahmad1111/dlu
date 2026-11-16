@@ -477,12 +477,7 @@ class CallEngine:
         except ValueError as exc:
             return CallResult(False, str(exc), str(exc))
 
-        if not analysis.cpt:
-            return self._fail(
-                caller, analysis, "CALL-CPT-NO-MATCH",
-                "No CPT route matches the dialed number", "cpt-no-match",
-            )
-        if analysis.cpt.eval.upper() == "NO":
+        if analysis.cpt and analysis.cpt.eval.upper() == "NO":
             return self._fail(
                 caller, analysis, "CALL-BLOCKED",
                 f"{analysis.cpt.name} · EVAL=NO", analysis.cpt.name,
@@ -662,6 +657,12 @@ class CallEngine:
 
     def resource_usage(self) -> tuple[int, int]:
         return self.repo.resource_usage()
+
+    def active_call_count(self) -> int:
+        row = self.db.conn.execute(
+            "SELECT COUNT(*) AS n FROM call_sessions WHERE state='CONNECTED'"
+        ).fetchone()
+        return int(row["n"])
 
     def prepare_demo_subscribers(self) -> tuple[str, str]:
         slot = self.db.get_slot(50, 0, 15)
