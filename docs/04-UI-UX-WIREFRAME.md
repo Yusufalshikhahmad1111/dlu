@@ -1,146 +1,121 @@
 # 04 — UI / UX Wireframe
 
-## 1. الهدف
+## الهدف
 
-الواجهة يجب أن تبدو كمختبر تشغيل مقسم، لا كلوحة إدارة CRUD.
+الواجهة هي مختبر DLU وليست Dashboard عامة.
 
-المعلومة البصرية الأهم هي حالة المقسم الآن.
+الطالب يجب أن يفهم بصريًا العلاقة:
 
-## 2. الشاشة الرئيسية
+DLU → Shelf → Module → Port → Subscriber
+
+## الشاشة الرئيسية
 
 ~~~text
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ ALE1   SYS: ACT   CRITICAL 0   MAJOR 1   MINOR 2   TRAFFIC 37/120          │
-├───────────────────────────────┬──────────────────────────────────────────────┤
-│                               │ OMT / TERMINAL                               │
-│        DLU OVERVIEW           │ > stat sub: dn=2233500;                     │
-│                               │                                              │
-│  Side 0    Side 1             │ RESULT                                       │
-│  DLUC0     DLUC1              │ DN      EQN         STATE     ...            │
-│                               │ 2233500  50-1-5-0   idle                    │
-│  Shelf 0  [cards...]          │                                              │
-│  Shelf 1  [cards...]          │ >                                            │
-│  ...                           ├──────────────────────────────────────────────┤
-│  Shelf 7  [cards...]          │ QUICK MACROS                                 │
-│                               │ [Expand 8 Lines] [CMRL Demo] [Fault/Repair] │
-│                               │ [Black List]     [Call Demo]                 │
-├───────────────────────────────┴──────────────────────────────────────────────┤
-│ selected: DLU 50 → Shelf 1 → Slot 5 → SLMA8                                  │
-│ Ports: ● ● ● ● ○ ○ ○ ○     Legend: gray=free  green=idle  yellow=mbl/blk   │
-└──────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ALE1   DLU 50   SYSTEM: ACT   CRIT 0   MAJOR 0   MINOR 1                  │
+├───────────────────────────────┬─────────────────────────────────────────────┤
+│ DLU HARDWARE                  │ OMT                                         │
+│                               │ > stat sub: dn=2233500;                     │
+│ Side 0        Side 1          │                                             │
+│ DLUC0         DLUC1           │ DN       EQN        STATE                    │
+│                               │ 2233500  50-1-5-0  idle                     │
+│ Shelf 0  [..16 modules..]    │                                             │
+│ Shelf 1  [..16 modules..]    │ >                                            │
+│ Shelf 2  [..16 modules..]    ├─────────────────────────────────────────────┤
+│ ...                           │ MACROS                                      │
+│ Shelf 7  [..16 modules..]    │ [8-Line Demo] [CMRL] [Maintenance]          │
+│                               │ [Call Demo]  [Blacklist]                    │
+├───────────────────────────────┴─────────────────────────────────────────────┤
+│ Selected: DLU 50 → Shelf 1 → Module 5 → SLMA8                              │
+│ Ports: 0 1 2 3 4 5 6 7                                                     │
+│        ● ● ● ● ○ ○ ○ ○                                                     │
+│        DN DN DN DN -- -- -- --                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
 ~~~
 
-## 3. DLU interactions
+## Level 1 — DLU
 
-### Level 1
+النقر على DLU يظهر:
+- DLU ID
+- controller states
+- channel information when available
+- alarms
+- shelves
 
-Click DLU:
-- show DLU summary.
-- show DLUC0/DLUC1.
-- show alarm state.
-- show channel usage.
+## Level 2 — Shelf
 
-### Level 2
+عند النقر:
+- نكبر الـ Shelf.
+- نعرض Modules بمواقعها.
+- الرقم جزء من EQN.
 
-Click Shelf:
-- zoom into 16 slots.
+مثال:
+Shelf 1
+Module 0 ... Module 15
 
-### Level 3
+ولا نغير الترقيم لمجرد أن التصميم أجمل.
 
-Click Slot/Card:
-- show card type.
-- card state.
-- port matrix.
-- subscriber mapping.
+## Level 3 — Module
 
-### Level 4
+مثال:
+50-1-5
 
-Click Port:
-- show DN.
-- LAC.
-- line state.
-- services.
-- block reason.
-- recent events.
+يعرض:
+- Card type
+- Card state
+- capacity
+- ports
 
-## 4. Visual semantics
+إذا كانت SLMA8:
+0 1 2 3 4 5 6 7
 
-- Gray: unassigned/free.
-- Green: subscriber idle.
-- Blue/Red pulse: busy/call.
-- Yellow: blk or mbl.
-- Red alarm marker: hardware fault/critical.
+إذا كانت بطاقة مختلفة، تُعرض سعتها الفعلية.
 
-الألوان ليست decorative؛ كل لون له معنى تشغيلي واحد.
+## Level 4 — Port
 
-## 5. OMT
+مثال:
+EQN = 50-1-5-0
 
-المطلوب من الطرفية:
-- command input.
-- history.
-- command completion.
-- output text.
-- structured result table.
-- clear screen.
-- macro insertion.
-- optional clock acceleration for command file scheduling.
+وتفاصيل:
+- DN = 2233500
+- LAC = 021
+- line state = idle
+- services
+- block
+- test status
 
-## 6. SYP
+## الألوان
 
-شريط دائم في أعلى الشاشة:
-- CRITICAL.
-- MAJOR.
-- MINOR.
-- PDC usage.
-- current traffic.
-- DLU active/standby health.
+- Gray = unassigned
+- Green = idle
+- Busy = active call
+- Yellow = blocked / maintenance
+- Red alarm marker = alarm
 
-Clicking an alarm يفتح مصدره.
+الألوان لا تمثل نوع البطاقة.
 
-## 7. Call Path mode
+## OMT
 
-عند بدء call، تتحول الشاشة إلى visual trace:
+- history
+- command input
+- raw response
+- structured data
+- error code
+- affected EQN
+- quick macro preview
 
-### Local
-DLU → SN → DLU
+## التعليم
 
-### National
-DLU → LTG → SN → LTG → DLU
+النقر على Port يجب أن يعرض العلاقة مباشرة:
 
-### International
-DLU → LTG → SN → Gateway
+DN 2233500
+⇅
+EQN 50-1-5-0
 
-### Rejected
-SUB → CPT → BLACK LIST / REJECT
+وهذا من أهم أهداف الواجهة.
 
-المطلوب أن يرى الطالب سبب القرار، لا animation بلا معنى.
+## قاعدة عدم الاختراع
 
-## 8. Labs navigation
+أي عنصر بصري لا نستطيع ربطه ببيانات Hardware أو Dataset معروف لا يظهر كحقيقة في الشاشة.
 
-Sidebar:
-- Exchange
-- DLU
-- OMT
-- Calls
-- OSI/TCP
-- Signals & Modulation
-- Scenarios
-- Database/Reset
-- About
-
-## 9. Responsive strategy
-
-الهدف الأساسي desktop 1366×768 وما فوق.
-
-لا نطارد mobile design. عند الشاشات الأصغر نستخدم:
-- collapsible DLU.
-- drawer للـ OMT.
-- modal للport details.
-
-## 10. Accessibility / teaching
-
-- labels واضحة.
-- tooltip لكل لون.
-- command error لا يظهر كرقم فقط.
-- كل macro يعرض الأوامر التي سينفذها قبل التنفيذ.
-- reset demo state واضح.
+الـ zoom والselection والtooltips والlegend أدوات عرض فقط، وليست ادعاءات عن العتاد.
