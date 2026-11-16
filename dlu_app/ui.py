@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QRectF, Qt
-from PySide6.QtGui import QColor, QBrush, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QBrush, QDrag, QFont, QPainter, QPainterPath, QPen, QMimeData
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -126,17 +126,54 @@ class HardwareView(QGraphicsView):
         self.current_dlu = 50
         self.current_shelf = 0
         self.current_module = 15
+        self.controller = None
+        self.setAcceptDrops(True)
 
     def wheelEvent(self, event):
         factor = 1.18 if event.angleDelta().y() > 0 else 0.85
         self.scale(factor, factor)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasFormat("application/x-dlu-card"):
+            event.acceptProposedAction()
+            return
+        event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasFormat("application/x-dlu-card"):
+            event.acceptProposedAction()
+            return
+        event.ignore()
+
+    def dropEvent(self, event):
+        if not event.mimeData().hasFormat("application/x-dlu-card"):
+            event.ignore()
+            return
+        card = bytes(event.mimeData().data("application/x-dlu-card")).decode("utf-8")
+        scene_pos = self.mapToScene(event.position().toPoint())
+        item = self.scene_obj.itemAt(scene_pos, self.transform())
+        target = item
+        while target is not None and not isinstance(target, ClickableRectItem):
+            target = target.parentItem()
+        if (
+            isinstance(target, ClickableRectItem)
+            and isinstance(target.data, tuple)
+            and len(target.data) == 3
+            and self.controller is not None
+        ):
+            dlu, shelf, module = target.data
+            self.controller.install_card_at(
+                int(dlu), int(shelf), int(module), card
+            )
+            event.acceptProposedAction()
+            return
+        event.ignore()
 
     def reset_zoom(self):
         self.resetTransform()
         rect = self.scene().itemsBoundingRect().adjusted(-30, -30, 30, 30)
         if rect.width() > 0 and rect.height() > 0:
             self.fitInView(rect, Qt.KeepAspectRatio)
-
 
 class HardwareSelectorDialog(QDialog):
     def __init__(self, db: Database, parent=None, card_type: str | None = None):
@@ -292,6 +329,25 @@ class ReferenceDialog(QDialog):
         layout.addWidget(buttons)
 
 
+class CardLibraryList(QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setDragEnabled(True)
+
+    def startDrag(self, supportedActions):
+        item = self.currentItem()
+        if item is None:
+            return
+        code = item.data(Qt.UserRole)
+        if not code or code == "UNCONFIGURED":
+            return
+        mime = QMimeData()
+        mime.setData("application/x-dlu-card", str(code).encode("utf-8"))
+        mime.setText(str(code))
+        drag = QDrag(self)
+        drag.setMimeData(mime)
+        drag.exec(Qt.CopyAction)
+
 class CardLibraryDialog(QDialog):
     def __init__(self, db: Database, parent=None):
         super().__init__(parent)
@@ -299,7 +355,7 @@ class CardLibraryDialog(QDialog):
         self.setWindowTitle("Hardware Library")
         self.resize(950, 520)
         root = QVBoxLayout(self)
-        list_widget = QListWidget()
+        list_widget = CardLibraryList()
         details = QTableWidget(0, 2)
         details.setHorizontalHeaderLabels(["Field", "Value"])
         details.horizontalHeader().setStretchLastSection(True)
@@ -498,6 +554,7 @@ class DluSimulatorWindow(QMainWindow):
         self.refresh_nav_modules()
 
         self.hardware = HardwareView()
+        self.hardware.controller = self
         ll.addWidget(self.hardware, 1)
 
         self.legend = QLabel(
@@ -785,9 +842,7 @@ class DluSimulatorWindow(QMainWindow):
             display_action = menu.addAction("Display Module")
             reference_action = menu.addAction("Reference")
             maintenance_action = menu.addAction("Maintenance")
-            action = menu.exec(self.hardware.mapToGlobal(self.hardware.mapFromScene(
-                self.hardware.mapToScene(self.hardware.mapFromGlobal(self.cursor().pos()))
-            )))
+            action = menu.exec(self.cursor().pos())
             if action is display_action:
                 self.show_module(dlu, shelf, module)
             elif action is reference_action:
@@ -1291,7 +1346,17 @@ class DluSimulatorWindow(QMainWindow):
                 ReferenceDialog(ref,self).exec()
 
     def open_library(self):
-        CardLibraryDialog(self.db,self).exec()
+        if getattr(self, "library_dialog", None) is not None:
+            self.library_dialog.raise_()
+            self.library_dialog.activateWindow()
+            return
+        self.library_dialog = CardLibraryDialog(self.db, self)
+        self.library_dialog.setWindowModality(Qt.NonModal)
+        self.library_dialog.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.library_dialog.destroyed.connect(
+            lambda: setattr(self, "library_dialog", None)
+        )
+        self.library_dialog.show()
 
     def inject_selected_fault(self):
         if self.current_view != "module":
@@ -1339,6 +1404,36 @@ class DluSimulatorWindow(QMainWindow):
             self._refresh_current_view()
         except ValueError as exc:
             QMessageBox.warning(self,"Remove Card",str(exc))
+
+    def install_card_at(self, dlu: int, shelf: int, module: int, card_type: str):
+        slot = self.db.get_slot(dlu, shelf, module)
+        if slot is None:
+            QMessageBox.warning(self, "Install Card", "Target module does not exist.")
+            return
+        if slot.card_type != "UNCONFIGURED":
+            QMessageBox.warning(
+                self,
+                "Install Card",
+                f"Module {dlu}-{shelf}-{module} already contains {slot.card_type}.",
+            )
+            return
+        ref = self.db.get_card_reference(card_type)
+        if ref is None or not ref.verified:
+            QMessageBox.warning(
+                self,
+                "Install Card",
+                f"{card_type} is not in the verified hardware registry.",
+            )
+            return
+        try:
+            self.db.install_card(dlu, shelf, module, card_type)
+            self.show_module(dlu, shelf, module)
+            self.terminal.append(
+                f"<span style='color:{GREEN}'>Drag&Drop installed "
+                f"{card_type} at {dlu}-{shelf}-{module}</span>"
+            )
+        except ValueError as exc:
+            QMessageBox.warning(self, "Install Card", str(exc))
 
     def install_selected_card(self):
         if self.current_view != "module":
