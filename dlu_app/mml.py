@@ -437,21 +437,41 @@ class MmlEngine:
                 "CONF DLU needs dluc0=y|n and ost=mbl|act",
             )
 
+        controller = requested.lower()
+        maintenance = ost.lower()
+
+        if controller not in {"y", "yes"}:
+            return MmlResult(
+                False,
+                "MML-PARAM",
+                "This prototype currently configures DLUC0 with dluc0=y",
+            )
+
+        if maintenance not in {"mbl", "act"}:
+            return MmlResult(
+                False,
+                "MML-PARAM",
+                "ost must be mbl or act",
+            )
+
         with self.db.conn:
-            if requested.lower() in {"y", "yes"}:
-                if ost.lower() == "mbl":
-                    self.db.conn.execute(
-                        "UPDATE dlus SET dluc0_state='mbl', dluc1_state='act' "
-                        "WHERE dlu_id=?",
-                        (dlu_id,),
-                    )
-                    self.db.clear_active_alarms(f"DLU {dlu_id}")
-                else:
-                    self.db.conn.execute(
-                        "UPDATE dlus SET dluc0_state='act' WHERE dlu_id=?",
-                        (dlu_id,),
-                    )
-                self.db.event(
+            if maintenance == "mbl":
+                self.db.conn.execute(
+                    "UPDATE dlus SET dluc0_state='mbl', dluc1_state='act' "
+                    "WHERE dlu_id=?",
+                    (dlu_id,),
+                )
+                self.db.clear_active_alarms(f"DLU {dlu_id}")
+            else:
+                # Returning DLUC0 to service must restore the partner to standby.
+                self.db.conn.execute(
+                    "UPDATE dlus SET dluc0_state='act', dluc1_state='standby' "
+                    "WHERE dlu_id=?",
+                    (dlu_id,),
+                )
+                self.db.clear_active_alarms(f"DLU {dlu_id}")
+
+            self.db.event(
                     "DluStateChanged",
                     "dlu",
                     str(dlu_id),
