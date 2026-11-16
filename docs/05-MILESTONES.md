@@ -46,7 +46,7 @@
 
 ## Stage 2 — Hardware Fidelity + MML Core
 
-**الحالة: Implemented — CI/manual validation pending final Windows run**
+**الحالة: Code-complete — final Windows manual audit is the release gate**
 
 المخرجات:
 - Hardware Dataset + source registry.
