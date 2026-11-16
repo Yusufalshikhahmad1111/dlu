@@ -1146,87 +1146,162 @@ class DluSimulatorWindow(QMainWindow):
 
     def draw_physical_dlu(self, dlu_id: int):
         dlu = self.db.get_dlu(dlu_id)
-        self.add_text(24, 18, f"DLU {dlu_id} · DIGITAL LINE UNIT", 22, TEXT, True)
+        scene = self.hardware.scene_obj
+        self.add_text(34, 18, f"DLU {dlu_id}", 26, TEXT, True)
         self.add_text(
-            24, 50,
-            "Front elevation training model · 8 shelves × 16 module positions",
-            11, MUTED
+            34, 52,
+            "DIGITAL LINE UNIT · 8 SHELVES · 16 MODULE POSITIONS / SHELF",
+            11, MUTED, True
         )
 
-        frame = QRectF(20, 90, 1040, 780)
-        self.hardware.scene_obj.addRect(
-            frame, QPen(QColor("#3a5265"), 2),
-            QBrush(QColor("#0d1821"))
+        chassis = rounded_path(24, 86, 1060, 790, 18)
+        scene.addPath(
+            chassis,
+            QPen(QColor("#35516c"), 2.2),
+            QBrush(QColor("#091521")),
+        )
+        # Rack rails.
+        scene.addRoundedRect(
+            QRectF(36, 102, 12, 754),
+            5, 5,
+            QPen(QColor("#304c64")),
+            QBrush(QColor("#13263a")),
+        )
+        scene.addRoundedRect(
+            QRectF(1060, 102, 12, 754),
+            5, 5,
+            QPen(QColor("#304c64")),
+            QBrush(QColor("#13263a")),
+        )
+        add_rack_rivets(scene, 54, 98, 1010, 4)
+
+        # Identification plate.
+        plate = rounded_path(62, 108, 360, 78, 10)
+        scene.addPath(
+            plate,
+            QPen(QColor("#3a5e7c"), 1.4),
+            QBrush(QColor("#0e2132")),
+        )
+        self.add_text(82, 122, f"DLU {dlu_id} · SYSTEM RACK", 14, TEXT, True)
+        self.add_text(82, 148, "SIEMENS EWSD TRAINING CHASSIS", 9, CYAN, True)
+        self.add_text(
+            82, 166,
+            f"DLUC0 {dlu['dluc0_state'].upper()} · DLUC1 {dlu['dluc1_state'].upper()}",
+            8, GREEN if dlu["dluc0_state"] == "act" else YELLOW, True
         )
 
-        side0 = QRectF(40, 115, 120, 86)
-        side1 = QRectF(180, 115, 120, 86)
-        for rect, label, state in (
-            (side0, "DLUC0", dlu["dluc0_state"]),
-            (side1, "DLUC1", dlu["dluc1_state"]),
-        ):
-            self.hardware.scene_obj.addRect(
-                rect, QPen(QColor(state_color(state)), 2),
-                QBrush(QColor("#172832"))
+        # Controller / interface section.
+        control_y = 112
+        for idx, (label, state) in enumerate((
+            ("DLUC0", dlu["dluc0_state"]),
+            ("DLUC1", dlu["dluc1_state"]),
+        )):
+            x = 450 + idx * 150
+            shell = rounded_path(x, control_y, 132, 70, 9)
+            accent = state_color(state)
+            scene.addPath(
+                shell,
+                QPen(QColor(accent), 1.5),
+                QBrush(QColor("#0e1e2c")),
             )
-            self.add_text(rect.x()+12, rect.y()+10, label, 12, TEXT, True)
-            self.add_text(rect.x()+12, rect.y()+38, state.upper(), 11, state_color(state), True)
+            self.add_text(x + 12, control_y + 10, label, 10, TEXT, True)
+            self.add_text(x + 12, control_y + 34, state.upper(), 11, accent, True)
+            scene.addEllipse(
+                QRectF(x + 102, control_y + 13, 10, 10),
+                QPen(QColor(accent)),
+                QBrush(QColor(accent)),
+            )
 
-        for i, name in enumerate(["DIUD0", "DIUD1", "PDC0", "PDC1", "PDC2", "PDC3"]):
-            x = 330 + i * 105
-            rect = QRectF(x, 125, 90, 60)
-            self.hardware.scene_obj.addRect(
-                rect, QPen(QColor("#344d60")),
-                QBrush(QColor("#121f28"))
+        for i, name in enumerate(["DIUD0", "DIUD1", "PDC0", "PDC1"]):
+            x = 760 + i * 74
+            shell = rounded_path(x, 126, 64, 44, 6)
+            scene.addPath(
+                shell,
+                QPen(QColor("#29455d"), 1),
+                QBrush(QColor("#0c1a27")),
             )
-            self.add_text(x+10, 138, name, 9, TEXT, True)
-            self.add_text(x+10, 158, "CTRL", 8, MUTED)
+            self.add_text(x + 7, 138, name, 7, BLUE if name.startswith("DIUD") else MUTED, True)
+            scene.addEllipse(
+                QRectF(x + 45, 138, 7, 7),
+                QPen(QColor(CYAN)),
+                QBrush(QColor(CYAN)),
+            )
 
         for shelf in range(8):
-            self.draw_shelf_strip(dlu_id, shelf, 45, 225 + shelf * 75)
+            self.draw_shelf_strip(dlu_id, shelf, 54, 212 + shelf * 78)
 
-        self.hardware.scene_obj.setSceneRect(0, 0, 1080, 900)
+        scene.setSceneRect(0, 0, 1110, 905)
         self.hardware.reset_zoom()
 
         self._set_details({
-            "DLU":dlu_id,
-            "Controller 0":dlu["dluc0_state"],
-            "Controller 1":dlu["dluc1_state"],
-            "Shelves":"0..7",
-            "Modules/Shelf":"0..15",
-            "View":"Physical",
+            "DLU": dlu_id,
+            "Controller 0": dlu["dluc0_state"],
+            "Controller 1": dlu["dluc1_state"],
+            "Shelves": "0..7",
+            "Modules/Shelf": "0..15",
+            "View": "Physical Rack",
         })
 
+
     def draw_shelf_strip(self, dlu_id: int, shelf: int, x: float, y: float):
-        self.add_text(x, y + 8, f"SHELF {shelf}", 10, TEXT, True)
-        base = QRectF(x + 85, y, 910, 62)
-        self.hardware.scene_obj.addRect(
+        scene = self.hardware.scene_obj
+        label_color = CYAN if shelf == self.hardware.current_shelf else MUTED
+
+        self.add_text(x, y + 14, f"SHELF {shelf}", 9, label_color, True)
+
+        base = rounded_path(x + 72, y, 970, 62, 8)
+        scene.addPath(
             base,
-            QPen(QColor("#324a5b"), 1.2),
-            QBrush(QColor("#111d26"))
+            QPen(QColor("#314e67"), 1.2),
+            QBrush(QColor("#0c1b29")),
         )
+        scene.addRoundedRect(
+            QRectF(x + 80, y + 8, 7, 46),
+            3, 3,
+            QPen(QColor(label_color)),
+            QBrush(QColor(label_color)),
+        )
+        add_rack_rivets(scene, x + 94, y + 5, 940, 5)
+
         slots = self.db.list_shelf(dlu_id, shelf)
         for slot in slots:
-            mx = x + 95 + slot["module"] * 55
-            fill = "#16222b" if slot["card_type"] == "UNCONFIGURED" else "#132b24"
-            edge = BORDER if slot["card_type"] == "UNCONFIGURED" else GREEN
-            if slot["fault_state"] == "fault":
-                fill = "#311d21"
-                edge = RED
+            mx = x + 96 + slot["module"] * 58
+            configured = slot["card_type"] != "UNCONFIGURED"
+            fault = slot["fault_state"] == "fault"
+            accent = RED if fault else (GREEN if configured else "#31485d")
+            fill = "#102a2b" if configured else "#0a1722"
+            if fault:
+                fill = "#2d1820"
+
+            visual = rounded_path(mx, y + 10, 52, 42, 5)
+            scene.addPath(
+                visual,
+                QPen(QColor(accent), 1.1),
+                QBrush(QColor(fill)),
+            )
+            scene.addLine(
+                mx + 7, y + 18, mx + 45, y + 18,
+                QPen(QColor("#38546c"), 1),
+            )
+            scene.addEllipse(
+                QRectF(mx + 7, y + 28, 6, 6),
+                QPen(QColor(accent)),
+                QBrush(QColor(accent)),
+            )
+            self.add_text(mx + 18, y + 24, str(slot["module"]), 7, TEXT, True)
+
             item = ClickableRectItem(
-                QRectF(mx, y + 6, 49, 50),
+                QRectF(mx, y + 10, 52, 42),
                 lambda data: self.show_module(*data),
                 (dlu_id, shelf, slot["module"]),
                 f"{dlu_id}-{shelf}-{slot['module']} · {slot['card_type']} · {slot['port_count']} ports",
                 on_double_click=lambda data: self.show_module(*data),
                 on_context=lambda data: self.open_hardware_context(data),
             )
-            item.setBrush(QBrush(QColor(fill)))
-            item.setPen(QPen(QColor(edge), 1.1))
-            self.hardware.scene_obj.addItem(item)
-            self.add_text(mx+4, y+10, str(slot["module"]), 8, TEXT, True)
-            label = slot["card_type"] if slot["card_type"] != "UNCONFIGURED" else "EMPTY"
-            self.add_text(mx+3, y+28, label[:8], 6, edge, True)
+            item.setBrush(Qt.NoBrush)
+            item.setPen(Qt.NoPen)
+            scene.addItem(item)
+
 
     def draw_logical_dlu(self, dlu_id: int):
         dlu = self.db.get_dlu(dlu_id)
