@@ -117,7 +117,7 @@ python -m pytest -q tests
 
 ## الحالة
 
-Stage 3 — Call Engine + CPT + Call Path: implemented
+Stage 3 — Call Engine + CPT + Call Path: **completed**
 - CPT exact/prefix/range resolution.
 - LOCAL / NATIONAL / INTERNATIONAL / SERVICE call analysis.
 - Persistent call sessions and PDC voice resource accounting (120 channels).
@@ -126,6 +126,8 @@ Stage 3 — Call Engine + CPT + Call Path: implemented
 - International DLU → LTG → SN → International Gateway path.
 - CPT EVAL=NO blacklist blocking before resource reservation.
 - CALL ENGINE · CPT · CALL PATH teaching UI.
-- Stage 3 automated tests and Windows manual QA checklist.
+- OMT TEST/STAT/DISP CALL integration.
+- Stage 3 automated coverage.
+- Windows manual QA completed successfully.
 
-التالي: Command Files، ثم Communication Labs وPackaging.
+التالي: Stage 4 — Command Files.
