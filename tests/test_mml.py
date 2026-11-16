@@ -73,3 +73,18 @@ def test_diag_guard():
     finally:
         db.close()
         tmp.cleanup()
+
+
+def test_seed_has_25_dlus_and_16_modules_per_shelf():
+    tmp, db, mml = make_engine()
+    try:
+        dlus = db.list_dlus()
+        assert len(dlus) == 25
+        assert [row["dlu_id"] for row in dlus] == list(range(10, 251, 10))
+
+        shelf = db.list_shelf(10, 0)
+        assert len(shelf) == 16
+        assert [row["module"] for row in shelf] == list(range(16))
+    finally:
+        db.close()
+        tmp.cleanup()
