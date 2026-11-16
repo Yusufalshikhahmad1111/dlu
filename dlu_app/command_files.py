@@ -110,10 +110,10 @@ class CommandFileEngine:
         if not indexed_lines:
             raise ValueError("Command file is empty")
 
-        first_no, first_line = indexed_lines[0]
+        _first_no, first_line = indexed_lines[0]
         if first_line.startswith(">") and first_line.endswith(";"):
             first_body = first_line[1:-1].strip()
-            if re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*", first_body):
+            if first_body.casefold() == name.casefold():
                 indexed_lines = indexed_lines[1:]
 
         if indexed_lines:
