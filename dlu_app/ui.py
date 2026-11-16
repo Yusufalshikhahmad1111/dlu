@@ -32,6 +32,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QListWidget,
     QListWidgetItem,
+    QToolButton,
 )
 
 from .call_engine import CallEngine
@@ -40,18 +41,21 @@ from .db import CardReference, Database
 from .mml import MmlEngine, MmlResult
 
 
-BG = "#071018"
-PANEL = "#0e1923"
-PANEL2 = "#0a141c"
-STEEL = "#71869a"
-TEXT = "#dce8f2"
-MUTED = "#7e96aa"
-BORDER = "#243a4b"
-GREEN = "#42d392"
-YELLOW = "#f0c75e"
-RED = "#ef6262"
-BLUE = "#5aa8ff"
-AMBER = "#e3a83b"
+BG = "#050914"
+PANEL = "#0c1728"
+PANEL2 = "#08111f"
+PANEL3 = "#102033"
+STEEL = "#718aa2"
+TEXT = "#f3f8ff"
+MUTED = "#8fa6bd"
+BORDER = "#28435e"
+GREEN = "#39e6a5"
+YELLOW = "#ffc857"
+RED = "#ff6577"
+BLUE = "#66a8ff"
+CYAN = "#40d9ff"
+VIOLET = "#9b7bff"
+AMBER = "#ffc857"
 WHITE = "#f7fbff"
 
 
@@ -66,6 +70,22 @@ def state_color(state: str) -> str:
     if value in {"test", "diagnostic"}:
         return BLUE
     return STEEL
+
+
+def rounded_path(x: float, y: float, w: float, h: float, radius: float = 10) -> QPainterPath:
+    path = QPainterPath()
+    path.addRoundedRect(QRectF(x, y, w, h), radius, radius)
+    return path
+
+
+def add_rack_rivets(scene, x: float, y: float, w: float, count: int = 4):
+    for i in range(count):
+        px = x + 8 + i * max(1.0, (w - 16) / max(1, count - 1))
+        scene.addEllipse(
+            QRectF(px - 2, y, 4, 4),
+            QPen(QColor("#5c7892")),
+            QBrush(QColor("#15263a")),
+        )
 
 
 class ClickableRectItem(QGraphicsRectItem):
