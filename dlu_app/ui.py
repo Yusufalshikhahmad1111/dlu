@@ -511,7 +511,7 @@ class DluSimulatorWindow(QMainWindow):
         self.show_hardware_home()
         self.refresh_status()
         self.terminal.append(
-            "<span style='color:#7e96aa'>DLU Lab ready. "
+            "<span style='color:{MUTED}'>DLU Lab ready. "
             "Hardware-first mode active. Type &gt; help;</span>"
         )
 
@@ -547,6 +547,12 @@ class DluSimulatorWindow(QMainWindow):
         self.logical_btn.clicked.connect(lambda: self.set_mode("logical"))
         h.addWidget(self.physical_btn)
         h.addWidget(self.logical_btn)
+
+        self.theme_btn = QPushButton("THEME: IVORY")
+        self.theme_btn.setObjectName("ThemeToggle")
+        self.theme_btn.setToolTip("Toggle between Brown + Ivory and Brown + Silver")
+        self.theme_btn.clicked.connect(self.toggle_theme)
+        h.addWidget(self.theme_btn)
 
         self.status_chip = QLabel("SYSTEM ACT")
         self.status_chip.setObjectName("StatusChip")
@@ -871,49 +877,49 @@ class DluSimulatorWindow(QMainWindow):
                 font-weight:900;
             }}
             QFrame#CommandDock {{
-                background:#091a2a;
-                border:1px solid #3b79a5;
+                background:{PANEL2};
+                border:1px solid {BORDER};
             }}
             QPushButton, QToolButton {{
-                background:#0f2133;
-                border:1px solid #2d4e69;
+                background:{PANEL2};
+                border:1px solid {BORDER};
                 border-radius:8px;
                 padding:8px 12px;
                 color:{TEXT};
                 font-weight:700;
             }}
             QPushButton:hover, QToolButton:hover {{
-                background:#16334b;
+                background:{PANEL3};
                 border-color:{CYAN};
             }}
             QPushButton:pressed, QToolButton:pressed {{
-                background:#1a3f5c;
+                background:{PANEL3};
             }}
             QPushButton:disabled {{
-                color:#536a7d;
-                background:#0a151f;
-                border-color:#1b3042;
+                color:{MUTED};
+                background:{DEEP};
+                border-color:{BORDER};
             }}
             QPushButton#PrimaryScenario {{
                 background:qlineargradient(x1:0,y1:0,x2:1,y2:0,
-                    stop:0 #12354d, stop:1 #19385a);
+                    stop:0 {PANEL3}, stop:1 {PANEL3});
                 border:1px solid {CYAN};
                 min-width:120px;
                 padding:10px 14px;
                 font-weight:900;
             }}
             QPushButton#PrimaryScenario:hover {{
-                background:#1a4864;
+                background:{CARD};
             }}
             QPushButton#CommandSend {{
-                background:#123e55;
+                background:{PANEL3};
                 border:1px solid {CYAN};
                 min-width:88px;
                 font-weight:900;
             }}
             QComboBox {{
-                background:#091b2b;
-                border:1px solid #2e4f69;
+                background:{DEEP};
+                border:1px solid {BORDER};
                 border-radius:8px;
                 padding:7px 9px;
                 min-height:28px;
@@ -922,35 +928,35 @@ class DluSimulatorWindow(QMainWindow):
                 border-color:{CYAN};
             }}
             QLineEdit {{
-                background:#061421;
-                border:1px solid #2f5875;
+                background:{DEEP};
+                border:1px solid {BORDER};
                 border-radius:8px;
                 padding:8px 10px;
                 color:{TEXT};
             }}
             QLineEdit:focus {{
                 border:2px solid {CYAN};
-                background:#071a2b;
+                background:{PANEL};
             }}
             QComboBox, QLineEdit, QTextEdit, QTableWidget, QListWidget {{
-                selection-background-color:#164764;
+                selection-background-color:{PANEL3};
                 selection-color:{WHITE};
             }}
             QTextEdit#Terminal {{
-                background:#061421;
-                border:1px solid #203d56;
+                background:{DEEP};
+                border:1px solid {BORDER};
                 border-radius:9px;
                 font-family:Cascadia Mono, Consolas, monospace;
                 font-size:12px;
                 padding:10px;
             }}
             QTableWidget {{
-                background:#081723;
+                background:{PANEL2};
                 border:1px solid {BORDER};
-                gridline-color:#1e3548;
+                gridline-color:{BORDER};
             }}
             QHeaderView::section {{
-                background:#10283b;
+                background:{PANEL3};
                 color:{TEXT};
                 border:0;
                 padding:7px;
@@ -962,9 +968,9 @@ class DluSimulatorWindow(QMainWindow):
                 border-radius:9px;
             }}
             QTabBar::tab {{
-                background:#0b1a29;
+                background:{PANEL2};
                 color:{MUTED};
-                border:1px solid #233f57;
+                border:1px solid {BORDER};
                 border-bottom:0;
                 padding:9px 16px;
                 margin-right:3px;
@@ -973,26 +979,33 @@ class DluSimulatorWindow(QMainWindow):
                 font-weight:800;
             }}
             QTabBar::tab:selected {{
-                background:#12344a;
+                background:{PANEL3};
                 color:{TEXT};
                 border-color:{CYAN};
             }}
             QMenu {{
-                background:#0b1724;
+                background:{PANEL2};
                 color:{TEXT};
                 border:1px solid {BORDER};
             }}
             QMenu::item:selected {{
-                background:#12364c;
+                background:{PANEL3};
             }}
             QSplitter::handle {{
-                background:#091522;
+                background:{DEEP};
             }}
             """
         )
 
+    def toggle_theme(self):
+        self.set_theme("silver" if THEME_NAME == "ivory" else "ivory")
+
     def set_theme(self, name: str):
         apply_theme_palette(name)
+        if hasattr(self, "theme_btn"):
+            self.theme_btn.setText(
+                "THEME: IVORY" if name == "ivory" else "THEME: SILVER"
+            )
         self._apply_style()
         if hasattr(self, "call_lab") and hasattr(self.call_lab, "set_theme"):
             self.call_lab.set_theme(name)
