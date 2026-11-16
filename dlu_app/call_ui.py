@@ -22,16 +22,19 @@ from PySide6.QtWidgets import (
 from .call_engine import CallEngine, CallPath, CallResult
 
 
-BG = "#071018"
-PANEL = "#0e1923"
-PANEL2 = "#0a141c"
-BORDER = "#243a4b"
-TEXT = "#dce8f2"
-MUTED = "#7e96aa"
-GREEN = "#42d392"
-YELLOW = "#f0c75e"
-RED = "#ef6262"
-BLUE = "#5aa8ff"
+BG = "#050914"
+PANEL = "#0c1728"
+PANEL2 = "#08111f"
+PANEL3 = "#102033"
+BORDER = "#28435e"
+TEXT = "#f3f8ff"
+MUTED = "#8fa6bd"
+GREEN = "#39e6a5"
+YELLOW = "#ffc857"
+RED = "#ff6577"
+BLUE = "#66a8ff"
+CYAN = "#40d9ff"
+VIOLET = "#9b7bff"
 
 
 class CallPathView(QGraphicsView):
@@ -51,36 +54,52 @@ class CallPathView(QGraphicsView):
         if not path:
             return
 
-        x0, y0 = 25, 65
-        box_w, box_h, gap = 145, 78, 35
+        x0, y0 = 24, 58
+        box_w, box_h, gap = 152, 92, 36
         colors = {
             "DLU": GREEN,
             "SN": BLUE,
             "LTG": YELLOW,
-            "GATEWAY": "#b88cff",
-            "SERVICE": "#72d6c9",
+            "GATEWAY": VIOLET,
+            "SERVICE": CYAN,
             "CPT": RED,
         }
 
         for idx, node in enumerate(path.nodes):
             x = x0 + idx * (box_w + gap)
             color = colors.get(node.node_type, MUTED)
-            rounded = QPainterPath()
-            rounded.addRoundedRect(
-                QRectF(x, y0, box_w, box_h),
-                10,
-                10,
-            )
+
+            body = QPainterPath()
+            body.addRoundedRect(QRectF(x, y0, box_w, box_h), 12, 12)
             self.scene_obj.addPath(
-                rounded,
+                body,
                 QPen(QColor(color), 2),
-                QBrush(QColor("#101d27")),
+                QBrush(QColor("#0a1724")),
             )
+
+            header = QPainterPath()
+            header.addRoundedRect(QRectF(x + 7, y0 + 7, box_w - 14, 22), 7, 7)
+            self.scene_obj.addPath(
+                header,
+                QPen(QColor("#294a63"), 1),
+                QBrush(QColor("#0f2638")),
+            )
+
+            tag = self.scene_obj.addText(node.node_type)
+            tag.setDefaultTextColor(QColor(color))
+            tag.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+            tag.setPos(x + 14, y0 + 10)
 
             label = self.scene_obj.addText(node.label)
             label.setDefaultTextColor(QColor(TEXT))
             label.setFont(QFont("Segoe UI", 10, QFont.Weight.Bold))
-            label.setPos(x + 10, y0 + 24)
+            label.setPos(x + 12, y0 + 41)
+
+            self.scene_obj.addEllipse(
+                QRectF(x + box_w - 24, y0 + 12, 7, 7),
+                QPen(QColor(color)),
+                QBrush(QColor(color)),
+            )
 
             if idx:
                 line_color = GREEN if active else RED
@@ -91,14 +110,20 @@ class CallPathView(QGraphicsView):
                     y0 + box_h / 2,
                     QPen(QColor(line_color), 3),
                 )
+                self.scene_obj.addEllipse(
+                    QRectF(x - 12, y0 + box_h / 2 - 4, 8, 8),
+                    QPen(QColor(line_color)),
+                    QBrush(QColor(line_color)),
+                )
 
         self.scene_obj.setSceneRect(
             0,
             0,
-            max(700, x0 + len(path.nodes) * (box_w + gap)),
+            max(760, x0 + len(path.nodes) * (box_w + gap)),
             220,
         )
         self.fitInView(self.scene_obj.sceneRect(), Qt.KeepAspectRatio)
+
 
 
 class CallLabWidget(QWidget):
@@ -125,7 +150,13 @@ class CallLabWidget(QWidget):
 
         controls = QFrame()
         controls.setStyleSheet(
-            f"QFrame {{background:{PANEL};border:1px solid {BORDER};border-radius:8px;}}"
+            f"QFrame {{background:{PANEL};border:1px solid {BORDER};border-radius:12px;}}"
+            f" QLabel {{color:{MUTED};font-weight:700;}}"
+            f" QPushButton {{background:#0f2133;border:1px solid #2d4e69;"
+            f"border-radius:8px;padding:8px 12px;color:{TEXT};font-weight:800;}}"
+            f" QPushButton:hover {{background:#16334b;border-color:{CYAN};}}"
+            f" QLineEdit,QComboBox {{background:#061421;border:1px solid #2f5875;"
+            f"border-radius:8px;padding:8px;color:{TEXT};}}"
         )
         form = QVBoxLayout(controls)
 
@@ -173,8 +204,8 @@ class CallLabWidget(QWidget):
 
         self.status = QLabel("IDLE · No active call")
         self.status.setStyleSheet(
-            f"padding:8px;border:1px solid {BORDER};"
-            f"border-radius:6px;color:{GREEN};"
+            f"padding:10px;border:1px solid {BORDER};"
+            f"border-radius:9px;background:#091a2a;color:{GREEN};font-weight:800;"
         )
         root.addWidget(self.status)
 
@@ -189,7 +220,8 @@ class CallLabWidget(QWidget):
         self.details.setReadOnly(True)
         self.details.setMaximumHeight(190)
         self.details.setStyleSheet(
-            f"background:{PANEL2};border:1px solid {BORDER};font-family:Consolas;"
+            f"background:{PANEL2};border:1px solid {BORDER};"
+            f"border-radius:9px;font-family:Cascadia Mono,Consolas;"
         )
         root.addWidget(self.details)
 
