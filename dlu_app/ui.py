@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMessageBox,
     QPushButton,
     QSplitter,
     QTableWidget,
@@ -89,7 +90,11 @@ class HardwareView(QGraphicsView):
 
 
 class HardwareSelectorDialog(QDialog):
-    """Teaching-oriented DLU -> Shelf -> Module selector."""
+    """Teaching-oriented DLU -> Shelf -> Module selector.
+
+    For scenarios such as 8-Line/CMRL, all 16 module positions are shown.
+    Compatibility is displayed and enforced instead of hiding positions.
+    """
 
     def __init__(self, db: Database, parent=None, card_type: str | None = None):
         super().__init__(parent)
@@ -101,7 +106,7 @@ class HardwareSelectorDialog(QDialog):
             title += f" · {card_type}"
         self.setWindowTitle(title)
         self.setModal(True)
-        self.resize(430, 260)
+        self.resize(500, 300)
 
         layout = QVBoxLayout(self)
         heading = QLabel(
@@ -121,17 +126,15 @@ class HardwareSelectorDialog(QDialog):
         form.addRow("Module", self.module_combo)
         layout.addLayout(form)
 
-        hint = QLabel(
-            "Module choices update with the selected Shelf."
-            if not card_type
-            else "Only modules containing this card type are listed."
-        )
-        hint.setObjectName("Legend")
-        layout.addWidget(hint)
+        self.status_label = QLabel()
+        self.status_label.setWordWrap(True)
+        self.status_label.setObjectName("Legend")
+        layout.addWidget(self.status_label)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         )
+        self.ok_button = buttons.button(QDialogButtonBox.Ok)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -142,30 +145,84 @@ class HardwareSelectorDialog(QDialog):
 
         self.dlu_combo.currentTextChanged.connect(self._refresh_modules)
         self.shelf_combo.currentTextChanged.connect(self._refresh_modules)
+        self.module_combo.currentIndexChanged.connect(self._update_compatibility)
+
         self._refresh_modules()
 
     def _refresh_modules(self):
         if not self.dlu_combo.currentText() or not self.shelf_combo.currentText():
             return
+
         dlu = int(self.dlu_combo.currentText())
         shelf = int(self.shelf_combo.currentText())
         current = self.module_combo.currentData()
 
         self.module_combo.blockSignals(True)
         self.module_combo.clear()
-        for row in self.db.list_shelf(dlu, shelf):
-            if self.card_type and row["card_type"] != self.card_type:
-                continue
-            label = f"{row['module']} · {row['card_type']} · {row['port_count']}P"
-            self.module_combo.addItem(label, row["module"])
+
+        # Always show the complete physical module position range 0..15.
+        rows = {
+            row["module"]: row
+            for row in self.db.list_shelf(dlu, shelf)
+        }
+        for module in range(16):
+            row = rows[module]
+            label = (
+                f"{module} · {row['card_type']} · "
+                f"{row['port_count']}P"
+            )
+            self.module_combo.addItem(label, module)
+
         if current is not None:
             for i in range(self.module_combo.count()):
                 if self.module_combo.itemData(i) == current:
                     self.module_combo.setCurrentIndex(i)
                     break
+
         self.module_combo.blockSignals(False)
+        self._update_compatibility()
+
+    def _update_compatibility(self):
+        module = self.module_combo.currentData()
+        if module is None:
+            self.status_label.setText("No module selected.")
+            self.ok_button.setEnabled(False)
+            return
+
+        dlu = int(self.dlu_combo.currentText())
+        shelf = int(self.shelf_combo.currentText())
+        slot = self.db.get_slot(dlu, shelf, int(module))
+        if slot is None:
+            self.status_label.setText("Module not found.")
+            self.ok_button.setEnabled(False)
+            return
+
+        if self.card_type:
+            if slot.card_type == self.card_type:
+                self.status_label.setText(
+                    f"✓ Compatible: {slot.card_type} · "
+                    f"{slot.port_count} ports · "
+                    f"EQN base {dlu}-{shelf}-{module}"
+                )
+                self.ok_button.setEnabled(True)
+            else:
+                self.status_label.setText(
+                    f"✕ Not compatible for this scenario: "
+                    f"module contains {slot.card_type}. "
+                    f"Required {self.card_type}."
+                )
+                self.ok_button.setEnabled(False)
+        else:
+            self.status_label.setText(
+                f"Selected: {slot.card_type} · "
+                f"{slot.port_count} ports · "
+                f"EQN base {dlu}-{shelf}-{module}"
+            )
+            self.ok_button.setEnabled(True)
 
     def accept(self):
+        if not self.ok_button.isEnabled():
+            return
         module = self.module_combo.currentData()
         if module is None:
             return
@@ -1302,7 +1359,9 @@ class DluSimulatorWindow(QMainWindow):
         )
 
     def _refresh_current_view(self):
-        if self.current_view == "dlu":
+        if self.current_view == "home":
+            self.show_hardware_home()
+        elif self.current_view == "dlu":
             self.show_dlu(self.hardware.current_dlu)
         elif self.current_view == "shelf":
             self.show_shelf(
