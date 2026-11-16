@@ -24,16 +24,20 @@ from .theme import THEMES
 from .ui_utils import make_font
 
 
-BG = "#050914"
-PANEL = "#0c1728"
-PANEL2 = "#08111f"
-PANEL3 = "#102033"
-BORDER = "#28435e"
-TEXT = "#f3f8ff"
-MUTED = "#8fa6bd"
-GREEN = "#39e6a5"
-YELLOW = "#ffc857"
-RED = "#ff6577"
+_PALETTE = THEMES["ivory"]
+BG = _PALETTE.BG
+PANEL = _PALETTE.PANEL
+PANEL2 = _PALETTE.PANEL2
+PANEL3 = _PALETTE.PANEL3
+BORDER = _PALETTE.BORDER
+TEXT = _PALETTE.TEXT
+MUTED = _PALETTE.MUTED
+GREEN = _PALETTE.GREEN
+YELLOW = _PALETTE.YELLOW
+RED = _PALETTE.RED
+BLUE = _PALETTE.BLUE
+CYAN = _PALETTE.CYAN
+VIOLET = _PALETTE.VIOLET
 THEME_NAME = "ivory"
 
 def apply_theme_palette(name: str):
@@ -41,12 +45,12 @@ def apply_theme_palette(name: str):
     global GREEN, YELLOW, RED, BLUE, CYAN, VIOLET
     palette = THEMES.get(name, THEMES["ivory"])
     for key in palette.__dataclass_fields__:
-        if key in globals():
-            globals()[key] = getattr(palette, key)
+        globals()[key] = getattr(palette, key)
     globals()["THEME_NAME"] = name
 
 
 apply_theme_palette("ivory")
+
 class CallPathView(QGraphicsView):
     def set_theme(self, name: str):
         apply_theme_palette(name)
