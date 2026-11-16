@@ -1317,51 +1317,94 @@ class DluSimulatorWindow(QMainWindow):
 
     def draw_logical_dlu(self, dlu_id: int):
         dlu = self.db.get_dlu(dlu_id)
-        self.add_text(24, 20, f"DLU {dlu_id} · LOGICAL VIEW", 22, TEXT, True)
-        nodes = [
-            ("DLU", 60, 110, f"DLU {dlu_id}"),
-            ("DLUC0", 270, 60, dlu["dluc0_state"].upper()),
-            ("DLUC1", 270, 190, dlu["dluc1_state"].upper()),
-            ("DIUD", 500, 110, "DIGITAL INTERFACE"),
-            ("SLM", 730, 110, "SUBSCRIBER MODULE"),
-            ("PORT", 930, 110, "PORT / EQN"),
-        ]
-        for kind, x, y, label in nodes:
-            node_path = QPainterPath()
-            node_path.addRoundedRect(QRectF(x, y, 160, 72), 8, 8)
-            self.hardware.scene_obj.addPath(
-                node_path,
-                QPen(QColor("#365168"), 1.6),
-                QBrush(QColor("#13232e")),
-            )
-            self.add_text(x+12, y+11, kind, 10, BLUE if kind in {"DIUD","PORT"} else GREEN, True)
-            self.add_text(x+12, y+38, label, 9, TEXT)
-        lines = [
-            ((220, 146), (270, 96)),
-            ((220, 146), (270, 226)),
-            ((430, 96), (500, 146)),
-            ((430, 226), (500, 146)),
-            ((660, 146), (730, 146)),
-            ((890, 146), (930, 146)),
-        ]
-        for (x1,y1),(x2,y2) in lines:
-            self.hardware.scene_obj.addLine(
-                x1,y1,x2,y2,QPen(QColor("#4b6e87"),2)
-            )
+        scene = self.hardware.scene_obj
+
+        self.add_text(34, 18, f"DLU {dlu_id} · LOGICAL SIGNAL MAP", 26, TEXT, True)
         self.add_text(
-            60, 330,
-            "Logical mode explains relationships; Physical mode explains equipment.",
-            12, MUTED
+            34, 52,
+            "Control → Interface → Subscriber Module → Port / EQN",
+            11, MUTED, True
         )
-        self.hardware.scene_obj.setSceneRect(0, 0, 1150, 480)
+
+        # Technical diagram backdrop.
+        backdrop = rounded_path(26, 88, 1100, 430, 18)
+        scene.addPath(
+            backdrop,
+            QPen(QColor("#29465f"), 1.5),
+            QBrush(QColor("#071521")),
+        )
+
+        nodes = [
+            ("DLU", 70, 230, 170, 86, f"DLU {dlu_id}", GREEN),
+            ("DLUC0", 310, 120, 170, 86, dlu["dluc0_state"].upper(), GREEN),
+            ("DLUC1", 310, 355, 170, 86, dlu["dluc1_state"].upper(), YELLOW),
+            ("DIUD", 560, 230, 170, 86, "DIGITAL INTERFACE", CYAN),
+            ("SLM", 810, 230, 170, 86, "SUBSCRIBER MODULE", VIOLET),
+            ("PORT", 1010, 230, 92, 86, "EQN", BLUE),
+        ]
+
+        for kind, x, y, w, h, label, accent in nodes:
+            path = rounded_path(x, y, w, h, 12)
+            scene.addPath(
+                path,
+                QPen(QColor(accent), 1.8),
+                QBrush(QColor("#0b1c2c")),
+            )
+            self.add_scene_rounded_rect(
+                QRectF(x + 8, y + 8, w - 16, 22),
+                6, 6,
+                QPen(QColor("#294761"), 1),
+                QBrush(QColor("#10283b")),
+            )
+            self.add_text(x + 16, y + 11, kind, 8, accent, True)
+            self.add_text(
+                x + 16, y + 42,
+                label,
+                9 if w < 110 else 10,
+                TEXT,
+                True,
+            )
+            scene.addEllipse(
+                QRectF(x + w - 20, y + 12, 7, 7),
+                QPen(QColor(accent)),
+                QBrush(QColor(accent)),
+            )
+
+        routes = [
+            ((240, 273), (310, 163), GREEN),
+            ((240, 273), (310, 398), YELLOW),
+            ((480, 163), (560, 273), GREEN),
+            ((480, 398), (560, 273), YELLOW),
+            ((730, 273), (810, 273), CYAN),
+            ((980, 273), (1010, 273), VIOLET),
+        ]
+        for (x1, y1), (x2, y2), color in routes:
+            scene.addLine(
+                x1, y1, x2, y2,
+                QPen(QColor(color), 3)
+            )
+            scene.addEllipse(
+                QRectF(x2 - 5, y2 - 5, 10, 10),
+                QPen(QColor(color)),
+                QBrush(QColor(color)),
+            )
+
+        self.add_text(
+            64, 470,
+            "Logical mode shows relationships; Physical mode shows equipment.",
+            11, MUTED, True
+        )
+        scene.setSceneRect(0, 0, 1160, 560)
         self.hardware.reset_zoom()
+
         self._set_details({
-            "DLU":dlu_id,
-            "Mode":"Logical",
-            "DLUC0":dlu["dluc0_state"],
-            "DLUC1":dlu["dluc1_state"],
-            "Flow":"DLU → Controller → DIUD → SLM → Port → DN",
+            "DLU": dlu_id,
+            "Mode": "Logical",
+            "DLUC0": dlu["dluc0_state"],
+            "DLUC1": dlu["dluc1_state"],
+            "Flow": "DLU → Controller → DIUD → SLM → Port → DN",
         })
+
 
     def show_shelf(self, dlu_id: int, shelf: int):
         self._sync_location(dlu_id, shelf)
