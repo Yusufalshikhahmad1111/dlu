@@ -72,9 +72,16 @@ class MmlEngine:
                     "MML-SYNTAX",
                     "Expected VERB OBJECT: param=value, ...;",
                 )
-            verb = compact.group("verb").upper()
-            obj = ""
+            compact_verb = compact.group("verb").upper()
             params = self._params(compact.group("params"))
+            if compact_verb in {"DISPDLUPORT", "DISPDLUPPORT"}:
+                verb, obj = "DISP", "DLUPORT"
+            elif compact_verb == "STATPORT":
+                verb, obj = "STAT", "PORT"
+            elif compact_verb == "TESTDLULC":
+                verb, obj = "TEST", "DLULC"
+            else:
+                verb, obj = compact_verb, ""
         else:
             verb = match.group("verb").upper()
             obj = (match.group("object") or "").upper()
