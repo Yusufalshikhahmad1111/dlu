@@ -109,3 +109,18 @@ def test_cmrl_guard_and_range():
     finally:
         db.close()
         tmp.cleanup()
+
+
+def test_compact_mml_aliases_and_port_focus():
+    tmp, db, mml = make_engine()
+    try:
+        result = mml.execute("> dispdlupport: eqn=50-0-15-0;")
+        assert result.ok
+        assert result.data["card_type"] == "SLMA8"
+
+        result = mml.execute("> STATPORT: eqn=50-0-15-0;")
+        assert result.ok
+        assert result.data["eqn"] == "50-0-15-0"
+    finally:
+        db.close()
+        tmp.cleanup()
