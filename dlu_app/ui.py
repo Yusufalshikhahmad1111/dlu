@@ -1638,46 +1638,47 @@ class DluSimulatorWindow(QMainWindow):
             self.add_text(34, 30, "MODULE NOT FOUND", 20, RED, True)
             return
 
+        configured = slot["card_type"] != "UNCONFIGURED"
+        fault = slot["fault_state"] == "fault"
+        ost = (slot["ost"] or "").lower()
+        accent = RED if fault else (GREEN if ost == "act" else YELLOW if ost == "mbl" else BORDER)
+        state_label = "FAULT" if fault else ost.upper() if ost else "UNKNOWN"
+        state_meaning = (
+            "Hardware fault detected" if fault
+            else "Operating / active" if ost == "act"
+            else "Maintenance / blocked" if ost == "mbl"
+            else "Ready / inactive"
+        )
+
         self.add_text(
             34, 18,
-            f"MODULE {module}  ·  {slot.card_type}",
+            f"MODULE {module}  ·  {slot['card_type']}",
             26, TEXT, True
         )
         self.add_text(
             34, 52,
-            f"EQN BASE {dlu_id}-{shelf}-{module}  ·  {slot.role or 'EMPTY MODULE'}",
+            f"EQN BASE {dlu_id}-{shelf}-{module}  ·  {slot['role'] or 'EMPTY MODULE'}",
             11, MUTED, True
         )
 
         scene = self.hardware.scene_obj
-        card_x, card_y, card_w, card_h = 34, 96, 510, 700
-        configured = slot.card_type != "UNCONFIGURED"
-        fault = slot.fault_state == "fault"
-        accent = RED if fault else (GREEN if configured else BORDER)
-        face_fill = PANEL2 if configured else DEEP
-        if fault:
-            face_fill = PANEL3
+        card_x, card_y, card_w, card_h = 34, 96, 450, 700
+        panel_x, panel_y, panel_w = 520, 96, 560
 
-        # Detailed telecom card faceplate.
-        face = rounded_path(card_x, card_y, card_w, card_h, 14)
+        # Physical telecom faceplate.
+        face = rounded_path(card_x, card_y, card_w, card_h, 16)
         scene.addPath(
             face,
-            QPen(QColor(accent), 2.2),
-            QBrush(QColor(face_fill)),
+            QPen(QColor(accent), 2.4),
+            QBrush(QColor(PANEL2 if configured else DEEP)),
         )
         self.add_scene_rounded_rect(
-            QRectF(card_x + 16, card_y + 16, card_w - 32, 68),
+            QRectF(card_x + 16, card_y + 16, card_w - 32, 70),
             9, 9,
-            QPen(QColor("#345672"), 1),
-            QBrush(QColor(DEEP)),
+            QPen(QColor(BORDER), 1.2),
+            QBrush(QColor(PANEL3)),
         )
-        add_rack_rivets(
-            scene,
-            card_x + 22,
-            card_y + 27,
-            card_w - 44,
-            4,
-        )
+        add_rack_rivets(scene, card_x + 24, card_y + 28, card_w - 48, 4)
 
         self.add_text(
             card_x + 34, card_y + 25,
@@ -1685,120 +1686,128 @@ class DluSimulatorWindow(QMainWindow):
             22, TEXT if configured else MUTED, True
         )
         self.add_text(
-            card_x + 34, card_y + 54,
+            card_x + 34, card_y + 56,
             slot["role"] or "No card installed",
             9, MUTED, True
         )
         self.add_text(
-            card_x + 390, card_y + 28,
+            card_x + 340, card_y + 27,
             f"{slot['port_count']}P",
             18, accent, True
         )
         self.add_text(
-            card_x + 390, card_y + 53,
-            slot["ost"].upper(),
-            8, state_color(slot["ost"]), True
+            card_x + 340, card_y + 53,
+            state_label,
+            9, accent, True
         )
 
-        # Faceplate technical areas.
-        for offset in (110, 128):
-            scene.addLine(
-                card_x + 28,
-                card_y + offset,
-                card_x + card_w - 28,
-                card_y + offset,
-                QPen(QColor("#1d3b52"), 1),
+        # Large status badge: always visible.
+        badge = rounded_path(card_x + 24, card_y + 112, card_w - 48, 72, 10)
+        scene.addPath(
+            badge,
+            QPen(QColor(accent), 1.5),
+            QBrush(QColor(PANEL3)),
+        )
+        scene.addEllipse(
+            QRectF(card_x + 40, card_y + 128, 14, 14),
+            QPen(QColor(accent), 1),
+            QBrush(QColor(accent)),
+        )
+        self.add_text(card_x + 68, card_y + 120, "OPERATING STATE", 8, MUTED, True)
+        self.add_text(card_x + 68, card_y + 143, state_label, 14, accent, True)
+        self.add_text(card_x + 68, card_y + 163, state_meaning, 8, TEXT, False)
+
+        # Hardware identity blocks.
+        blocks = [
+            (card_x + 24, "EQN BASE", f"{dlu_id}-{shelf}-{module}"),
+            (card_x + 204, "CAPACITY", f"{slot['port_count']} PORTS"),
+        ]
+        for bx, label, value in blocks:
+            self.add_scene_rounded_rect(
+                QRectF(bx, card_y + 206, 162, 58),
+                8, 8,
+                QPen(QColor(BORDER), 1),
+                QBrush(QColor(DEEP)),
             )
+            self.add_text(bx + 12, card_y + 216, label, 7, MUTED, True)
+            self.add_text(bx + 12, card_y + 238, value, 10, CYAN if "EQN" in label else TEXT, True)
 
+        # Reference/source block.
+        ref_text = slot["source_id"] or "SOURCE NOT SPECIFIED"
         self.add_scene_rounded_rect(
-            QRectF(card_x + 24, card_y + 145, 128, 48),
-            6, 6,
-            QPen(QColor("#28445d"), 1),
+            QRectF(card_x + 24, card_y + 286, card_w - 48, 64),
+            8, 8,
+            QPen(QColor(BORDER), 1),
             QBrush(QColor(DEEP)),
         )
-        self.add_text(card_x + 36, card_y + 156, "STATUS", 7, MUTED, True)
-        self.add_text(
-            card_x + 36, card_y + 172,
-            "FAULT" if fault else "NORMAL",
-            10, RED if fault else GREEN, True
-        )
+        self.add_text(card_x + 36, card_y + 297, "ACADEMIC REFERENCE", 7, MUTED, True)
+        self.add_text(card_x + 36, card_y + 319, ref_text, 10, CYAN, True)
+        ref = self.db.get_card_reference(slot["card_type"]) if configured else None
+        if ref and ref.source_page:
+            self.add_text(card_x + 220, card_y + 319, f"COURSE PAGE {ref.source_page}", 8, MUTED, True)
 
+        # Card condition block.
         self.add_scene_rounded_rect(
-            QRectF(card_x + 170, card_y + 145, 140, 48),
-            6, 6,
-            QPen(QColor("#28445d"), 1),
+            QRectF(card_x + 24, card_y + 372, card_w - 48, 72),
+            8, 8,
+            QPen(QColor(BORDER), 1),
             QBrush(QColor(DEEP)),
         )
-        self.add_text(card_x + 182, card_y + 156, "EQN BASE", 7, MUTED, True)
+        self.add_text(card_x + 36, card_y + 383, "CARD CONDITION", 7, MUTED, True)
+        condition = "FAULT" if fault else "NORMAL"
+        self.add_text(card_x + 36, card_y + 405, condition, 10, RED if fault else GREEN, True)
         self.add_text(
-            card_x + 182, card_y + 172,
-            f"{dlu_id}-{shelf}-{module}",
-            9, CYAN, True
+            card_x + 150, card_y + 405,
+            f"OST {ost.upper()}",
+            9, state_color(ost), True
         )
 
-        self.add_scene_rounded_rect(
-            QRectF(card_x + 330, card_y + 145, 150, 48),
-            6, 6,
-            QPen(QColor("#28445d"), 1),
-            QBrush(QColor(DEEP)),
-        )
-        self.add_text(card_x + 342, card_y + 156, "STATE", 7, MUTED, True)
-        self.add_text(
-            card_x + 342, card_y + 172,
-            slot["ost"].upper(),
-            10, state_color(slot["ost"]), True
-        )
-
-        if slot.card_type == "UNCONFIGURED":
+        if not configured:
+            self.add_text(card_x + 36, card_y + 492, "EMPTY MODULE", 18, YELLOW, True)
             self.add_text(
-                card_x + 34,
-                card_y + 250,
-                "EMPTY MODULE",
-                18,
-                YELLOW,
-                True
-            )
-            self.add_text(
-                card_x + 34,
-                card_y + 280,
-                "Install a verified card from Hardware Library.",
-                10,
-                MUTED
+                card_x + 36, card_y + 522,
+                "Use Hardware Library to install a verified card.",
+                9, MUTED
             )
         else:
-            self.draw_port_grid(
-                dlu_id, shelf, module, slot,
-                card_x + 24, card_y + 220
+            self.add_text(
+                card_x + 36, card_y + 490,
+                "CARD FACEPLATE",
+                8, MUTED, True
+            )
+            self.add_text(
+                card_x + 36, card_y + 518,
+                f"{slot['family'].upper()} · {slot['port_count']}P",
+                11, TEXT, True
+            )
+            self.add_text(
+                card_x + 36, card_y + 548,
+                "Click a port to inspect subscriber/EQN state.",
+                8, MUTED
             )
 
-        if slot.source_id:
-            ref = self.db.get_card_reference(slot.card_type)
-            if ref:
-                self.add_text(
-                    card_x + 34,
-                    card_y + card_h - 26,
-                    f"SOURCE {ref.source_id} · COURSE PAGE {ref.source_page}",
-                    8, MUTED, True
-                )
+        # Port bank gets its own visible work area.
+        if configured:
+            self.draw_port_grid(
+                dlu_id, shelf, module, slot,
+                panel_x, panel_y
+            )
 
-        # Full-card click target keeps all existing interactions.
-        item = ClickableRectItem(
-            QRectF(card_x, card_y, card_w, card_h),
-            lambda data: None,
-            (dlu_id, shelf, module),
-            f"Module {module} · {slot.card_type}",
-            on_context=lambda data: self.open_hardware_context(data),
+        panel = rounded_path(panel_x - 12, panel_y, panel_w, 700, 16)
+        scene.addPath(
+            panel,
+            QPen(QColor(BORDER), 1.5),
+            QBrush(QColor(PANEL)),
         )
-        item.setBrush(Qt.NoBrush)
-        item.setPen(Qt.NoPen)
-        item.setZValue(-1)
-        # The module itself remains reachable through existing navigation;
-        # port overlays keep their own clicks above the faceplate.
+        # Move the panel behind the already-created port items by assigning negative Z.
+        for item in scene.items():
+            if item.data(9001) == "PORT_PANEL":
+                item.setZValue(-3)
 
         scene.setSceneRect(
             0,
             0,
-            1120 if slot.port_count <= 16 else 1260,
+            1120 if slot["port_count"] <= 16 else 1280,
             max(840, card_y + card_h + 50),
         )
         self.hardware.reset_zoom()
@@ -1807,13 +1816,14 @@ class DluSimulatorWindow(QMainWindow):
             "DLU": dlu_id,
             "Shelf": shelf,
             "Module": module,
-            "Card": slot.card_type,
-            "Role": slot.role,
-            "Capacity": slot.port_count,
-            "OST": slot.ost,
-            "Fault": slot.fault_state,
+            "Card": slot["card_type"],
+            "Role": slot["role"],
+            "Family": slot["family"],
+            "Capacity": slot["port_count"],
+            "OST": slot["ost"],
+            "Fault": slot["fault_state"],
             "EQN Base": f"{dlu_id}-{shelf}-{module}",
-            "Source": slot.source_id or "—",
+            "Source": slot["source_id"] or "—",
         })
         self.refresh_event_log()
 
@@ -1822,45 +1832,45 @@ class DluSimulatorWindow(QMainWindow):
         scene = self.hardware.scene_obj
         capacity = int(slot.port_count or 0)
 
-        if capacity >= 48:
-            cols, cell_w = 4, 116
+        if capacity >= 32:
+            cols, cell_w = 8, 92
         elif capacity > 16:
             cols, cell_w = 4, 118
         elif capacity >= 8:
             cols, cell_w = 4, 108
         else:
-            cols, cell_w = 3, 145
+            cols, cell_w = 3, 160
 
-        cell_h = 70
+        cell_h = 72
         rows = (capacity + cols - 1) // cols
+        bank_w = max(440, cols * cell_w + 10)
+        bank_h = max(180, rows * (cell_h + 10) + 68)
 
-        # A visible connector bank makes small cards such as CMRL readable at a glance.
-        bank_w = max(430, cols * cell_w + 10)
-        bank_h = max(120, rows * (cell_h + 10) + 58)
-        bank = rounded_path(x, y, bank_w, bank_h, 12)
-        scene.addPath(
+        bank = rounded_path(x, y, bank_w, bank_h, 14)
+        bank_item = scene.addPath(
             bank,
-            QPen(QColor(BORDER), 1.2),
+            QPen(QColor(BORDER), 1.4),
             QBrush(QColor(PANEL2)),
         )
+        bank_item.setData(9001, "PORT_PANEL")
+
+        self.add_text(x + 18, y + 14, "PORT BANK", 10, CYAN, True)
         self.add_text(
-            x + 18, y + 12,
-            f"PORT BANK · {capacity} CHANNELS",
-            10, CYAN, True
+            x + 118, y + 14,
+            f"{capacity} CONNECTORS",
+            9, MUTED, True
         )
         self.add_text(
-            x + bank_w - 98, y + 12,
+            x + bank_w - 78, y + 14,
             f"{capacity}P",
             10, AMBER, True
         )
 
         for port in range(capacity):
             px = x + 12 + (port % cols) * cell_w
-            py = y + 42 + (port // cols) * (cell_h + 10)
+            py = y + 48 + (port // cols) * (cell_h + 10)
 
-            sub = self.db.get_port_subscriber(
-                dlu_id, shelf, module, port
-            )
+            sub = self.db.get_port_subscriber(dlu_id, shelf, module, port)
             if not sub:
                 color = STEEL
                 label = "EMPTY"
@@ -1874,51 +1884,58 @@ class DluSimulatorWindow(QMainWindow):
                     state_label = "BLOCKED"
 
             socket = rounded_path(px, py, cell_w - 10, cell_h, 9)
-            scene.addPath(
+            item_socket = scene.addPath(
                 socket,
                 QPen(QColor(BORDER), 1),
                 QBrush(QColor(DEEP)),
             )
+            item_socket.setData(9001, "PORT_PANEL")
 
-            connector = rounded_path(px + 10, py + 15, 38, 40, 7)
-            scene.addPath(
+            connector = rounded_path(px + 9, py + 14, 38, 42, 7)
+            connector_item = scene.addPath(
                 connector,
                 QPen(QColor(STEEL), 1),
                 QBrush(QColor(BG)),
             )
+            connector_item.setData(9001, "PORT_PANEL")
 
             for pin in range(3):
-                scene.addEllipse(
-                    QRectF(px + 18 + pin * 9, py + 22, 5, 5),
+                dot = scene.addEllipse(
+                    QRectF(px + 17 + pin * 9, py + 22, 5, 5),
                     QPen(QColor(color)),
                     QBrush(QColor(color)),
                 )
+                dot.setData(9001, "PORT_PANEL")
 
-            scene.addEllipse(
-                QRectF(px + cell_w - 30, py + 12, 9, 9),
+            led = scene.addEllipse(
+                QRectF(px + cell_w - 28, py + 11, 9, 9),
                 QPen(QColor(color)),
                 QBrush(QColor(color)),
             )
+            led.setData(9001, "PORT_PANEL")
 
             self.add_text(px + 58, py + 9, f"PORT {port}", 9, TEXT, True)
             self.add_text(px + 58, py + 29, label, 9, color, True)
-            self.add_text(px + 58, py + 48, state_label, 7, color, True)
+            self.add_text(px + 58, py + 49, state_label, 7, color, True)
             self.add_text(
-                px + cell_w - 78, py + 49,
+                px + cell_w - 75, py + 50,
                 f"{dlu_id}-{shelf}-{module}-{port}",
                 6, MUTED
             )
 
-            item = ClickableRectItem(
+            clickable = ClickableRectItem(
                 QRectF(px, py, cell_w - 10, cell_h),
                 lambda data: self.select_port(*data),
                 (dlu_id, shelf, module, port),
                 f"EQN {dlu_id}-{shelf}-{module}-{port}",
                 on_context=lambda data: self.port_context(*data),
             )
-            item.setBrush(Qt.NoBrush)
-            item.setPen(Qt.NoPen)
-            scene.addItem(item)
+            clickable.setBrush(Qt.NoBrush)
+            clickable.setPen(Qt.NoPen)
+            clickable.setZValue(1)
+            scene.addItem(clickable)
+
+
 
     def port_context(self, dlu_id,shelf,module,port):
         eqn = f"{dlu_id}-{shelf}-{module}-{port}"
