@@ -141,8 +141,8 @@ def add_rack_rivets(scene, x: float, y: float, w: float, count: int = 4):
         px = x + 8 + i * max(1.0, (w - 16) / max(1, count - 1))
         scene.addEllipse(
             QRectF(px - 2, y, 4, 4),
-            QPen(QColor("#5c7892")),
-            QBrush(QColor("#15263a")),
+            QPen(QColor(BORDER)),
+            QBrush(QColor(DEEP)),
         )
 
 
@@ -1080,11 +1080,16 @@ class DluSimulatorWindow(QMainWindow):
         self.hardware.resetTransform()
 
     def add_text(self, x, y, text, size=12, color=TEXT, bold=False):
-        item = self.hardware.scene_obj.addText(text)
-        font = QFont("Segoe UI", max(1, int(size)))
-        font.setBold(bold)
+        item = self.hardware.scene_obj.addText(str(text))
+        try:
+            point_size = max(1, int(float(size)))
+        except (TypeError, ValueError):
+            point_size = 12
+        font = QFont("Segoe UI")
+        font.setPointSize(point_size)
+        font.setBold(bool(bold))
         item.setFont(font)
-        item.setDefaultTextColor(QColor(color))
+        item.setDefaultTextColor(QColor(str(color)))
         item.setPos(x, y)
         return item
 
@@ -1376,7 +1381,7 @@ class DluSimulatorWindow(QMainWindow):
             mx = x + 96 + slot["module"] * 58
             configured = slot["card_type"] != "UNCONFIGURED"
             fault = slot["fault_state"] == "fault"
-            accent = RED if fault else (GREEN if configured else {BORDER})
+            accent = RED if fault else (GREEN if configured else BORDER)
             fill = PANEL2 if configured else DEEP
             if fault:
                 fill = PANEL3
@@ -1570,7 +1575,7 @@ class DluSimulatorWindow(QMainWindow):
         scene = self.hardware.scene_obj
         configured = slot["card_type"] != "UNCONFIGURED"
         fault = slot["fault_state"] == "fault"
-        accent = RED if fault else (GREEN if configured else {BORDER})
+        accent = RED if fault else (GREEN if configured else BORDER)
         body_fill = PANEL2 if configured else DEEP
         if fault:
             body_fill = PANEL3
@@ -1618,8 +1623,8 @@ class DluSimulatorWindow(QMainWindow):
         )
         scene.addEllipse(
             QRectF(x + w - 16, y + 81, 8, 8),
-            QPen(QColor(RED if fault else {BORDER})),
-            QBrush(QColor(RED if fault else {BORDER})),
+            QPen(QColor(RED if fault else BORDER)),
+            QBrush(QColor(RED if fault else BORDER)),
         )
 
         max_ports = min(slot["port_count"], 64)
@@ -1664,6 +1669,12 @@ class DluSimulatorWindow(QMainWindow):
         self.back_btn.setEnabled(True)
 
         slot = self.db.get_slot(dlu_id, shelf, module)
+        if slot is not None and not isinstance(slot, dict):
+            slot = (
+                slot.__dict__
+                if hasattr(slot, "__dict__")
+                else dict(slot)
+            )
         self.breadcrumb.setText(
             f"DLU {dlu_id}  /  SHELF {shelf}  /  MODULE {module}"
         )
@@ -1696,7 +1707,8 @@ class DluSimulatorWindow(QMainWindow):
 
         scene = self.hardware.scene_obj
         card_x, card_y, card_w, card_h = 34, 96, 450, 700
-        panel_x, panel_y, panel_w = 520, 96, 560
+        panel_x, panel_y = 520, 96
+        panel_w = 760 if int(slot["port_count"] or 0) >= 32 else 560
 
         # Physical telecom faceplate.
         face = rounded_path(card_x, card_y, card_w, card_h, 16)
@@ -1836,7 +1848,7 @@ class DluSimulatorWindow(QMainWindow):
         scene.setSceneRect(
             0,
             0,
-            1120 if slot["port_count"] <= 16 else 1280,
+            max(1120 if slot["port_count"] <= 16 else 1280, panel_x + panel_w + 40),
             max(840, card_y + card_h + 50),
         )
         self.hardware.reset_zoom()
