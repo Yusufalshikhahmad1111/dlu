@@ -117,6 +117,15 @@ python -m pytest -q tests
 
 ## الحالة
 
-Stage 2 — Hardware Fidelity + MML Core: implemented
+Stage 3 — Call Engine + CPT + Call Path: implemented
+- CPT exact/prefix/range resolution.
+- LOCAL / NATIONAL / INTERNATIONAL / SERVICE call analysis.
+- Persistent call sessions and PDC voice resource accounting (120 channels).
+- Local DLU → SN → DLU path.
+- National DLU → LTG → SN → LTG → logical remote DLU/LAC path.
+- International DLU → LTG → SN → International Gateway path.
+- CPT EVAL=NO blacklist blocking before resource reservation.
+- CALL ENGINE · CPT · CALL PATH teaching UI.
+- Stage 3 automated tests and Windows manual QA checklist.
 
-التالي: Call Engine + CPT/Call Path، ثم Command Files، ثم Communication Labs وPackaging.
+التالي: Command Files، ثم Communication Labs وPackaging.
