@@ -77,20 +77,27 @@ FAULT → MBL → DIAG → REMOVE → INSTALL → ACTIVATE → VERIFY
 
 مع سجل hardware_events وMaintenance Timeline داخل الواجهة.
 
-## Hardware Library / Reference Viewer
+## Communications Labs
 
-يعرض النوع والوظيفة والسعة والـport range ومصدره وصفحة المرجع وحالة التحقق.
+تبويب **Communications** يضم:
+- OSI 7-layer model.
+- TCP vs UDP comparison.
+- AM / FM / PM.
+- PAM / PWM / PPM / PCM.
+- ASK / FSK / PSK / QPSK / 16-QAM.
+- QPSK / 16-QAM constellation.
+- BPSK / QPSK / 16-QAM BER basics.
+
+النماذج الحسابية normalized وتعليمية وليست محاكاة RF كهربائية كاملة.
 
 ## Scenarios
 
-### 8-Line
-يطلب DLU → Shelf → Module ثم ينفذ 8 أوامر CR SUB على Ports 0..7.
+الموجود حاليًا:
+- 8-Line hardware teaching action.
+- CMRL capacity guard.
+- DLU/card maintenance demo.
 
-### CMRL
-ينشئ Ports 0..5 ثم يحاول Port 6 ويعرض CARD-INCOMPATIBLE/رفض السعة.
-
-### Maintenance
-حقن fault ثم mbl/diag/remove/install/activate مع تتبع زمني.
+Stage 6 سيحوّل هذه الوظائف إلى سيناريوهات رسمية موحدة بصيغة PASS/FAIL، ويضيف Billing Block وInternational Blacklist وCommand File Overnight Run.
 
 ## التشغيل على Windows 11
 
@@ -117,34 +124,16 @@ python -m pytest -q tests
 
 ## الحالة
 
-Stage 4 — Command Files: **completed**
-- Command-file parser and persistent lifecycle.
-- Accepted / Started / Finished / Executed / Failed.
-- Deterministic virtual clock and scheduling.
-- OMT EXECMDFILE integration.
-- Windows manual QA completed successfully.
+Stage 0–4: **completed**
 
-Stage 5 — Communications Labs: **implemented — release gates pending**
-- OSI 7-layer teaching model.
-- TCP vs UDP comparison.
-- AM / FM / PM.
-- PAM / PWM / PPM / PCM.
-- ASK / FSK / PSK / QPSK / 16-QAM.
-- QPSK / 16-QAM constellation.
-- BPSK / QPSK / 16-QAM BER basics.
-- Integrated Communications tab without new runtime dependencies.
+Stage 5 — Communications Labs: **completed — automated release verified**
+- 63/63 tests passed on Windows CI.
+- Python compilation passed.
+- UI static audit passed.
+- Communications UI smoke test passed.
+- PR #1 merged into main.
+- pyproject package/build metadata synchronized.
 
-Next release gate: Stage 5 automated CI, then Windows manual QA.
-- CPT exact/prefix/range resolution.
-- LOCAL / NATIONAL / INTERNATIONAL / SERVICE call analysis.
-- Persistent call sessions and PDC voice resource accounting (120 channels).
-- Local DLU → SN → DLU path.
-- National DLU → LTG → SN → LTG → logical remote DLU/LAC path.
-- International DLU → LTG → SN → International Gateway path.
-- CPT EVAL=NO blacklist blocking before resource reservation.
-- CALL ENGINE · CPT · CALL PATH teaching UI.
-- OMT TEST/STAT/DISP CALL integration.
-- Stage 3 automated coverage.
-- Windows manual QA completed successfully.
+ملاحظة QA: لم يتم تنفيذ جلسة Windows hands-on من المستخدم لهذه المرحلة أثناء هذا الإغلاق لأن الكمبيوتر غير متاح. لذلك لم يتم الادعاء بفحص بصري يدوي غير حاصل.
 
-التالي: Stage 4 — Command Files.
+التالي: **Stage 6 — Teaching Scenarios**.
