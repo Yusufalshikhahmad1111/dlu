@@ -159,7 +159,7 @@ docs/30-STAGE-06-CLOSEOUT.md
 
 ## Stage 7 — Packaging & Final Audit
 
-**الحالة: In progress — release build + final Windows QA gate**
+**الحالة: مكتملة — Windows release gate passed**
 
 المخرجات:
 - Windows onefile executable via `pyside6-deploy`;
@@ -175,6 +175,9 @@ docs/31-STAGE-07-PACKAGING-PLAN.md
 
 User manual:
 docs/32-USER-MANUAL.md
+
+Final academic report:
+docs/33-FINAL-ACADEMIC-TEST-REPORT.md
 
 Windows QA:
 docs/34-STAGE-07-WINDOWS-QA.md
