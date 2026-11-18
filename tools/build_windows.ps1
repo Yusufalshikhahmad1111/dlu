@@ -10,6 +10,7 @@ $env:QT_QPA_PLATFORM = "offscreen"
 python tools/capture_screenshots.py --output-dir artifacts/screenshots
 
 if (Test-Path pysidedeploy.spec) { Remove-Item pysidedeploy.spec -Force }
+New-Item -ItemType Directory -Force -Path dist | Out-Null
 pyside6-deploy --force --init main.py
 
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
