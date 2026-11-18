@@ -9,6 +9,9 @@ python -m pip install -r requirements-dev.txt
 $env:QT_QPA_PLATFORM = "offscreen"
 python tools/capture_screenshots.py --output-dir artifacts/screenshots
 
+if (Test-Path pysidedeploy.spec) { Remove-Item pysidedeploy.spec -Force }
+pyside6-deploy --force --init main.py
+
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 if (Test-Path $vswhere) {
     $installationPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
