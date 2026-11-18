@@ -5,8 +5,8 @@ from pathlib import Path
 import subprocess
 import sys
 
-from PySide6.QtCore import QEvent, QMimeData, QDesktopServices, QRectF, Qt, QTimer, QUrl
-from PySide6.QtGui import QColor, QBrush, QDrag, QPainter, QPainterPath, QPen
+from PySide6.QtCore import QEvent, QMimeData, QRectF, Qt, QTimer, QUrl
+from PySide6.QtGui import QColor, QBrush, QDrag, QPainter, QPainterPath, QPen, QDesktopServices
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
