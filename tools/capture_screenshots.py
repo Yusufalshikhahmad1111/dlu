@@ -25,7 +25,7 @@ def capture(output_dir: Path) -> list[Path]:
 
         outputs: list[Path] = []
         home = output_dir / "01-main-workbench.png"
-        window.grab().save(home)
+        window.grab().save(str(home))
         outputs.append(home)
 
         tabs = window.findChildren(QTabWidget)
@@ -50,8 +50,11 @@ def capture(output_dir: Path) -> list[Path]:
                 window.grab().save(path)
                 outputs.append(path)
 
-        window.close()
-        QCoreApplication.processEvents()
+        try:
+            QCoreApplication.processEvents()
+        finally:
+            window.close()
+            app.processEvents()
         return outputs
 
 
