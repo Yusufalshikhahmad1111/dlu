@@ -3,6 +3,10 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication, QTabWidget
