@@ -192,6 +192,9 @@ Python + PySide6 يعطي:
 
 هذا أبسط من Tauri للمشروع الحالي مع الحفاظ على نفس المبدأ: Domain Core واحد والواجهة مجرد View للحالة.
 
+### Communications Lab
+Stage 5 يضيف communications_lab.py كنواة حسابية مستقلة عن PySide6 وSQLite. الواجهة تستدعي هذه النواة لعرض نماذج تعليمية normalized للموجات، modulation، constellation، وBER دون الادعاء بمحاكاة RF أو قناة فيزيائية كاملة.
+
 ## 9. سياسة الاستمرارية
 
 SQLite هي مصدر الحقيقة.
