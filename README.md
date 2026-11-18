@@ -156,9 +156,10 @@ Stage 6 — Teaching Scenarios:
 Stage 7 — Packaging & Final Audit:
 - release version 1.0.0;
 - safe SQLite backup/restore;
-- Windows onefile deployment configuration;
-- automated screenshot capture;
-- Windows release workflow with executable smoke test;
-- user manual and final academic QA documentation.
+- Windows onefile executable;
+- executable smoke test;
+- five final UI screenshots uploaded as release artifacts;
+- user manual and final academic test report;
+- **76/76 tests passed on Windows CI**.
 
-المرحلة الحالية: **Stage 7 — release/final-audit gate**.
+الحالة الحالية: **Stage 7 complete — DLU Lab 1.0.0 release-ready**.
