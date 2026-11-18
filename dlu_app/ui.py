@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
+import sys
 
-from PySide6.QtCore import QEvent, QMimeData, QRectF, Qt, QTimer
+from PySide6.QtCore import QEvent, QMimeData, QDesktopServices, QRectF, Qt, QTimer, QUrl
 from PySide6.QtGui import QColor, QBrush, QDrag, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
     QApplication,
@@ -35,6 +37,7 @@ from PySide6.QtWidgets import (
     QToolButton,
 )
 
+from .backup_restore import BackupError, DatabaseBackupManager
 from .call_engine import CallEngine
 from .command_file_ui import CommandFileLab
 from .communications_ui import CommunicationsLabWidget
@@ -466,6 +469,7 @@ class DluSimulatorWindow(QMainWindow):
         self.history_index = 0
         self.current_view = "home"
         self.mode = "physical"
+        self._restart_after_restore = False
         self.selected_eqn: str | None = None
         self.selected_dn: str | None = None
 
@@ -573,8 +577,16 @@ class DluSimulatorWindow(QMainWindow):
 
         library_action = tool_menu.addAction("Hardware Library")
         library_action.triggered.connect(self.open_library)
+
+        backup_action = tool_menu.addAction("Backup Database")
+        backup_action.triggered.connect(self.backup_database)
+        restore_action = tool_menu.addAction("Restore Database")
+        restore_action.triggered.connect(self.restore_database)
+        data_folder_action = tool_menu.addAction("Open Data Folder")
+        data_folder_action.triggered.connect(self.open_data_folder)
+
         reset_action = tool_menu.addAction("Reset Demo")
-        reset_action.triggered.connect(self.reset_demo)
+        reset_action.triggered.connect(self.confirm_reset_demo)
         tool_btn.setMenu(tool_menu)
         toolbar.addWidget(tool_btn)
 
@@ -2436,6 +2448,18 @@ class DluSimulatorWindow(QMainWindow):
         if getattr(self, "current_view", "home") == "module":
             self._refresh_current_view()
 
+    def confirm_reset_demo(self):
+        answer = QMessageBox.question(
+            self,
+            "Reset Demo",
+            "Reset teaching data, alarms, command files and subscriber records to the "
+            "source-backed demo state?\\n\\nThis cannot be undone unless you have a backup.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if answer == QMessageBox.Yes:
+            self.reset_demo()
+
     def reset_demo(self):
         self.db.reset_demo()
         self.call_engine.repo.reset_demo()
@@ -2448,6 +2472,98 @@ class DluSimulatorWindow(QMainWindow):
         )
         self._refresh_current_view()
 
+    def backup_database(self):
+        default_dir = DatabaseBackupManager.default_backup_dir(self.db.path)
+        default_dir.mkdir(parents=True, exist_ok=True)
+        default_name = default_dir / "dlu_lab_backup.sqlite3"
+        target, _ = QFileDialog.getSaveFileName(
+            self,
+            "Backup DLU Lab database",
+            str(default_name),
+            "SQLite backup (*.sqlite3);;All files (*.*)",
+        )
+        if not target:
+            return
+        try:
+            target_path = Path(target).resolve()
+            if target_path == Path(self.db.path).resolve():
+                raise BackupError("Backup target cannot be the live database file.")
+            info = DatabaseBackupManager.create_backup(self.db.path, target_path)
+            self.terminal.append(
+                f"<span style='color:{GREEN}'>"
+                f"[BACKUP] Created {info.path} · {info.size_bytes:,} bytes · integrity=ok"
+                "</span>"
+            )
+            QMessageBox.information(
+                self,
+                "Backup Complete",
+                f"Backup created successfully.\\n\\n{info.path}\\n\\nSQLite integrity: OK",
+            )
+        except BackupError as exc:
+            QMessageBox.critical(self, "Backup Failed", str(exc))
+
+    def restore_database(self):
+        source, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select DLU Lab backup",
+            str(DatabaseBackupManager.default_backup_dir(self.db.path)),
+            "SQLite backup (*.sqlite3);;All files (*.*)",
+        )
+        if not source:
+            return
+        try:
+            info = DatabaseBackupManager.validate_backup(source)
+        except BackupError as exc:
+            QMessageBox.critical(self, "Invalid Backup", str(exc))
+            return
+
+        answer = QMessageBox.warning(
+            self,
+            "Restore Database",
+            "This will replace the current database on application restart. "
+            "A safety backup of the current database will be created automatically.\\n\\n"
+            f"Selected: {info.path}\\n\\nContinue?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if answer != QMessageBox.Yes:
+            return
+
+        try:
+            pending = DatabaseBackupManager.prepare_restore(self.db.path, info.path)
+            self._restart_after_restore = True
+            self.terminal.append(
+                f"<span style='color:{YELLOW}'>"
+                f"[RESTORE] Validated and staged {pending.name}. Application will restart."
+                "</span>"
+            )
+            QMessageBox.information(
+                self,
+                "Restore Ready",
+                "The backup is valid and staged safely. The application will now close. "
+                "Launch DLU Lab again to continue with the restored database.",
+            )
+            self.close()
+        except BackupError as exc:
+            QMessageBox.critical(self, "Restore Failed", str(exc))
+
+    def open_data_folder(self):
+        data_dir = Path(self.db.path).resolve().parent
+        data_dir.mkdir(parents=True, exist_ok=True)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(data_dir)))
+
     def closeEvent(self,event):
+        db_path = Path(self.db.path).resolve()
         self.db.close()
+
+        if self._restart_after_restore:
+            try:
+                DatabaseBackupManager.apply_pending_restore(db_path)
+                subprocess.Popen([sys.executable, *sys.argv], close_fds=True)
+            except (BackupError, OSError) as exc:
+                QMessageBox.critical(
+                    None,
+                    "Restore Restart Failed",
+                    f"The restore was validated but could not be applied/restarted.\\n\\n{exc}",
+                )
         event.accept()
