@@ -734,12 +734,9 @@ class TeachingScenarioRunner:
         caller, _called = pair
 
         raw = (
-            f"> {self.OVERNIGHT_FILE};
-"
-            f"> mod sub: dn={caller}, blk=accsusp;
-"
-            f"> disp sub: dn={caller};
-"
+            f"> {self.OVERNIGHT_FILE};\n"
+            f"> mod sub: dn={caller}, blk=accsusp;\n"
+            f"> disp sub: dn={caller};\n"
             "> endfile;"
         )
         try:
