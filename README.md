@@ -117,7 +117,24 @@ python -m pytest -q tests
 
 ## الحالة
 
-Stage 3 — Call Engine + CPT + Call Path: **completed**
+Stage 4 — Command Files: **completed**
+- Command-file parser and persistent lifecycle.
+- Accepted / Started / Finished / Executed / Failed.
+- Deterministic virtual clock and scheduling.
+- OMT EXECMDFILE integration.
+- Windows manual QA completed successfully.
+
+Stage 5 — Communications Labs: **implemented — release gates pending**
+- OSI 7-layer teaching model.
+- TCP vs UDP comparison.
+- AM / FM / PM.
+- PAM / PWM / PPM / PCM.
+- ASK / FSK / PSK / QPSK / 16-QAM.
+- QPSK / 16-QAM constellation.
+- BPSK / QPSK / 16-QAM BER basics.
+- Integrated Communications tab without new runtime dependencies.
+
+Next release gate: Stage 5 automated CI, then Windows manual QA.
 - CPT exact/prefix/range resolution.
 - LOCAL / NATIONAL / INTERNATIONAL / SERVICE call analysis.
 - Persistent call sessions and PDC voice resource accounting (120 channels).

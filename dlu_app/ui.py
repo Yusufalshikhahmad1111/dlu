@@ -37,6 +37,7 @@ from PySide6.QtWidgets import (
 
 from .call_engine import CallEngine
 from .command_file_ui import CommandFileLab
+from .communications_ui import CommunicationsLabWidget
 from .call_ui import CallLabWidget
 from .db import CardReference, Database
 from .mml import MmlEngine, MmlResult
@@ -739,6 +740,9 @@ class DluSimulatorWindow(QMainWindow):
         )
         right.addTab(self.call_lab, "Call Path")
 
+        self.communications_lab = CommunicationsLabWidget(parent=self)
+        right.addTab(self.communications_lab, "Communications")
+
         info_tab = QWidget()
         info_layout = QVBoxLayout(info_tab)
         self.details = QTableWidget(0, 2)
@@ -992,6 +996,8 @@ class DluSimulatorWindow(QMainWindow):
         self._apply_style()
         if hasattr(self, "call_lab") and hasattr(self.call_lab, "set_theme"):
             self.call_lab.set_theme(name)
+        if hasattr(self, "communications_lab") and hasattr(self.communications_lab, "set_theme"):
+            self.communications_lab.set_theme(name)
         self._refresh_current_view()
 
     def set_mode(self, mode: str):

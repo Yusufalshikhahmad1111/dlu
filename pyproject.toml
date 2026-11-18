@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "dlu-lab"
 version = "0.1.0"
@@ -5,5 +9,22 @@ description = "Educational Siemens EWSD DLU simulator"
 requires-python = ">=3.12,<3.14"
 dependencies = ["PySide6>=6.10,<6.13"]
 
+[tool.setuptools.packages.find]
+include = ["dlu_app*"]
+
 [tool.pyside6-project]
-files = ["main.py", "dlu_app/__init__.py", "dlu_app/db.py", "dlu_app/mml.py", "dlu_app/ui.py"]
+files = [
+  "main.py",
+  "dlu_app/__init__.py",
+  "dlu_app/db.py",
+  "dlu_app/mml.py",
+  "dlu_app/ui.py",
+  "dlu_app/call_engine.py",
+  "dlu_app/call_ui.py",
+  "dlu_app/command_files.py",
+  "dlu_app/command_file_ui.py",
+  "dlu_app/theme.py",
+  "dlu_app/ui_utils.py",
+  "dlu_app/communications_lab.py",
+  "dlu_app/communications_ui.py",
+]
