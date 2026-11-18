@@ -131,7 +131,7 @@ docs/26-STAGE-05-CLOSEOUT.md
 
 ## Stage 6 — Teaching Scenarios
 
-**الحالة: Implemented — release/Windows QA gate**
+**الحالة: مكتملة — automated Windows release gate passed**
 
 المخرجات:
 - formal deterministic Teaching Scenario model;
