@@ -24,7 +24,7 @@
 - UI static audit: **PASS**
 - Full pytest suite on the final Stage 6 branch revision: **71 passed**
 - Teaching Scenarios UI smoke test: **PASS**
-- PR #2: **release gate passed; final merge pending after documentation synchronization**
+- PR #2: **MERGED**
 
 ## Stage 6 scenarios
 
@@ -66,4 +66,4 @@ No physical hands-on Windows GUI session was available during this closeout. The
 
 ## Current status
 
-**Stage 0 → Stage 6 are implemented. Stage 6 is release-ready on automated verification. Stage 7 is next.**
+**Stage 0 → Stage 6 are implemented. Stage 6 is closed on automated verification and merged to main. Stage 7 is next.**
