@@ -282,6 +282,7 @@ class TeachingScenariosWidget(QWidget):
 
     def set_theme(self, name: str):
         self._palette_name = name
+        self._style_status(self.status_chip.text())
 
     def _style_status(self, status: str):
         from .theme import THEMES
