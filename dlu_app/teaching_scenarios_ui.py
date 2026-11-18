@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QSplitter,
     QTableWidget,
     QTableWidgetItem,
+    QHeaderView,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -147,11 +148,11 @@ class TeachingScenariosWidget(QWidget):
         self.steps_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.steps_table.setSelectionMode(QTableWidget.NoSelection)
         self.steps_table.horizontalHeader().setStretchLastSection(True)
-        self.steps_table.horizontalHeader().setSectionResizeMode(0, QTableWidget.ResizeToContents)
-        self.steps_table.horizontalHeader().setSectionResizeMode(1, QTableWidget.ResizeToContents)
-        self.steps_table.horizontalHeader().setSectionResizeMode(2, QTableWidget.Stretch)
-        self.steps_table.horizontalHeader().setSectionResizeMode(3, QTableWidget.Stretch)
-        self.steps_table.horizontalHeader().setSectionResizeMode(4, QTableWidget.ResizeToContents)
+        self.steps_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.steps_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.steps_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.steps_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        self.steps_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
         layout.addWidget(self.steps_table, 1)
 
         self.command_preview = QTextEdit()
