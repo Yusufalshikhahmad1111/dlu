@@ -17,7 +17,7 @@ title = "DLU Lab"
 input_file = "main.py"
 exec_directory = "dist"
 mode = "onefile"
-extra_args = "--windows-console-mode=disable --include-data-dir=data=data"
+extra_args = "--windows-console-mode=disable --include-data-dir=data=data --assume-yes-for-downloads"
 
 [tool.pyside6-project]
 files = [
