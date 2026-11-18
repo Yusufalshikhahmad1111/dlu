@@ -31,22 +31,9 @@
 - CPT seed.
 - event log.
 
-المنفذ حاليًا: قاعدة البيانات + نواة MML الأساسية + أول واجهة DLU/OMT قابلة للتشغيل.
-
-اختبارات:
-- EQN uniqueness.
-- shelf/module range.
-- card capacity.
-- port range.
-- DN uniqueness.
-- seed integrity.
-- transaction rollback.
-
-**ممنوع في هذه المرحلة:** رسم DLU النهائي قبل إثبات صحة dataset.
-
 ## Stage 2 — Hardware Fidelity + MML Core
 
-**الحالة: Code-complete — final Windows manual audit is the release gate**
+**الحالة: مكتملة — automated regression + prior Windows QA passed**
 
 المخرجات:
 - Hardware Dataset + source registry.
@@ -55,15 +42,8 @@
 - Source viewer.
 - Card install/replace workflow.
 - OMT ↔ hardware highlighting.
-- Lexer.
-- Parser.
-- Normalizer.
-- Validator.
-- Dispatcher.
+- Lexer/parser/normalizer/validator/dispatcher.
 - cr/can/mod/disp/stat/test/conf/diag.
-
-Definition of Done:
-Hardware hierarchy + source-backed cards + Physical/Logical modes + maintenance replacement + OMT hardware linking are implemented.
 
 ## Stage 3 — Call Engine + CPT + Call Path
 
@@ -71,48 +51,33 @@ Hardware hierarchy + source-backed cards + Physical/Logical modes + maintenance 
 
 المخرجات:
 - deterministic CPT exact/prefix/range resolver.
-- number analysis.
-- LOCAL / NATIONAL / INTERNATIONAL / SERVICE call classification.
+- LOCAL / NATIONAL / INTERNATIONAL / SERVICE classification.
 - persistent call sessions and call legs.
 - PDC voice resource capacity 120 with reservation/release.
-- LOCAL path: DLU → SN → DLU.
-- NATIONAL path: DLU → LTG → SN → LTG → logical remote DLU/LAC.
-- INTERNATIONAL path: DLU → LTG → SN → International Gateway.
+- LOCAL, NATIONAL, INTERNATIONAL call paths.
 - EVAL=NO blocking before resource reservation.
 - CALL ENGINE · CPT · CALL PATH teaching tab.
 - OMT TEST/STAT/DISP CALL integration.
-- Stage 3 automated tests.
-- Final Windows manual runtime verification.
-
-Definition of Done:
-Call decisions, resource state, subscriber busy state, DB session state, and visual Call Path agree.
 
 Closeout:
 docs/16-STAGE-03-CLOSEOUT.md
 
 ## Stage 3.5 — Next-Generation UX/UI + Hardware Visual Redesign
 
-**الحالة: Implemented — Windows visual QA is the release gate**
+**الحالة: مكتملة — Windows visual QA/hardening passed**
 
 المخرجات:
 - Space telecommunications visual system.
 - permanent OMT command dock.
-- simplified navigation and secondary Tools menu.
-- redesigned teaching action hierarchy.
+- simplified navigation.
 - DLU fleet rack-card visuals.
-- DLU chassis / Shelf equipment bay / Module faceplate / Port connector visuals.
+- DLU chassis / Shelf / Module / Port visuals.
 - redesigned Logical signal map.
 - redesigned Call Path visual treatment.
-- no intentional change to Stage 1–3 domain behavior.
+- shared theme and font safety hardening.
 
-Definition of Done:
-Visual hierarchy, readability, hardware representation, MML visibility, and classroom usability are improved without breaking existing functionality.
-
-QA checklist:
+QA:
 docs/19-STAGE-03_5-WINDOWS-QA.md
-
-Implementation report:
-docs/18-STAGE-03_5-UX-UI-IMPLEMENTATION.md
 
 ## Stage 4 — Command Files
 
@@ -120,8 +85,7 @@ docs/18-STAGE-03_5-UX-UI-IMPLEMENTATION.md
 
 المخرجات:
 - command-file parser.
-- persistent command file records.
-- Accepted / Started / Finished / Executed / Failed lifecycle.
+- persistent lifecycle: Accepted / Started / Finished / Executed / Failed.
 - fail-fast execution logging.
 - HH:MM scheduling.
 - deterministic virtual clock.
@@ -129,9 +93,6 @@ docs/18-STAGE-03_5-UX-UI-IMPLEMENTATION.md
 - OMT EXECMDFILE integration.
 - Command Files teaching workbench.
 - automated Stage 4 tests.
-
-Definition of Done:
-Command files use the existing MML engine, persist their lifecycle/log, execute deterministically, and scheduled files run when the virtual clock reaches their target time.
 
 QA:
 docs/22-STAGE-04-WINDOWS-QA.md
@@ -141,7 +102,7 @@ docs/21-STAGE-04-IMPLEMENTATION-REPORT.md
 
 ## Stage 5 — Communications Labs
 
-**الحالة: Implemented — automated CI + Windows manual QA are the release gates**
+**الحالة: مكتملة — automated release verified**
 
 المخرجات:
 - OSI 7-layer teaching view.
@@ -151,9 +112,10 @@ docs/21-STAGE-04-IMPLEMENTATION-REPORT.md
 - ASK / FSK / PSK / QPSK / 16-QAM waveform lab.
 - QPSK / 16-QAM constellation visualizer.
 - BPSK / QPSK / 16-QAM theoretical + deterministic empirical BER basics.
-- Communications Lab UI integrated into DLU Lab.
-- Pure Python domain core with no new runtime dependency.
-- Stage 5 automated tests.
+- Communications Lab UI.
+- pure Python domain core with no new runtime dependency.
+- UI smoke coverage.
+- synchronized package/build metadata.
 
 Plan:
 docs/23-STAGE-05-COMMUNICATIONS-LABS-PLAN.md
@@ -163,6 +125,9 @@ docs/24-STAGE-05-IMPLEMENTATION-REPORT.md
 
 QA:
 docs/25-STAGE-05-WINDOWS-QA.md
+
+Closeout:
+docs/26-STAGE-05-CLOSEOUT.md
 
 ## Stage 6 — Teaching Scenarios
 
