@@ -4,6 +4,7 @@ from typing import Callable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -145,8 +146,8 @@ class TeachingScenariosWidget(QWidget):
             ["Step", "Type", "Expected", "Actual", "Result"]
         )
         self.steps_table.verticalHeader().setVisible(False)
-        self.steps_table.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.steps_table.setSelectionMode(QTableWidget.NoSelection)
+        self.steps_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.steps_table.setSelectionMode(QAbstractItemView.NoSelection)
         self.steps_table.horizontalHeader().setStretchLastSection(True)
         self.steps_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.steps_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
