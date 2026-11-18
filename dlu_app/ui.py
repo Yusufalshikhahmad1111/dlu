@@ -1008,6 +1008,8 @@ class DluSimulatorWindow(QMainWindow):
             self.call_lab.set_theme(name)
         if hasattr(self, "communications_lab") and hasattr(self.communications_lab, "set_theme"):
             self.communications_lab.set_theme(name)
+        if hasattr(self, "teaching_scenarios") and hasattr(self.teaching_scenarios, "set_theme"):
+            self.teaching_scenarios.set_theme(name)
         self._refresh_current_view()
 
     def set_mode(self, mode: str):
