@@ -27,4 +27,6 @@ files = [
   "dlu_app/ui_utils.py",
   "dlu_app/communications_lab.py",
   "dlu_app/communications_ui.py",
+  "dlu_app/teaching_scenarios.py",
+  "dlu_app/teaching_scenarios_ui.py",
 ]
