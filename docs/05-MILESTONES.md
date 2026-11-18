@@ -159,12 +159,28 @@ docs/30-STAGE-06-CLOSEOUT.md
 
 ## Stage 7 — Packaging & Final Audit
 
-- Windows executable.
-- optional installer.
-- reset/backup/restore.
-- screenshots.
-- user manual.
-- final academic test report.
+**الحالة: In progress — release build + final Windows QA gate**
+
+المخرجات:
+- Windows onefile executable via `pyside6-deploy`;
+- automated executable smoke test;
+- safe SQLite reset/backup/restore lifecycle;
+- final UI screenshot artifact generation;
+- user manual;
+- final academic test report;
+- final Windows QA and closeout.
+
+Plan:
+docs/31-STAGE-07-PACKAGING-PLAN.md
+
+User manual:
+docs/32-USER-MANUAL.md
+
+Windows QA:
+docs/34-STAGE-07-WINDOWS-QA.md
+
+Closeout:
+docs/35-STAGE-07-CLOSEOUT.md
 
 ## قاعدة التنفيذ
 
