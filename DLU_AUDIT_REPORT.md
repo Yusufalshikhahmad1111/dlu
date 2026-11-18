@@ -4,66 +4,56 @@
 
 ## الخلاصة
 
-تم إغلاق تدقيق Stage 5 ثم تنفيذ وإغلاق Stage 6 على فرع الإصدار الخاص بها.
+تم إغلاق Stage 5 وStage 6 ثم تنفيذ وإغلاق **Stage 7 — Packaging & Final Audit**.
 
-### Stage 5 verification
+### Stage 5
 
-- Windows GitHub Actions: **PASS**
-- Python compile: **PASS**
-- UI static audit: **PASS**
-- Full pytest suite at closeout: **63 passed**
-- Communications UI smoke test: **PASS**
-- PR #1: **MERGED**
-- pyproject build/package metadata: **synchronized**
+- Windows GitHub Actions: PASS
+- Full pytest suite at closeout: 63 passed
+- Communications UI smoke: PASS
+- PR #1: MERGED
 
-### Stage 6 verification
+### Stage 6
 
-- Formal Teaching Scenarios layer: **IMPLEMENTED**
-- Six scenarios: **PASS**
-- Windows compile: **PASS**
-- UI static audit: **PASS**
-- Full pytest suite on the final Stage 6 branch revision: **71 passed**
-- Teaching Scenarios UI smoke test: **PASS**
-- PR #2: **MERGED**
+- Six formal teaching scenarios: PASS
+- Full pytest suite at closeout: 71 passed
+- PR #2: MERGED
 
-## Stage 6 scenarios
+### Stage 7
 
-- Aleppo 8-Line Expansion
-- CMRL Capacity Limit
-- DLU / Card Maintenance
-- Billing Block
-- International Blacklist
-- Command File Overnight Run
+- Release version: **1.0.0**
+- Windows onefile executable: **PASS**
+- Packaged executable smoke test: **PASS**
+- SQLite backup/restore tests: **PASS**
+- Final screenshot automation: **PASS**
+- Windows release artifact upload: **PASS**
+- Final screenshot artifact upload: **PASS**
+- Final Windows CI regression: **76 passed**
+- Stage 7 closeout documentation: **COMPLETE**
 
-Each scenario reports commands/actions, affected EQN(s), expected result, actual result and PASS/FAIL.
+## Release artifacts
 
-## Important defect found and fixed
+GitHub Actions final release artifacts:
 
-Windows CI caught an actual Stage 6 syntax defect in the overnight command-file scenario:
-- literal line breaks were placed inside an f-string;
-- Windows py_compile reported an unterminated f-string literal;
-- the command-file payload was corrected to use explicit newline escapes.
+- `DLU-Lab-Windows` — approximately 27.9 MB.
+- `DLU-Lab-Screenshots` — approximately 309 KB.
 
-A UI hardening pass also ensures the Scenario status chip refreshes its colors when the global theme changes.
+## Important fixes during Stage 7
 
-## Preservation
-
-Stage 6 is additive. The existing Stage 1–5 hardware, MML, maintenance, Command Files, Call Path and Communications workbenches remain in the application.
+1. Corrected `QDesktopServices` import location.
+2. Hardened screenshot path handling for Windows `QPixmap.save`.
+3. Added project-root import resolution to screenshot automation.
+4. Added cleanup-safe screenshot window closure.
+5. Enabled automated Nuitka/Dependency Walker downloads.
+6. Ensured the deployment output directory exists after `pyside6-deploy --init`.
+7. Added release smoke test and safe restore-on-restart flow.
 
 ## Verification boundary
 
-No physical hands-on Windows GUI session was available during this closeout. The automated Windows job did instantiate and exercise the PySide6 Scenario workbench, and the full regression suite passed.
+Windows CI executed compilation, static UI audit, full regression, GUI screenshot capture, Windows packaging and packaged-executable smoke testing.
 
-## Remaining roadmap
+No separate physical hands-on session on the developer's own Windows workstation was available during this closeout, so no unsupported local visual claim is made.
 
-### Stage 7 — Packaging & Final Audit
+## Final state
 
-- Windows executable packaging;
-- backup/restore;
-- user manual;
-- screenshots / final visual QA;
-- final academic regression report.
-
-## Current status
-
-**Stage 0 → Stage 6 are implemented. Stage 6 is closed on automated verification and merged to main. Stage 7 is next.**
+**Stage 0 → Stage 7 are implemented and the DLU Lab 1.0.0 release gate is closed.**

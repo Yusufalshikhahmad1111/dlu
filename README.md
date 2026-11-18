@@ -111,6 +111,12 @@ FAULT → MBL → DIAG → REMOVE → INSTALL → ACTIVATE → VERIFY
 
 ## التشغيل على Windows 11
 
+### Packaged release
+
+Stage 7 produces a Windows onefile executable through Qt for Python `pyside6-deploy`. The packaged executable runs without a Python installation.
+
+### Development
+
 ```bat
 run.bat
 ```
@@ -134,16 +140,26 @@ python -m pytest -q tests
 
 ## الحالة
 
-Stage 0–4: **completed**
+Stage 0–6: **completed**
 
-Stage 5 — Communications Labs: **completed — automated release verified**
-- 63/63 tests passed on Windows CI.
-- Python compilation passed.
-- UI static audit passed.
-- Communications UI smoke test passed.
-- PR #1 merged into main.
-- pyproject package/build metadata synchronized.
+Stage 5 — Communications Labs:
+- automated release verified;
+- 63/63 tests passed at closeout;
+- PR #1 merged into `main`.
 
-ملاحظة QA: لم يتم تنفيذ جلسة Windows hands-on من المستخدم لهذه المرحلة أثناء هذا الإغلاق لأن الكمبيوتر غير متاح. لذلك لم يتم الادعاء بفحص بصري يدوي غير حاصل.
+Stage 6 — Teaching Scenarios:
+- six formal PASS/FAIL scenarios;
+- automated Windows release gate passed;
+- 71/71 tests passed at closeout;
+- PR #2 merged into `main`.
 
-التالي: **Stage 7 — Packaging & Final Audit**.
+Stage 7 — Packaging & Final Audit:
+- release version 1.0.0;
+- safe SQLite backup/restore;
+- Windows onefile executable;
+- executable smoke test;
+- five final UI screenshots uploaded as release artifacts;
+- user manual and final academic test report;
+- **76/76 tests passed on Windows CI**.
+
+الحالة الحالية: **Stage 7 complete — DLU Lab 1.0.0 release-ready**.
