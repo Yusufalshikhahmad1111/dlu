@@ -4,42 +4,66 @@
 
 ## الخلاصة
 
-تم إغلاق تدقيق Stage 5 بعد معالجة فجوة CI ودمج PR #1 إلى `main`.
+تم إغلاق تدقيق Stage 5 ثم تنفيذ وإغلاق Stage 6 على فرع الإصدار الخاص بها.
 
 ### Stage 5 verification
 
 - Windows GitHub Actions: **PASS**
 - Python compile: **PASS**
 - UI static audit: **PASS**
-- Full pytest suite: **63 passed**
+- Full pytest suite at closeout: **63 passed**
 - Communications UI smoke test: **PASS**
 - PR #1: **MERGED**
 - pyproject build/package metadata: **synchronized**
 
-## الإصلاحات المهمة التي اكتُشفت أثناء التدقيق
+### Stage 6 verification
 
-1. Stage 5 كان يفشل في CI بسبب استيراد `QLineF` من `PySide6.QtGui` بدل `PySide6.QtCore`.
-2. تم إضافة smoke test حقيقي يبني `CommunicationsLabWidget` ويشغّل أوضاع المختبرات.
-3. تم تحديث `pyproject.toml` ليشمل حزمة المشروع وملفات `pyside6-project` الحالية.
-4. تم إضافة `[build-system]` إلى `pyproject.toml`.
-5. تم إصلاح README الذي كان متأخرًا عن الحالة الفعلية.
-6. تم توحيد Milestones مع حالة المشروع.
+- Formal Teaching Scenarios layer: **IMPLEMENTED**
+- Six scenarios: **PASS**
+- Windows compile: **PASS**
+- UI static audit: **PASS**
+- Full pytest suite on the final Stage 6 branch revision: **71 passed**
+- Teaching Scenarios UI smoke test: **PASS**
+- PR #2: **release gate passed; final merge pending after documentation synchronization**
 
-## حدود التحقق
+## Stage 6 scenarios
 
-لم تُنفذ جلسة Windows hands-on من المستخدم أثناء هذا الإغلاق لأن جهازه غير متاح. لذلك:
-- لا يوجد ادعاء بفحص بصري يدوي.
-- التحقق الآلي شمل تشغيل واستدعاء واجهة Communications داخل PySide6 test.
-- الفحص البصري النهائي يبقى خطوة اختيارية عندما يصبح الكمبيوتر متاحًا.
+- Aleppo 8-Line Expansion
+- CMRL Capacity Limit
+- DLU / Card Maintenance
+- Billing Block
+- International Blacklist
+- Command File Overnight Run
 
-## المتبقي فعليًا
+Each scenario reports commands/actions, affected EQN(s), expected result, actual result and PASS/FAIL.
 
-### Stage 6
-Teaching Scenarios موحدة بصيغة PASS/FAIL، مع Billing Block وInternational Blacklist وCommand File Overnight Run.
+## Important defect found and fixed
 
-### Stage 7
-Packaging، backup/restore، screenshots، user manual، وFinal Academic Test Report.
+Windows CI caught an actual Stage 6 syntax defect in the overnight command-file scenario:
+- literal line breaks were placed inside an f-string;
+- Windows py_compile reported an unterminated f-string literal;
+- the command-file payload was corrected to use explicit newline escapes.
 
-## النتيجة
+A UI hardening pass also ensures the Scenario status chip refreshes its colors when the global theme changes.
 
-**Stage 5 مغلقة على مستوى التنفيذ الآلي والدمج. المشروع جاهز للانتقال إلى Stage 6.**
+## Preservation
+
+Stage 6 is additive. The existing Stage 1–5 hardware, MML, maintenance, Command Files, Call Path and Communications workbenches remain in the application.
+
+## Verification boundary
+
+No physical hands-on Windows GUI session was available during this closeout. The automated Windows job did instantiate and exercise the PySide6 Scenario workbench, and the full regression suite passed.
+
+## Remaining roadmap
+
+### Stage 7 — Packaging & Final Audit
+
+- Windows executable packaging;
+- backup/restore;
+- user manual;
+- screenshots / final visual QA;
+- final academic regression report.
+
+## Current status
+
+**Stage 0 → Stage 6 are implemented. Stage 6 is release-ready on automated verification. Stage 7 is next.**

@@ -92,12 +92,22 @@ FAULT → MBL → DIAG → REMOVE → INSTALL → ACTIVATE → VERIFY
 
 ## Scenarios
 
-الموجود حاليًا:
-- 8-Line hardware teaching action.
-- CMRL capacity guard.
-- DLU/card maintenance demo.
+تبويب **Scenarios** يقدّم ستة Teaching Scenarios رسمية موحدة:
+- Aleppo 8-Line Expansion.
+- CMRL Capacity Limit.
+- DLU / Card Maintenance.
+- Billing Block.
+- International Blacklist.
+- Command File Overnight Run.
 
-Stage 6 سيحوّل هذه الوظائف إلى سيناريوهات رسمية موحدة بصيغة PASS/FAIL، ويضيف Billing Block وInternational Blacklist وCommand File Overnight Run.
+كل Scenario يعرض:
+- commands/actions;
+- affected EQN;
+- expected result;
+- actual result;
+- PASS/FAIL.
+
+التنفيذ يعيد استخدام MML وDB وCall Engine وCommand Files الفعلية، ولا ينشئ منطقًا موازيًا للتدريس.
 
 ## التشغيل على Windows 11
 
@@ -136,4 +146,4 @@ Stage 5 — Communications Labs: **completed — automated release verified**
 
 ملاحظة QA: لم يتم تنفيذ جلسة Windows hands-on من المستخدم لهذه المرحلة أثناء هذا الإغلاق لأن الكمبيوتر غير متاح. لذلك لم يتم الادعاء بفحص بصري يدوي غير حاصل.
 
-التالي: **Stage 6 — Teaching Scenarios**.
+التالي: **Stage 7 — Packaging & Final Audit**.

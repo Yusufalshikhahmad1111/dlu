@@ -38,6 +38,7 @@ from PySide6.QtWidgets import (
 from .call_engine import CallEngine
 from .command_file_ui import CommandFileLab
 from .communications_ui import CommunicationsLabWidget
+from .teaching_scenarios_ui import TeachingScenariosWidget
 from .call_ui import CallLabWidget
 from .db import CardReference, Database
 from .mml import MmlEngine, MmlResult
@@ -743,6 +744,15 @@ class DluSimulatorWindow(QMainWindow):
         self.communications_lab = CommunicationsLabWidget(parent=self)
         right.addTab(self.communications_lab, "Communications")
 
+        self.teaching_scenarios = TeachingScenariosWidget(
+            self.db,
+            self.mml,
+            on_state_changed=self._on_scenario_state_changed,
+            on_reset_demo=self.reset_demo,
+            parent=self,
+        )
+        right.addTab(self.teaching_scenarios, "Scenarios")
+
         info_tab = QWidget()
         info_layout = QVBoxLayout(info_tab)
         self.details = QTableWidget(0, 2)
@@ -998,6 +1008,8 @@ class DluSimulatorWindow(QMainWindow):
             self.call_lab.set_theme(name)
         if hasattr(self, "communications_lab") and hasattr(self.communications_lab, "set_theme"):
             self.communications_lab.set_theme(name)
+        if hasattr(self, "teaching_scenarios") and hasattr(self.teaching_scenarios, "set_theme"):
+            self.teaching_scenarios.set_theme(name)
         self._refresh_current_view()
 
     def set_mode(self, mode: str):
@@ -2411,6 +2423,13 @@ class DluSimulatorWindow(QMainWindow):
         self.path_label.setText("PATH ACTIVE" if active_calls else "PATH —")
 
     def _on_call_state_changed(self):
+        if hasattr(self, "call_lab"):
+            self.call_lab.refresh_subscribers()
+        self.refresh_status()
+        if getattr(self, "current_view", "home") == "module":
+            self._refresh_current_view()
+
+    def _on_scenario_state_changed(self):
         if hasattr(self, "call_lab"):
             self.call_lab.refresh_subscribers()
         self.refresh_status()
