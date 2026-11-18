@@ -3,13 +3,14 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QColor, QPainter, QPen, QBrush
+from PySide6.QtGui import QColor, QPainter, QPen, QBrush, QLineF
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
     QDoubleSpinBox,
     QFormLayout,
     QGroupBox,
+    QFrame,
     QHBoxLayout,
     QHeaderView,
     QLabel,
@@ -142,7 +143,7 @@ class SignalPlot(QWidget):
             path.append((px, py))
         painter.setPen(QPen(QColor(self._palette.CYAN), 2))
         for (x1, y1), (x2, y2) in zip(path, path[1:]):
-            painter.drawLine(x1, y1, x2, y2)
+            painter.drawLine(QLineF(x1, y1, x2, y2))
 
         painter.setPen(QColor(self._palette.MUTED))
         painter.setFont(make_font(8))
@@ -201,7 +202,7 @@ class SignalPlot(QWidget):
 
         painter.setPen(QPen(QColor(self._palette.CYAN), 2))
         for a, b in zip(theoretical_path, theoretical_path[1:]):
-            painter.drawLine(*a, *b)
+            painter.drawLine(QLineF(a[0], a[1], b[0], b[1]))
 
         painter.setPen(QPen(QColor(self._palette.YELLOW), 1.5))
         painter.setBrush(QBrush(QColor(self._palette.YELLOW)))
@@ -562,7 +563,7 @@ class CommunicationsLabWidget(QWidget):
     def _scroll(self, page: QWidget) -> QWidget:
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QScrollArea.NoFrame)
+        scroll.setFrameShape(QFrame.NoFrame)
         scroll.setWidget(page)
         return scroll
 
