@@ -3,7 +3,6 @@ name: DLU Stage 7 Release Build
 on:
   push:
     branches:
-      - stage-07-packaging-final-audit
       - main
     tags:
       - "v*"
