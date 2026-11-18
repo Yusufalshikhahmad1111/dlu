@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QRectF, Qt
+from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QPainter, QPen, QBrush, QLineF
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -147,9 +147,9 @@ class SignalPlot(QWidget):
 
         painter.setPen(QColor(self._palette.MUTED))
         painter.setFont(make_font(8))
-        painter.drawText(rect.left(), rect.bottom() + 19, "time")
-        painter.drawText(8, rect.top() + 10, f"{high:.2f}")
-        painter.drawText(12, rect.bottom(), f"{low:.2f}")
+        painter.drawText(QPointF(rect.left(), rect.bottom() + 19), "time")
+        painter.drawText(QPointF(8, rect.top() + 10), f"{high:.2f}")
+        painter.drawText(QPointF(12, rect.bottom()), f"{low:.2f}")
 
     def _draw_constellation(self, painter: QPainter, rect: QRectF, points: tuple[ConstellationPoint, ...]):
         self._title(painter, "Constellation")
@@ -177,9 +177,9 @@ class SignalPlot(QWidget):
 
         painter.setPen(QColor(self._palette.MUTED))
         painter.setFont(make_font(8))
-        painter.drawText(rect.center().x(), rect.bottom() + 19, "I (in-phase)")
-        painter.drawText(rect.left() - 1, rect.top() + 10, "Q")
-        painter.drawText(rect.right() - 34, rect.bottom() + 19, "+I")
+        painter.drawText(QPointF(rect.center().x(), rect.bottom() + 19), "I (in-phase)")
+        painter.drawText(QPointF(rect.left() - 1, rect.top() + 10), "Q")
+        painter.drawText(QPointF(rect.right() - 34, rect.bottom() + 19), "+I")
 
     def _draw_ber(self, painter: QPainter, rect: QRectF, points: tuple[BerPoint, ...]):
         self._title(painter, "BER vs Eb/N0")
@@ -213,9 +213,9 @@ class SignalPlot(QWidget):
 
         painter.setPen(QColor(self._palette.MUTED))
         painter.setFont(make_font(8))
-        painter.drawText(rect.center().x(), rect.bottom() + 19, "Eb/N0 (dB)")
-        painter.drawText(8, rect.top() + 10, f"{top:.3g}")
-        painter.drawText(8, rect.bottom(), f"{bottom:.0e}")
+        painter.drawText(QPointF(rect.center().x(), rect.bottom() + 19), "Eb/N0 (dB)")
+        painter.drawText(QPointF(8, rect.top() + 10), f"{top:.3g}")
+        painter.drawText(QPointF(8, rect.bottom()), f"{bottom:.0e}")
 
 
 class CommunicationsLabWidget(QWidget):
