@@ -116,7 +116,7 @@ docs/18-STAGE-03_5-UX-UI-IMPLEMENTATION.md
 
 ## Stage 4 — Command Files
 
-**الحالة: Implemented — Windows manual QA is the release gate**
+**الحالة: مكتملة — Windows manual QA passed**
 
 المخرجات:
 - command-file parser.
@@ -141,12 +141,28 @@ docs/21-STAGE-04-IMPLEMENTATION-REPORT.md
 
 ## Stage 5 — Communications Labs
 
-- OSI.
-- TCP/UDP.
-- AM/FM/PM.
-- PAM/PWM/PPM/PCM.
-- ASK/FSK/PSK/QPSK/QAM.
-- constellation/BER basics.
+**الحالة: Implemented — automated CI + Windows manual QA are the release gates**
+
+المخرجات:
+- OSI 7-layer teaching view.
+- TCP vs UDP comparison.
+- AM / FM / PM waveform lab.
+- PAM / PWM / PPM / PCM pulse lab.
+- ASK / FSK / PSK / QPSK / 16-QAM waveform lab.
+- QPSK / 16-QAM constellation visualizer.
+- BPSK / QPSK / 16-QAM theoretical + deterministic empirical BER basics.
+- Communications Lab UI integrated into DLU Lab.
+- Pure Python domain core with no new runtime dependency.
+- Stage 5 automated tests.
+
+Plan:
+docs/23-STAGE-05-COMMUNICATIONS-LABS-PLAN.md
+
+Report:
+docs/24-STAGE-05-IMPLEMENTATION-REPORT.md
+
+QA:
+docs/25-STAGE-05-WINDOWS-QA.md
 
 ## Stage 6 — Teaching Scenarios
 
