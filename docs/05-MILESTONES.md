@@ -131,19 +131,31 @@ docs/26-STAGE-05-CLOSEOUT.md
 
 ## Stage 6 — Teaching Scenarios
 
-- Aleppo 8-line expansion.
-- CMRL capacity limit.
-- DLU/card maintenance.
-- Billing block.
-- International blacklist.
-- Command file overnight run.
+**الحالة: Implemented — release/Windows QA gate**
 
-كل Scenario يعرض:
-- commands.
-- affected EQN.
-- expected result.
-- actual result.
-- PASS/FAIL.
+المخرجات:
+- formal deterministic Teaching Scenario model;
+- Aleppo 8-line expansion;
+- CMRL capacity limit;
+- DLU/card maintenance;
+- Billing block;
+- International blacklist;
+- Command File overnight run;
+- unified commands/actions + affected EQN + expected/actual + PASS/FAIL workbench;
+- automated scenario + UI smoke coverage.
+
+Plan:
+docs/27-STAGE-06-TEACHING-SCENARIOS-PLAN.md
+
+Report:
+docs/28-STAGE-06-IMPLEMENTATION-REPORT.md
+
+QA:
+docs/29-STAGE-06-WINDOWS-QA.md
+
+Closeout:
+docs/30-STAGE-06-CLOSEOUT.md
+
 
 ## Stage 7 — Packaging & Final Audit
 
