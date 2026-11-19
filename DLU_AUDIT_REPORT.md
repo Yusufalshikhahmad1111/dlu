@@ -54,6 +54,30 @@ Windows CI executed compilation, static UI audit, full regression, GUI screensho
 
 No separate physical hands-on session on the developer's own Windows workstation was available during this closeout, so no unsupported local visual claim is made.
 
+### Stage 8
+
+- New Deep Navy / Graphite / Cyan / Emerald / Amber design system.
+- New LAB navigation shell.
+- Legacy Brown + Ivory / Brown + Silver presentation removed from the primary UX.
+- Responsive initial window sizing.
+- Post-layout Hardware scene fitting.
+- 1280×720 / 1366×768 / 1600×900 / 1920×1080 screenshot QA.
+- 79 passed on final Windows CI.
+- Windows onefile build and smoke test: PASS.
+- Final screenshot artifact upload: PASS.
+- Final Stage 8 closeout: COMPLETE.
+
+## Final Stage 8 artifacts
+
+- DLU-Lab-Windows — artifact 14565472543 — approximately 27.97 MB.
+- DLU-Lab-Screenshots — artifact 14564639523 — approximately 482 KB.
+
+## Verification boundary
+
+Windows CI executed compilation, static UI audit, full regression, GUI screenshot capture, Windows packaging and packaged-executable smoke testing.
+
+Final visual QA was performed against all four target resolutions using the release screenshot artifact. A separate physical end-user session on a personal Windows workstation is not claimed.
+
 ## Final state
 
 **Stage 0 → Stage 7 are implemented and the DLU Lab 1.0.0 release gate is closed.**
