@@ -355,6 +355,29 @@ docs/42-STAGE-08-EXECUTION-PROMPT.md
 Stage 9→20 Prompts:
 docs/43-STAGE-09-20-EXECUTION-PROMPTS.md
 
+## Stage 8 — UX/UI Reimagination
+
+**الحالة: تنفيذ مكتمل — 79/79 tests passed — Windows packaged visual gate pending merge**
+
+المخرجات:
+- centralized Stage 8 design tokens;
+- Deep Navy / Graphite / Cyan / Emerald / Amber identity;
+- centralized QPalette + shared styling;
+- new LAB navigation shell;
+- legacy theme selector removed from primary UX;
+- clearer feature tab naming;
+- Stage 8 screenshot integration;
+- UX/UI shell + contrast regression tests.
+
+Implementation:
+docs/44-STAGE-08-IMPLEMENTATION-REPORT.md
+
+Windows UX QA:
+docs/45-STAGE-08-WINDOWS-UX-QA.md
+
+Closeout:
+docs/46-STAGE-08-CLOSEOUT.md
+
 ## قاعدة التنفيذ
 
 Implement → Tests → Manual Demo → Fix → Report → Commit
