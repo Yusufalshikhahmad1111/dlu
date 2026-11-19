@@ -80,4 +80,4 @@ Final visual QA was performed against all four target resolutions using the rele
 
 ## Final state
 
-**Stage 0 → Stage 7 are implemented and the DLU Lab 1.0.0 release gate is closed.**
+**Stage 0 → Stage 8 are implemented and verified; Stage 8 is the current post-release UX/UI baseline.**
