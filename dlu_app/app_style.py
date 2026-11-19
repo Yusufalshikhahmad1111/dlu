@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QPushButton, QTabWidget, QToolButton, QWidget
 
@@ -448,3 +448,9 @@ def apply_stage8_ui(window: QWidget) -> None:
 
     _restyle_window(window)
     _select_initial_nav(window)
+
+    # The hardware scene is built before the final window/layout geometry exists.
+    # Re-fit it after the first layout pass so 1280x720 and similar viewports do
+    # not inherit an oversized scene transform.
+    if hasattr(window, "hardware"):
+        QTimer.singleShot(0, window.hardware.reset_zoom)
