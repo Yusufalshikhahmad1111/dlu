@@ -39,6 +39,16 @@ def main() -> int:
     window = DluSimulatorWindow(db_path)
     apply_stage8_ui(window)
 
+    # Keep the default desktop presentation within the user's available
+    # work area while preserving the larger Stage 8 reference size when space
+    # permits.
+    screen = app.primaryScreen()
+    if screen is not None:
+        available = screen.availableGeometry()
+        width = min(1580, max(1180, available.width() - 40))
+        height = min(940, max(680, available.height() - 80))
+        window.resize(width, height)
+
     if "--smoke-test" in sys.argv[1:]:
         window.show()
         app.processEvents()
