@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .design_tokens import TOKENS
+
 
 @dataclass(frozen=True)
 class ThemePalette:
@@ -25,19 +27,31 @@ class ThemePalette:
     DEEP: str
 
 
+CONTROL_ROOM = ThemePalette(
+    BG=TOKENS.bg,
+    PANEL=TOKENS.surface,
+    PANEL2=TOKENS.surface,
+    PANEL3=TOKENS.surface_elevated,
+    STEEL=TOKENS.border_strong,
+    TEXT=TOKENS.text_primary,
+    MUTED=TOKENS.text_muted,
+    BORDER=TOKENS.border,
+    GREEN=TOKENS.success,
+    YELLOW=TOKENS.warning,
+    RED=TOKENS.danger,
+    BLUE=TOKENS.info,
+    CYAN=TOKENS.primary,
+    VIOLET="#A78BFA",
+    AMBER=TOKENS.warning,
+    WHITE=TOKENS.white,
+    CARD=TOKENS.surface_interactive,
+    DEEP=TOKENS.black,
+)
+
+# Compatibility aliases for feature widgets that still accept a legacy theme
+# name. All aliases intentionally render the Stage 8 control-room palette.
 THEMES: dict[str, ThemePalette] = {
-    "ivory": ThemePalette(
-        BG="#f3eadc", PANEL="#fffaf1", PANEL2="#eee3d2", PANEL3="#e4d5c0",
-        STEEL="#7d6e5f", TEXT="#2f271f", MUTED="#746658", BORDER="#bda98f",
-        GREEN="#2f8a68", YELLOW="#b67825", RED="#bd4f4f", BLUE="#806b5c",
-        CYAN="#b66f42", VIOLET="#765e50", AMBER="#b67825", WHITE="#fffdf8",
-        CARD="#f0e5d5", DEEP="#e6d8c5",
-    ),
-    "silver": ThemePalette(
-        BG="#292825", PANEL="#3a3834", PANEL2="#2f2e2b", PANEL3="#47443f",
-        STEEL="#aaa49a", TEXT="#f3efe8", MUTED="#c4bfb7", BORDER="#766f65",
-        GREEN="#66c39b", YELLOW="#d2a35b", RED="#df7777", BLUE="#b2a79b",
-        CYAN="#c08b63", VIOLET="#a58f84", AMBER="#d2a35b", WHITE="#fffdf8",
-        CARD="#3f3d39", DEEP="#262522",
-    ),
+    "control_room": CONTROL_ROOM,
+    "ivory": CONTROL_ROOM,
+    "silver": CONTROL_ROOM,
 }
