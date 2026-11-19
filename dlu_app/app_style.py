@@ -422,6 +422,11 @@ def apply_stage8_ui(window: QWidget) -> None:
     if hasattr(window, "status_chip"):
         window.status_chip.setText("SYSTEM · ACTIVE")
 
+    # The legacy window minimum (1250x760) cannot support the Stage 8 QA target
+    # of 1280x720. Keep the normal application size unchanged while allowing the
+    # smallest supported visual-audit viewport.
+    window.setMinimumSize(1180, 680)
+
     tabs = _main_tabs(window)
     if tabs is not None:
         replacements = {
