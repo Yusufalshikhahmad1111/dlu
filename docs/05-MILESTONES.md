@@ -156,7 +156,6 @@ docs/29-STAGE-06-WINDOWS-QA.md
 Closeout:
 docs/30-STAGE-06-CLOSEOUT.md
 
-
 ## Stage 7 — Packaging & Final Audit
 
 **الحالة: مكتملة — Windows release gate passed**
@@ -184,6 +183,177 @@ docs/34-STAGE-07-WINDOWS-QA.md
 
 Closeout:
 docs/35-STAGE-07-CLOSEOUT.md
+
+---
+
+# Post-Release Roadmap — Stage 8→20
+
+**الحالة: مخططة — لا يوجد تنفيذ وظيفي بعد**
+
+الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
+
+## Stage 8 — UX/UI Reimagination
+
+**الحالة: مخططة**
+
+- Design System.
+- Deep Navy / Graphite / Cyan / Emerald / Amber visual identity.
+- typography, spacing, semantic states.
+- redesigned application shell.
+- reusable UI primitives.
+- keyboard/focus foundation.
+- removal of scattered legacy theme styling.
+
+Execution prompt:
+docs/42-STAGE-08-EXECUTION-PROMPT.md
+
+## Stage 9 — Student-Centered Navigation
+
+**الحالة: مخططة**
+
+- Learning Home.
+- Continue Learning.
+- current context.
+- progress.
+- recent activity.
+- quick actions.
+- progressive disclosure.
+
+## Stage 10 — Hardware UX 2.0
+
+**الحالة: مخططة**
+
+- Exchange → DLU → Side → Shelf → Module → Port → Subscriber hierarchy.
+- context inspector.
+- EQN/capacity/state presentation.
+- hover/selection/maintenance visualization.
+
+## Stage 11 — OMT/MML UX 2.0
+
+**الحالة: مخططة**
+
+- command editor.
+- history.
+- syntax feedback.
+- command explanation.
+- result + affected hardware pairing.
+- no duplicate MML engine.
+
+## Stage 12 — Call & Network Visualization
+
+**الحالة: مخططة**
+
+- readable call-flow visualization.
+- resource reservation states.
+- route explanation.
+- blocked-call explanation.
+- controlled signal-flow animation.
+
+## Stage 13 — Communications Lab 2.0
+
+**الحالة: مخططة**
+
+- Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge.
+- improved waveform/constellation readability.
+
+## Stage 14 — Teaching Scenarios 2.0
+
+**الحالة: مخططة**
+
+- Objective → Observe → Execute → Diagnose → Fix → Verify → Result.
+- progress.
+- hints.
+- mistake explanations.
+- expected vs actual.
+
+## Stage 15 — Academic Learning Layer
+
+**الحالة: مخططة**
+
+- Learn → Practice → Experiment → Challenge → Verify.
+- coherent course progression over the existing modules.
+
+## Stage 16 — Instructor / Classroom Mode
+
+**الحالة: مخططة**
+
+- reset.
+- scenario loading.
+- guided demonstration.
+- answer visibility.
+- expected vs actual.
+- projector-friendly view.
+
+## Stage 17 — Accessibility & Usability Audit
+
+**الحالة: مخططة**
+
+- contrast.
+- focus.
+- keyboard navigation.
+- state communication.
+- typography.
+- empty/error/loading states.
+- target resolution audit.
+
+## Stage 18 — Performance & Architecture Cleanup
+
+**الحالة: مخططة**
+
+Target boundaries:
+- app_shell.
+- navigation.
+- design_tokens.
+- feature views.
+- shared components.
+
+The domain core remains independent.
+
+## Stage 19 — Final Academic UX Audit
+
+**الحالة: مخططة**
+
+End-to-end student/instructor audit covering:
+- Hardware.
+- MML.
+- Calls.
+- Communications.
+- Scenarios.
+
+## Stage 20 — DLU Lab 2.0 Release
+
+**الحالة: مخططة**
+
+- full regression.
+- visual/accessibility QA.
+- Windows packaging.
+- screenshots.
+- updated manuals/guides.
+- final closeout.
+
+Master plan:
+docs/36-POST-RELEASE-UX-UI-MASTER-PLAN.md
+
+Research:
+docs/37-UX-UI-RESEARCH-STUDY.md
+
+Design System:
+docs/38-DESIGN-SYSTEM-SPECIFICATION.md
+
+UX Journeys:
+docs/39-UX-JOURNEYS-AND-INFORMATION-ARCHITECTURE.md
+
+Architecture Target:
+docs/40-UX-UI-ARCHITECTURE-TARGET.md
+
+Quality Gates:
+docs/41-UX-UI-QUALITY-GATES.md
+
+Stage 8 Prompt:
+docs/42-STAGE-08-EXECUTION-PROMPT.md
+
+Stage 9→20 Prompts:
+docs/43-STAGE-09-20-EXECUTION-PROMPTS.md
 
 ## قاعدة التنفيذ
 
