@@ -162,4 +162,17 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 7 complete — DLU Lab 1.0.0 release-ready**.
+الحالة الحالية: **Stage 8 complete — DLU Lab 1.0.0 UX/UI reimagination closed**.
+
+Stage 8:
+- Deep Navy / Graphite / Cyan / Emerald / Amber design system;
+- new LAB navigation shell;
+- legacy theme selector removed from primary UX;
+- responsive initial window sizing;
+- post-layout Hardware scene fitting;
+- visual QA at 1280×720, 1366×768, 1600×900 and 1920×1080;
+- 79/79 tests passed;
+- Windows onefile build and smoke test passed;
+- final release screenshots uploaded.
+
+Next planned stage: **Stage 9 — Student-Centered Navigation**.
