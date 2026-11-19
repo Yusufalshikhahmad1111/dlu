@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: مخططة — لا يوجد تنفيذ وظيفي بعد**
+**الحالة: Stage 8 مكتملة — Stage 9→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
