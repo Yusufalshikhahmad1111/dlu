@@ -6,12 +6,15 @@ import sys
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from dlu_app import APP_NAME, __version__
+from dlu_app.app_style import apply_application_style
 from dlu_app.backup_restore import BackupError, DatabaseBackupManager
+from dlu_app.stage8_ui import apply_stage8_ui
 from dlu_app.ui import DluSimulatorWindow
 
 
 def main() -> int:
     app = QApplication(sys.argv)
+    apply_application_style(app)
     app.setApplicationName(APP_NAME)
     app.setApplicationVersion(__version__)
     app.setOrganizationName("PEU")
@@ -29,11 +32,13 @@ def main() -> int:
         QMessageBox.critical(
             None,
             "DLU Lab Restore Error",
-            f"A pending database restore could not be applied safely.\\n\\n{exc}",
+            f"A pending database restore could not be applied safely.\n\n{exc}",
         )
         return 2
 
     window = DluSimulatorWindow(db_path)
+    apply_stage8_ui(window)
+
     if "--smoke-test" in sys.argv[1:]:
         window.show()
         app.processEvents()
