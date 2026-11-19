@@ -11,6 +11,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication, QTabWidget
 
+from dlu_app.stage8_ui import apply_stage8_ui
 from dlu_app.ui import DluSimulatorWindow
 
 
@@ -21,6 +22,7 @@ def capture(output_dir: Path) -> list[Path]:
     with TemporaryDirectory(prefix="dlu-screenshot-") as tmp:
         window = DluSimulatorWindow(Path(tmp) / "screenshot.sqlite3")
         try:
+            apply_stage8_ui(window)
             window.resize(1580, 940)
             window.show()
             app.processEvents()
@@ -35,10 +37,10 @@ def capture(output_dir: Path) -> list[Path]:
             main_tabs = max(tabs, key=lambda widget: widget.count()) if tabs else None
             if main_tabs is not None:
                 for tab_name, filename in (
-                    ("Scenarios", "02-teaching-scenarios.png"),
-                    ("Call Path", "03-call-path.png"),
-                    ("Communications", "04-communications.png"),
-                    ("Command Files", "05-command-files.png"),
+                    ("SCENARIOS", "02-teaching-scenarios.png"),
+                    ("CALLS", "03-call-path.png"),
+                    ("COMMS LAB", "04-communications.png"),
+                    ("COMMAND FILES", "05-command-files.png"),
                 ):
                     index = -1
                     for i in range(main_tabs.count()):
