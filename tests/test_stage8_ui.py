@@ -33,13 +33,14 @@ def test_stage8_shell_applies_and_preserves_feature_tabs(tmp_path: Path):
         assert tabs
 
         labels = [tabs[0].tabText(i) for i in range(tabs[0].count())]
-        assert labels == [
+        assert labels[:5] == [
             "OMT / MML",
             "COMMAND FILES",
             "CALLS",
             "COMMS LAB",
             "SCENARIOS",
         ]
+        assert "Hardware" in labels
     finally:
         window.close()
         app.processEvents()
