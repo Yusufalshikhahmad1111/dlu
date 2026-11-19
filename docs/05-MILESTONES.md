@@ -194,18 +194,29 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 ## Stage 8 — UX/UI Reimagination
 
-**الحالة: مخططة**
+**الحالة: مكتملة — 79/79 tests passed — Windows release gate #30 passed**
 
-- Design System.
-- Deep Navy / Graphite / Cyan / Emerald / Amber visual identity.
-- typography, spacing, semantic states.
-- redesigned application shell.
-- reusable UI primitives.
-- keyboard/focus foundation.
-- removal of scattered legacy theme styling.
+المخرجات:
+- centralized Stage 8 design tokens;
+- Deep Navy / Graphite / Cyan / Emerald / Amber identity;
+- centralized QPalette + shared styling;
+- new LAB navigation shell;
+- legacy theme selector removed from primary UX;
+- clearer feature tab naming;
+- responsive initial window sizing;
+- post-layout Hardware scene fitting;
+- 1280×720 / 1366×768 / 1600×900 / 1920×1080 visual QA;
+- 9 final screenshots;
+- Windows onefile build + smoke test.
 
-Execution prompt:
-docs/42-STAGE-08-EXECUTION-PROMPT.md
+Implementation:
+docs/44-STAGE-08-IMPLEMENTATION-REPORT.md
+
+Windows UX QA:
+docs/45-STAGE-08-WINDOWS-UX-QA.md
+
+Closeout:
+docs/46-STAGE-08-CLOSEOUT.md
 
 ## Stage 9 — Student-Centered Navigation
 
@@ -355,28 +366,6 @@ docs/42-STAGE-08-EXECUTION-PROMPT.md
 Stage 9→20 Prompts:
 docs/43-STAGE-09-20-EXECUTION-PROMPTS.md
 
-## Stage 8 — UX/UI Reimagination
-
-**الحالة: تنفيذ مكتمل — 79/79 tests passed — Windows packaged visual gate pending merge**
-
-المخرجات:
-- centralized Stage 8 design tokens;
-- Deep Navy / Graphite / Cyan / Emerald / Amber identity;
-- centralized QPalette + shared styling;
-- new LAB navigation shell;
-- legacy theme selector removed from primary UX;
-- clearer feature tab naming;
-- Stage 8 screenshot integration;
-- UX/UI shell + contrast regression tests.
-
-Implementation:
-docs/44-STAGE-08-IMPLEMENTATION-REPORT.md
-
-Windows UX QA:
-docs/45-STAGE-08-WINDOWS-UX-QA.md
-
-Closeout:
-docs/46-STAGE-08-CLOSEOUT.md
 
 ## قاعدة التنفيذ
 
