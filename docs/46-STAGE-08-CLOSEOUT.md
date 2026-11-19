@@ -1,21 +1,32 @@
 # Stage 8 — UX/UI Reimagination Closeout
 
-**Status:** Prepared for final release-gate verification
+Status: CLOSED ✅
 
-Stage 8 introduces the first major post-release visual/product transformation:
+Stage 8 is the completed first post-release product transformation.
 
+## Delivered
 - centralized design system;
-- new Deep Navy / Graphite / Cyan / Emerald / Amber identity;
-- centralized Qt palette and styling;
+- Deep Navy / Graphite / Cyan / Emerald / Amber identity;
+- centralized Qt palette and shared styling;
 - learning-oriented LAB navigation;
-- removal of legacy theme selection from the primary UX;
-- preserved domain and academic behavior;
-- 79-test Windows regression gate.
+- legacy theme selector removed from the primary UX;
+- clearer feature naming;
+- responsive initial window sizing;
+- post-layout Hardware scene fitting;
+- target-resolution screenshot QA;
+- preserved EWSD/MML/domain behavior.
 
-Final closeout condition:
-1. Windows release build succeeds on merged `main`.
-2. Packaged executable smoke test succeeds.
-3. Stage 8 screenshots are generated.
-4. No critical visual regression is found.
+## Final validation
+- 79/79 tests passed
+- Windows CI: PASS
+- Windows onefile build: PASS
+- packaged smoke test: PASS
+- final screenshots: PASS
+- release artifacts uploaded: PASS
 
-After those conditions are satisfied, Stage 8 is closed and Stage 9 becomes the next implementation stage.
+## Final release artifacts
+Windows: 14565472543
+Screenshots: 14564639523
+
+## Next stage
+Stage 9 — Student-Centered Navigation
