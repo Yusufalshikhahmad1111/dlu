@@ -57,9 +57,6 @@ def main() -> int:
             if window.learning_home.width() < width - 40:
                 raise AssertionError("Learning Home does not fill the available workspace")
 
-            scroll = window.learning_home.findChild(type(window.learning_home).mro()[1])
-            del scroll  # visual capture is the source of truth for the scroll area
-
             home_path = output / f"home-{width}x{height}.png"
             if not window.grab().save(str(home_path)):
                 raise RuntimeError(f"Failed to save {home_path}")
