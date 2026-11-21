@@ -21,7 +21,10 @@ def test_stage8_shell_applies_and_preserves_feature_tabs(tmp_path: Path):
         apply_stage8_ui(window)
 
         assert window.objectName() == "DLULabStage8"
-        assert window.findChild(QPushButton, "ThemeToggle").isHidden()
+        theme_button = window.findChild(QPushButton, "ThemeToggle")
+        assert theme_button is not None
+        assert not theme_button.isHidden()
+        assert "NIGHT" in theme_button.text()
 
         nav = window.findChild(QPushButton, "Stage8NavButton")
         assert nav is not None
