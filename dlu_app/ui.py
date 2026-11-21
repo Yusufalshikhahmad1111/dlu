@@ -2566,16 +2566,21 @@ class DluSimulatorWindow(QMainWindow):
                 home.setChecked(True)
             return
 
-        index = self._student_tab_index(area)
-        if index is None:
-            return
         self.workspace_left.show()
         if hasattr(self, "main_split"):
             total = max(1, self.main_split.width())
             left_size = max(700, int(total * 0.68))
             self.main_split.setSizes([left_size, max(1, total - left_size)])
-        self.feature_tabs.setCurrentIndex(index)
-        self.student_navigation.visit(area, area)
+
+        if area == "HARDWARE":
+            self.show_hardware_home()
+            self.student_navigation.visit("HARDWARE", "Hardware / DLU Fleet")
+        else:
+            index = self._student_tab_index(area)
+            if index is None:
+                return
+            self.feature_tabs.setCurrentIndex(index)
+            self.student_navigation.visit(area, area)
         for button in self.findChildren(QPushButton, "Stage8NavButton"):
             button.setChecked(button.text() == area)
         home = self.findChild(QPushButton, "Stage9HomeButton")
