@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 8 مكتملة — Stage 9→20 مخططة**
+**الحالة: Stage 9 مكتملة — Stage 10→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -218,15 +218,25 @@ docs/50-STAGE-08-REDESIGN-V2-CLOSEOUT.md
 
 ## Stage 9 — Student-Centered Navigation
 
-**الحالة: مخططة**
+**الحالة: مكتملة — 85/85 tests passed — Windows Stage 9 functional/visual QA passed — Windows release smoke-test passed**
 
-- Learning Home.
-- Continue Learning.
-- current context.
-- progress.
+المخرجات:
+- Learning Home entry surface.
+- Continue Learning with session-aware recommendation.
+- live current-context ribbon.
+- session progress across six learning areas.
 - recent activity.
-- quick actions.
-- progressive disclosure.
+- live hardware/resource status.
+- six Quick Start actions.
+- progressive disclosure between Home and technical workspaces.
+- preserved Stage 8 tab ordering and Morning/Night theme behavior.
+- Stage 9 navigation regression coverage and target-resolution screenshots.
+
+QA:
+docs/52-STAGE-09-NAVIGATION-QA.md
+
+Closeout:
+docs/53-STAGE-09-CLOSEOUT.md
 
 ## Stage 10 — Hardware UX 2.0
 
