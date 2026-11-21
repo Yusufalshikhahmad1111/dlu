@@ -27,7 +27,7 @@ class StudentNavigationState:
     def visit(self, area: str, context: str | None = None) -> None:
         normalized = area.strip() or "HOME"
         self.active_area = normalized
-        if context:
+        if normalized != "HOME" and context:
             self.current_context = context
         if normalized != "HOME":
             self.visited_areas.add(normalized)
