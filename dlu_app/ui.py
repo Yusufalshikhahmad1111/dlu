@@ -50,7 +50,7 @@ from .theme import THEMES
 from .ui_utils import make_font
 
 
-_PALETTE = THEMES["morning"]
+_PALETTE = THEMES["ivory"]
 BG = _PALETTE.BG
 PANEL = _PALETTE.PANEL
 PANEL2 = _PALETTE.PANEL2
@@ -735,7 +735,7 @@ class DluSimulatorWindow(QMainWindow):
             )
             examples_layout.addWidget(button)
         clear_button = QPushButton("CLEAR")
-        clear_button.clicked.connect(self.terminal.clear)
+        clear_button.clicked.connect(lambda: self.terminal.clear())
         examples_layout.addWidget(clear_button)
         examples_layout.addStretch(1)
         olt.addWidget(command_examples)
