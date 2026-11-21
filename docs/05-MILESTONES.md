@@ -194,29 +194,29 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 ## Stage 8 — UX/UI Reimagination
 
-**الحالة: مكتملة — 79/79 tests passed — Windows release gate #30 passed**
+**الحالة: Rework v2 قيد الإغلاق**
 
-المخرجات:
-- centralized Stage 8 design tokens;
-- Deep Navy / Graphite / Cyan / Emerald / Amber identity;
-- centralized QPalette + shared styling;
-- new LAB navigation shell;
-- legacy theme selector removed from primary UX;
-- clearer feature tab naming;
-- responsive initial window sizing;
-- post-layout Hardware scene fitting;
-- 1280×720 / 1366×768 / 1600×900 / 1920×1080 visual QA;
-- 9 final screenshots;
-- Windows onefile build + smoke test.
+The first visual direction is preserved as historical work. The accepted product direction is now the v2 rework:
+
+- Morning: warm white + soft green;
+- Night: charcoal-green + soft mint;
+- shared components and spacing;
+- visible theme switching;
+- real OMT/MML workbench;
+- direct GUI regression for command execution;
+- target-resolution visual QA.
 
 Implementation:
-docs/44-STAGE-08-IMPLEMENTATION-REPORT.md
+docs/48-STAGE-08-REDESIGN-V2-IMPLEMENTATION.md
+
+Plan:
+docs/47-STAGE-08-REDESIGN-V2-PLAN.md
 
 Windows UX QA:
-docs/45-STAGE-08-WINDOWS-UX-QA.md
+docs/49-STAGE-08-REDESIGN-V2-QA.md
 
 Closeout:
-docs/46-STAGE-08-CLOSEOUT.md
+docs/50-STAGE-08-REDESIGN-V2-CLOSEOUT.md
 
 ## Stage 9 — Student-Centered Navigation
 
