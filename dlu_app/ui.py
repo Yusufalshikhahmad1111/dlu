@@ -1074,6 +1074,7 @@ class DluSimulatorWindow(QMainWindow):
         self._apply_style()
         from .app_style import apply_application_style
         from .stage8_ui import restyle_stage8_ui
+        from .stage9_ui import update_stage9_theme
         app = QApplication.instance()
         if app is not None:
             apply_application_style(app, resolved)
@@ -1086,6 +1087,8 @@ class DluSimulatorWindow(QMainWindow):
         if hasattr(self, "learning_home"):
             self.learning_home.set_theme(resolved)
         restyle_stage8_ui(self, resolved)
+        if getattr(self, "dlu_stage9_enabled", False):
+            update_stage9_theme(self, resolved)
         self._refresh_current_view()
 
     def set_mode(self, mode: str):
