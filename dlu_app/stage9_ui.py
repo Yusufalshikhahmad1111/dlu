@@ -49,6 +49,18 @@ def _sync_active(window: QWidget, area: str) -> None:
         home.setChecked(area == "HOME")
 
 
+def update_stage9_context(window: QWidget, context: str) -> None:
+    nav = window.findChild(QFrame, "Stage8Nav")
+    if nav is None:
+        return
+    label = nav.findChild(QLabel, "Stage8NavHint")
+    if label is None:
+        return
+    value = (context or "Learning Home").strip()
+    label.setText(f"CONTEXT · {value}")
+    label.setToolTip(value)
+
+
 def apply_stage9_ui(window: QWidget, mode: str = "morning") -> None:
     """Add the student home to the stable Stage 8 shell."""
     mode = normalize_mode(mode or window.property("dlu_theme_mode") or "morning")
