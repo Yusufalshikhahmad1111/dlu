@@ -1,6 +1,6 @@
 # Stage 9 — Student-Centered Navigation Closeout
 
-Status: **CLOSED AFTER CI VERIFICATION**
+Status: **IMPLEMENTED — AWAITING CI VERIFICATION**
 
 ## Final result
 
@@ -30,7 +30,7 @@ No duplicate MML, call-routing, communications, or scenario logic was added.
 
 ## Verification
 
-Windows CI evidence and the final test count are recorded in the Stage 9 QA report and pull request.
+Windows CI is the final gate. The closeout remains provisional until the Stage 9 Windows QA, full regression, and target-resolution visual checks pass on the final branch head.
 
 Next stage:
 
