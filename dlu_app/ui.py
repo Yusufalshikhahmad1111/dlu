@@ -46,6 +46,8 @@ from .teaching_scenarios_ui import TeachingScenariosWidget
 from .call_ui import CallLabWidget
 from .db import CardReference, Database
 from .mml import MmlEngine, MmlResult
+from .navigation import StudentNavigationState
+from .student_home import LearningHomeWidget
 from .theme import THEMES
 from .ui_utils import make_font
 
@@ -473,6 +475,7 @@ class DluSimulatorWindow(QMainWindow):
         self._restart_after_restore = False
         self.selected_eqn: str | None = None
         self.selected_dn: str | None = None
+        self.student_navigation = StudentNavigationState()
 
         self.setWindowTitle("DLU Lab — Siemens EWSD Educational Simulator")
         self.resize(1580, 940)
@@ -549,9 +552,11 @@ class DluSimulatorWindow(QMainWindow):
 
         split = QSplitter(Qt.Horizontal)
         split.setChildrenCollapsible(False)
+        self.main_split = split
         main.addWidget(split, 1)
 
         left = QWidget()
+        self.workspace_left = left
         ll = QVBoxLayout(left)
         ll.setContentsMargins(0, 0, 0, 0)
 
@@ -695,6 +700,13 @@ class DluSimulatorWindow(QMainWindow):
         split.addWidget(left)
 
         right = QTabWidget()
+        self.feature_tabs = right
+        self.learning_home = LearningHomeWidget(
+            on_navigate=self.navigate_student_area,
+            parent=self,
+        )
+        right.addTab(self.learning_home, "Learning Home")
+
         self.omt_tab = QWidget()
         olt = QVBoxLayout(self.omt_tab)
         olt.setContentsMargins(10, 10, 10, 10)
@@ -833,6 +845,7 @@ class DluSimulatorWindow(QMainWindow):
 
         split.addWidget(right)
         split.setSizes([1060, 500])
+        self.learning_home.setMinimumWidth(560)
 
         self.nav_dlu_combo.currentTextChanged.connect(
             lambda _: self.sync_header_dlu()
@@ -1061,6 +1074,7 @@ class DluSimulatorWindow(QMainWindow):
         self._apply_style()
         from .app_style import apply_application_style
         from .stage8_ui import restyle_stage8_ui
+        from .stage9_ui import update_stage9_context, update_stage9_theme
         app = QApplication.instance()
         if app is not None:
             apply_application_style(app, resolved)
@@ -1070,7 +1084,11 @@ class DluSimulatorWindow(QMainWindow):
             self.communications_lab.set_theme(resolved)
         if hasattr(self, "teaching_scenarios") and hasattr(self.teaching_scenarios, "set_theme"):
             self.teaching_scenarios.set_theme(resolved)
+        if hasattr(self, "learning_home"):
+            self.learning_home.set_theme(resolved)
         restyle_stage8_ui(self, resolved)
+        if self.property("dlu_stage9_enabled"):
+            update_stage9_theme(self, resolved)
         self._refresh_current_view()
 
     def set_mode(self, mode: str):
@@ -1150,6 +1168,8 @@ class DluSimulatorWindow(QMainWindow):
 
     def show_hardware_home(self):
         self.current_view = "home"
+        self.workspace_left.show()
+        self.student_navigation.current_context = "Hardware / DLU Fleet"
         self.clear_scene()
         self.back_btn.setEnabled(False)
         self.breadcrumb.setText("HARDWARE FLEET")
@@ -1244,6 +1264,7 @@ class DluSimulatorWindow(QMainWindow):
             "Range": "10..250",
             "Hierarchy": "DLU → Shelf → Module → Port",
         })
+        self._refresh_learning_home()
 
 
     def _sync_location(self, dlu: int, shelf: int | None = None, module: int | None = None):
@@ -1291,6 +1312,8 @@ class DluSimulatorWindow(QMainWindow):
     def show_dlu(self, dlu_id: int):
         self._sync_location(dlu_id)
         self.current_view = "dlu"
+        self.student_navigation.visit("HARDWARE", f"Hardware / DLU {dlu_id}")
+        self._refresh_learning_home()
         self.clear_scene()
         self.back_btn.setEnabled(True)
         self.breadcrumb.setText(f"DLU {dlu_id}")
@@ -1567,6 +1590,10 @@ class DluSimulatorWindow(QMainWindow):
     def show_shelf(self, dlu_id: int, shelf: int):
         self._sync_location(dlu_id, shelf)
         self.current_view = "shelf"
+        self.student_navigation.visit(
+            "HARDWARE", f"Hardware / DLU {dlu_id} / Shelf {shelf}"
+        )
+        self._refresh_learning_home()
         self.clear_scene()
         self.back_btn.setEnabled(True)
         self.breadcrumb.setText(f"DLU {dlu_id}  /  SHELF {shelf}")
@@ -1726,6 +1753,11 @@ class DluSimulatorWindow(QMainWindow):
     def show_module(self, dlu_id: int, shelf: int, module: int):
         self._sync_location(dlu_id, shelf, module)
         self.current_view = "module"
+        self.student_navigation.visit(
+            "HARDWARE",
+            f"Hardware / DLU {dlu_id} / Shelf {shelf} / Module {module}",
+        )
+        self._refresh_learning_home()
         self.clear_scene()
         self.back_btn.setEnabled(True)
 
@@ -2211,6 +2243,11 @@ class DluSimulatorWindow(QMainWindow):
             self.command_status.setText(
                 f"{'OK' if result.ok else 'ERROR'} · {result.code} · {result.message}"
             )
+        self.student_navigation.visit(
+            "OMT / MML",
+            f"OMT / MML · {'Command succeeded' if result.ok else 'Command failed'}",
+        )
+        self._refresh_learning_home()
         QTimer.singleShot(0, lambda result=result: self.focus_result(result))
         self.refresh_status()
         self.input.setFocus()
@@ -2449,8 +2486,122 @@ class DluSimulatorWindow(QMainWindow):
             )
         self.focus_result(result)
 
+    def _student_tab_index(self, area: str) -> int | None:
+        aliases = {
+            "OMT / MML": {"OMT / MML", "OMT"},
+            "CALLS": {"CALLS", "Call Path"},
+            "COMMANDS": {"COMMANDS", "COMMAND FILES", "Command Files"},
+            "COMMS LAB": {"COMMS LAB", "Communications"},
+            "SCENARIOS": {"SCENARIOS", "Scenarios"},
+            "HARDWARE": {"HARDWARE", "Hardware"},
+        }
+        targets = aliases.get(area, set())
+        for index in range(self.feature_tabs.count()):
+            if self.feature_tabs.tabText(index) in targets:
+                return index
+        return None
+
+    def _learning_home_status(self) -> str:
+        alarms = len(self.db.list_active_alarms())
+        used, capacity = self.call_engine.resource_usage()
+        current = self.db.get_dlu(self.hardware.current_dlu)
+        system = "ACTIVE" if current and (
+            current["dluc0_state"] == "act" or current["dluc1_state"] == "act"
+        ) else "DEGRADED"
+        return f"System {system} · Alarms {alarms} · PDC {used}/{capacity}"
+
+    def _refresh_learning_home(self) -> None:
+        if not hasattr(self, "learning_home"):
+            return
+        context = self.student_navigation.current_context
+        visited = self.student_navigation.visited_count
+        if visited == 0:
+            continue_target = "HARDWARE"
+            next_step = "Start with Hardware: identify the DLU hierarchy before using advanced tools."
+        elif "HARDWARE" not in self.student_navigation.visited_areas:
+            continue_target = "HARDWARE"
+            next_step = "Explore Hardware to connect the physical DLU hierarchy with MML."
+        elif "OMT / MML" not in self.student_navigation.visited_areas:
+            continue_target = "OMT / MML"
+            next_step = "Run a simple MML status command and see it focus the matching object."
+        elif "CALLS" not in self.student_navigation.visited_areas:
+            continue_target = "CALLS"
+            next_step = "Trace a call and explain its route and resource state."
+        elif "COMMS LAB" not in self.student_navigation.visited_areas:
+            continue_target = "COMMS LAB"
+            next_step = "Run one communications experiment and compare the visual result."
+        elif "SCENARIOS" not in self.student_navigation.visited_areas:
+            continue_target = "SCENARIOS"
+            next_step = "Practice a guided scenario and verify the expected result."
+        else:
+            continue_target = "COMMANDS"
+            next_step = "Revisit any lab or practice Command Files for a multi-step workflow."
+
+        try:
+            from .stage9_ui import update_stage9_context
+            update_stage9_context(self, context)
+        except ImportError:
+            pass
+        self.learning_home.update_snapshot(
+            current_context=context,
+            continue_target=continue_target,
+            progress_percent=self.student_navigation.progress_percent,
+            visited_count=visited,
+            recent_activity=list(self.student_navigation.recent_activity),
+            hardware_status=self._learning_home_status(),
+            next_step=next_step,
+        )
+
+    def show_learning_home(self):
+        self.current_view = "learning_home"
+        self.back_btn.setEnabled(False)
+        self.breadcrumb.setText("LEARNING HOME")
+        self.workspace_left.hide()
+        self.feature_tabs.setCurrentWidget(self.learning_home)
+        if hasattr(self, "main_split"):
+            self.main_split.setSizes([0, max(1, self.main_split.width())])
+        self.student_navigation.visit("HOME", "Learning Home · choose your next step")
+        self._refresh_learning_home()
+        self.refresh_status()
+
+    def navigate_student_area(self, area: str):
+        area = area.strip()
+        if area == "HOME":
+            self.show_learning_home()
+            for button in self.findChildren(QPushButton, "Stage8NavButton"):
+                button.setChecked(False)
+            home = self.findChild(QPushButton, "Stage9HomeButton")
+            if home is not None:
+                home.setChecked(True)
+            return
+
+        self.workspace_left.show()
+        if hasattr(self, "main_split"):
+            total = max(1, self.main_split.width())
+            left_size = max(700, int(total * 0.68))
+            self.main_split.setSizes([left_size, max(1, total - left_size)])
+
+        if area == "HARDWARE":
+            self.show_hardware_home()
+            self.student_navigation.visit("HARDWARE", "Hardware / DLU Fleet")
+        else:
+            index = self._student_tab_index(area)
+            if index is None:
+                return
+            self.feature_tabs.setCurrentIndex(index)
+            self.student_navigation.visit(area, area)
+        for button in self.findChildren(QPushButton, "Stage8NavButton"):
+            button.setChecked(button.text() == area)
+        home = self.findChild(QPushButton, "Stage9HomeButton")
+        if home is not None:
+            home.setChecked(False)
+        self._refresh_learning_home()
+
     def _refresh_current_view(self):
-        if self.current_view=="home":
+        if self.current_view=="learning_home":
+            self._refresh_learning_home()
+            self.feature_tabs.setCurrentWidget(self.learning_home)
+        elif self.current_view=="home":
             self.show_hardware_home()
         elif self.current_view=="dlu":
             self.show_dlu(self.hardware.current_dlu)
@@ -2544,6 +2695,10 @@ class DluSimulatorWindow(QMainWindow):
         self.call_engine.repo.reset_demo()
         if hasattr(self, "call_lab"):
             self.call_lab.reset()
+        self.student_navigation.recent_activity.insert(0, "Reset teaching demo · source-backed state restored")
+        self.student_navigation.recent_activity = self.student_navigation.recent_activity[:8]
+        self.student_navigation.current_context = "Learning Home" if self.current_view == "learning_home" else self.student_navigation.current_context
+        self._refresh_learning_home()
         self.terminal.append(
             f"<span style='color:{YELLOW}'>"
             "[RESET] Source-backed hardware restored; subscriber demo state cleared."

@@ -1,0 +1,124 @@
+from __future__ import annotations
+
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QFrame, QTabWidget, QWidget
+
+from .design_tokens import get_tokens, normalize_mode
+
+
+AREA_ALIASES = {
+    "HARDWARE": {"HARDWARE", "Hardware"},
+    "OMT / MML": {"OMT / MML", "OMT"},
+    "CALLS": {"CALLS", "Call Path"},
+    "COMMANDS": {"COMMAND FILES", "Command Files"},
+    "COMMS LAB": {"COMMS LAB", "Communications"},
+    "SCENARIOS": {"SCENARIOS", "Scenarios"},
+}
+
+
+def _main_tabs(window: QWidget) -> QTabWidget | None:
+    tabs = getattr(window, "feature_tabs", None)
+    if isinstance(tabs, QTabWidget):
+        return tabs
+    for widget in window.findChildren(QTabWidget):
+        labels = [widget.tabText(i) for i in range(widget.count())]
+        if any("OMT / MML" in label for label in labels):
+            return widget
+    return None
+
+
+def _add_home_button(window: QWidget, nav: QFrame) -> QPushButton:
+    existing = window.findChild(QPushButton, "Stage9HomeButton")
+    if existing is not None:
+        return existing
+    home = QPushButton("HOME", nav)
+    home.setObjectName("Stage9HomeButton")
+    home.setCheckable(True)
+    home.setAutoDefault(False)
+    layout = nav.layout()
+    if isinstance(layout, QHBoxLayout):
+        layout.insertWidget(1, home)
+    home.clicked.connect(lambda: window.navigate_student_area("HOME"))
+    return home
+
+
+def _sync_active(window: QWidget, area: str) -> None:
+    for button in window.findChildren(QPushButton, "Stage8NavButton"):
+        button.setChecked(button.text() == area)
+    home = window.findChild(QPushButton, "Stage9HomeButton")
+    if home is not None:
+        home.setChecked(area == "HOME")
+
+
+def update_stage9_context(window: QWidget, context: str) -> None:
+    nav = window.findChild(QFrame, "Stage8Nav")
+    if nav is None:
+        return
+    label = nav.findChild(QLabel, "Stage8NavHint")
+    if label is None:
+        return
+    value = (context or "Learning Home").strip()
+    label.setText(f"CONTEXT · {value}")
+    label.setToolTip(value)
+
+
+def apply_stage9_ui(window: QWidget, mode: str = "morning") -> None:
+    """Add the student home to the stable Stage 8 shell."""
+    mode = normalize_mode(mode or window.property("dlu_theme_mode") or "morning")
+    window.setProperty("dlu_stage9_enabled", True)
+    nav = window.findChild(QFrame, "Stage8Nav")
+    if nav is None:
+        return
+    home = _add_home_button(window, nav)
+    tokens = get_tokens(mode)
+    home.setStyleSheet(
+        f"""
+        QPushButton#Stage9HomeButton {{
+            min-height: 32px;
+            padding: 5px 11px;
+            background: {tokens.surface_elevated};
+            border: 1px solid {tokens.border};
+            border-radius: {tokens.radius_sm}px;
+            color: {tokens.text_primary};
+            font-weight: 900;
+        }}
+        QPushButton#Stage9HomeButton:hover {{
+            background: {tokens.surface_interactive};
+            border-color: {tokens.primary};
+        }}
+        QPushButton#Stage9HomeButton:checked {{
+            background: {tokens.primary};
+            border-color: {tokens.primary};
+            color: {tokens.white};
+        }}
+        """
+    )
+    label = nav.findChild(QLabel, "Stage8NavTitle")
+    if label is not None:
+        label.setText("LEARNING LAB")
+    _sync_active(window, "HOME")
+
+    tabs = _main_tabs(window)
+    if tabs is not None and not getattr(window, "_stage9_tabs_hooked", False):
+        def on_tab_changed(index: int) -> None:
+            if getattr(window, "_stage9_tab_guard", False):
+                return
+            label = tabs.tabText(index)
+            if label == "Learning Home":
+                window.show_learning_home()
+                return
+            for area, aliases in AREA_ALIASES.items():
+                if label in aliases:
+                    window.navigate_student_area(area)
+                    return
+        tabs.currentChanged.connect(on_tab_changed)
+        window._stage9_tabs_hooked = True
+
+    if not getattr(window, "_stage9_nav_hooked", False):
+        for button in window.findChildren(QPushButton, "Stage8NavButton"):
+            button.clicked.connect(
+                lambda _checked=False, target=button.text(): window.navigate_student_area(target)
+            )
+        window._stage9_nav_hooked = True
+
+    if hasattr(window, "show_learning_home"):
+        window.show_learning_home()
