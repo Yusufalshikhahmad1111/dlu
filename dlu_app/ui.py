@@ -1074,7 +1074,7 @@ class DluSimulatorWindow(QMainWindow):
         self._apply_style()
         from .app_style import apply_application_style
         from .stage8_ui import restyle_stage8_ui
-        from .stage9_ui import update_stage9_theme
+        from .stage9_ui import update_stage9_context, update_stage9_theme
         app = QApplication.instance()
         if app is not None:
             apply_application_style(app, resolved)
@@ -2533,6 +2533,11 @@ class DluSimulatorWindow(QMainWindow):
             continue_target = "COMMANDS"
             next_step = "Revisit any lab or practice Command Files for a multi-step workflow."
 
+        try:
+            from .stage9_ui import update_stage9_context
+            update_stage9_context(self, context)
+        except ImportError:
+            pass
         self.learning_home.update_snapshot(
             current_context=context,
             continue_target=continue_target,
