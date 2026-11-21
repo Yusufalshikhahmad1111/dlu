@@ -1264,6 +1264,7 @@ class DluSimulatorWindow(QMainWindow):
             "Range": "10..250",
             "Hierarchy": "DLU → Shelf → Module → Port",
         })
+        self._refresh_learning_home()
 
 
     def _sync_location(self, dlu: int, shelf: int | None = None, module: int | None = None):
@@ -1312,6 +1313,7 @@ class DluSimulatorWindow(QMainWindow):
         self._sync_location(dlu_id)
         self.current_view = "dlu"
         self.student_navigation.visit("HARDWARE", f"Hardware / DLU {dlu_id}")
+        self._refresh_learning_home()
         self.clear_scene()
         self.back_btn.setEnabled(True)
         self.breadcrumb.setText(f"DLU {dlu_id}")
@@ -1591,6 +1593,7 @@ class DluSimulatorWindow(QMainWindow):
         self.student_navigation.visit(
             "HARDWARE", f"Hardware / DLU {dlu_id} / Shelf {shelf}"
         )
+        self._refresh_learning_home()
         self.clear_scene()
         self.back_btn.setEnabled(True)
         self.breadcrumb.setText(f"DLU {dlu_id}  /  SHELF {shelf}")
@@ -1754,6 +1757,7 @@ class DluSimulatorWindow(QMainWindow):
             "HARDWARE",
             f"Hardware / DLU {dlu_id} / Shelf {shelf} / Module {module}",
         )
+        self._refresh_learning_home()
         self.clear_scene()
         self.back_btn.setEnabled(True)
 
