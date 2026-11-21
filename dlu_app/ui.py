@@ -1087,7 +1087,7 @@ class DluSimulatorWindow(QMainWindow):
         if hasattr(self, "learning_home"):
             self.learning_home.set_theme(resolved)
         restyle_stage8_ui(self, resolved)
-        if getattr(self, "dlu_stage9_enabled", False):
+        if self.property("dlu_stage9_enabled"):
             update_stage9_theme(self, resolved)
         self._refresh_current_view()
 
