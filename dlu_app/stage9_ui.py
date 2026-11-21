@@ -85,6 +85,22 @@ def apply_stage9_ui(window: QWidget, mode: str = "morning") -> None:
         label.setText("LEARNING LAB")
     _sync_active(window, "HOME")
 
+    tabs = _main_tabs(window)
+    if tabs is not None and not getattr(window, "_stage9_tabs_hooked", False):
+        def on_tab_changed(index: int) -> None:
+            if getattr(window, "_stage9_tab_guard", False):
+                return
+            label = tabs.tabText(index)
+            if label == "Learning Home":
+                window.show_learning_home()
+                return
+            for area, aliases in AREA_ALIASES.items():
+                if label in aliases:
+                    window.navigate_student_area(area)
+                    return
+        tabs.currentChanged.connect(on_tab_changed)
+        window._stage9_tabs_hooked = True
+
     if not getattr(window, "_stage9_nav_hooked", False):
         for button in window.findChildren(QPushButton, "Stage8NavButton"):
             button.clicked.connect(
