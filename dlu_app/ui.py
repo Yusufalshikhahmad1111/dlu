@@ -50,7 +50,7 @@ from .theme import THEMES
 from .ui_utils import make_font
 
 
-_PALETTE = THEMES["ivory"]
+_PALETTE = THEMES["morning"]
 BG = _PALETTE.BG
 PANEL = _PALETTE.PANEL
 PANEL2 = _PALETTE.PANEL2
@@ -71,7 +71,7 @@ CARD = _PALETTE.CARD
 DEEP = _PALETTE.DEEP
 
 
-THEME_NAME = "ivory"
+THEME_NAME = "morning"
 
 
 
@@ -86,7 +86,7 @@ def apply_theme_palette(name: str):
     THEME_NAME = name
 
 
-apply_theme_palette("ivory")
+apply_theme_palette("morning")
 def state_color(state: str) -> str:
     value = (state or "").lower()
     if value in {"act", "idle"}:
@@ -483,7 +483,7 @@ class DluSimulatorWindow(QMainWindow):
         self.refresh_status()
         self.terminal.append(
             "<span style='color:{MUTED}'>DLU Lab ready. "
-            "Hardware-first mode active. Type &gt; help;</span>"
+            "University Communications Laboratory. Use QUICK RUN or type &gt; help;</span>"
         )
 
     def _build_ui(self):
@@ -519,9 +519,9 @@ class DluSimulatorWindow(QMainWindow):
         h.addWidget(self.physical_btn)
         h.addWidget(self.logical_btn)
 
-        self.theme_btn = QPushButton("THEME: IVORY")
+        self.theme_btn = QPushButton("☾ NIGHT MODE")
         self.theme_btn.setObjectName("ThemeToggle")
-        self.theme_btn.setToolTip("Toggle between Brown + Ivory and Brown + Silver")
+        self.theme_btn.setToolTip("Switch to the night theme")
         self.theme_btn.clicked.connect(self.toggle_theme)
         h.addWidget(self.theme_btn)
 
@@ -703,10 +703,42 @@ class DluSimulatorWindow(QMainWindow):
         omt_header = QFrame()
         omt_header.setObjectName("WorkbenchHeader")
         omt_head = QHBoxLayout(omt_header)
-        omt_head.addWidget(QLabel("OMT"))
-        omt_head.addWidget(QLabel("Operations & Maintenance"), 1)
-        omt_head.addWidget(QLabel("LIVE"), 0, Qt.AlignRight)
+        omt_head.addWidget(QLabel("OMT / MML"))
+        omt_head.addWidget(QLabel("Operations & Maintenance · real MML workflow"), 1)
+        omt_head.addWidget(QLabel("ONLINE"), 0, Qt.AlignRight)
         olt.addWidget(omt_header)
+
+        command_help = QLabel(
+            "Run real MML commands. Examples: > help; · > stat dlu: dlu=50; · "
+            "> disp dlumod: dlu=50, shelf=0, module=15;"
+        )
+        command_help.setObjectName("CommandHint")
+        command_help.setWordWrap(True)
+        olt.addWidget(command_help)
+
+        command_examples = QFrame()
+        command_examples.setObjectName("CommandDock")
+        examples_layout = QHBoxLayout(command_examples)
+        examples_layout.setContentsMargins(8, 6, 8, 6)
+        examples_layout.setSpacing(6)
+        examples_layout.addWidget(QLabel("QUICK RUN"))
+        for label, command in (
+            ("HELP", "> help;"),
+            ("DLU STATUS", "> stat dlu: dlu=50;"),
+            ("MODULE 50-0-15", "> disp dlumod: dlu=50, shelf=0, module=15;"),
+            ("PORT 50-0-15-0", "> statport: eqn=50-0-15-0;"),
+        ):
+            button = QPushButton(label)
+            button.setAutoDefault(False)
+            button.clicked.connect(
+                lambda _checked=False, value=command: self.set_command_text(value)
+            )
+            examples_layout.addWidget(button)
+        clear_button = QPushButton("CLEAR")
+        clear_button.clicked.connect(self.terminal.clear)
+        examples_layout.addWidget(clear_button)
+        examples_layout.addStretch(1)
+        olt.addWidget(command_examples)
 
         self.terminal = QTextEdit()
         self.terminal.setReadOnly(True)
@@ -731,11 +763,15 @@ class DluSimulatorWindow(QMainWindow):
         self.input.installEventFilter(self)
         command_layout.addWidget(self.input, 1)
 
-        execute_btn = QPushButton("SEND")
+        execute_btn = QPushButton("RUN")
         execute_btn.setObjectName("CommandSend")
         execute_btn.setMinimumHeight(42)
         execute_btn.clicked.connect(self.execute_input)
         command_layout.addWidget(execute_btn)
+
+        self.command_status = QLabel("READY · Enter a command or use QUICK RUN")
+        self.command_status.setObjectName("CommandStatus")
+        command_layout.addWidget(self.command_status)
 
         olt.addWidget(command_dock)
         self.omt_tab.setLayout(olt)
@@ -1007,22 +1043,34 @@ class DluSimulatorWindow(QMainWindow):
         )
 
     def toggle_theme(self):
-        self.set_theme("silver" if THEME_NAME == "ivory" else "ivory")
+        self.set_theme("night" if THEME_NAME == "morning" else "morning")
 
     def set_theme(self, name: str):
-        apply_theme_palette(name)
+        resolved = "night" if name in {"night", "dark", "silver", "control_room"} else "morning"
+        apply_theme_palette(resolved)
         self.hardware.setBackgroundBrush(QColor(BG))
         if hasattr(self, "theme_btn"):
             self.theme_btn.setText(
-                "THEME: IVORY" if name == "ivory" else "THEME: SILVER"
+                "☾ NIGHT MODE" if resolved == "morning" else "☀ DAY MODE"
+            )
+            self.theme_btn.setToolTip(
+                "Switch to the night theme"
+                if resolved == "morning"
+                else "Switch to the morning theme"
             )
         self._apply_style()
+        from .app_style import apply_application_style
+        from .stage8_ui import restyle_stage8_ui
+        app = QApplication.instance()
+        if app is not None:
+            apply_application_style(app, resolved)
         if hasattr(self, "call_lab") and hasattr(self.call_lab, "set_theme"):
-            self.call_lab.set_theme(name)
+            self.call_lab.set_theme(resolved)
         if hasattr(self, "communications_lab") and hasattr(self.communications_lab, "set_theme"):
-            self.communications_lab.set_theme(name)
+            self.communications_lab.set_theme(resolved)
         if hasattr(self, "teaching_scenarios") and hasattr(self.teaching_scenarios, "set_theme"):
-            self.teaching_scenarios.set_theme(name)
+            self.teaching_scenarios.set_theme(resolved)
+        restyle_stage8_ui(self, resolved)
         self._refresh_current_view()
 
     def set_mode(self, mode: str):
@@ -2109,33 +2157,63 @@ class DluSimulatorWindow(QMainWindow):
             )
         self.event_log.setPlainText("\\n".join(lines))
 
+    def set_command_text(self, command: str):
+        self.input.setText(command)
+        self.input.setFocus()
+        self.input.selectAll()
+        if hasattr(self, "command_status"):
+            self.command_status.setText("READY · Review the command and press RUN")
+
     def execute_input(self):
-        command=self.input.text().strip()
+        command = self.input.text().strip()
         if not command:
+            if hasattr(self, "command_status"):
+                self.command_status.setText("READY · Enter a command first")
+            self.input.setFocus()
             return
         if not command.startswith(">"):
-            command="> "+command
+            command = "> " + command
         self.history.append(command)
-        self.history_index=len(self.history)
+        self.history_index = len(self.history)
         self.input.clear()
         self._execute_command(command)
 
-    def _execute_command(self,command:str):
+    def _execute_command(self, command: str):
         self.terminal.append(
             f"<span style='color:{TEXT}'>&gt; {command[1:].strip()}</span>"
         )
-        result=self.mml.execute(command)
-        color=GREEN if result.ok else RED
+        try:
+            result = self.mml.execute(command)
+        except Exception as exc:
+            self.terminal.append(
+                f"<span style='color:{RED}'>[UI-EXEC-ERROR] {exc}</span>"
+            )
+            if hasattr(self, "command_status"):
+                self.command_status.setText("ERROR · Command execution raised an exception")
+            self.input.setFocus()
+            return
+
+        color = GREEN if result.ok else RED
         self.terminal.append(
             f"<span style='color:{color}'>[{result.code}] {result.message}</span>"
         )
         if result.data is not None:
-            pretty=json.dumps(result.data,ensure_ascii=False,indent=2,default=str)
+            pretty = json.dumps(
+                result.data,
+                ensure_ascii=False,
+                indent=2,
+                default=str,
+            )
             self.terminal.append(
                 f"<pre style='color:{MUTED}'>{pretty}</pre>"
             )
+        if hasattr(self, "command_status"):
+            self.command_status.setText(
+                f"{'OK' if result.ok else 'ERROR'} · {result.code} · {result.message}"
+            )
         QTimer.singleShot(0, lambda result=result: self.focus_result(result))
         self.refresh_status()
+        self.input.setFocus()
 
     def copy_selected_mml(self):
         if not self.selected_eqn:
