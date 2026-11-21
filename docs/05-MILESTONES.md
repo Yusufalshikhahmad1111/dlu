@@ -194,23 +194,21 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 ## Stage 8 — UX/UI Reimagination
 
-**الحالة: Rework v2 قيد الإغلاق**
+**الحالة: مكتملة — Rework v2 — 80/80 tests passed — Windows UX/functional QA passed**
 
-The first visual direction is preserved as historical work. The accepted product direction is now the v2 rework:
+The first blue/black visual direction was rejected and replaced by the accepted v2 direction:
 
 - Morning: warm white + soft green;
 - Night: charcoal-green + soft mint;
-- shared components and spacing;
-- visible theme switching;
-- real OMT/MML workbench;
-- direct GUI regression for command execution;
-- target-resolution visual QA.
+- shared component system and spacing;
+- visible Morning/Night switch;
+- stable LAB navigation;
+- first-class OMT/MML workbench;
+- real GUI command execution regression;
+- Windows target-resolution QA.
 
 Implementation:
 docs/48-STAGE-08-REDESIGN-V2-IMPLEMENTATION.md
-
-Plan:
-docs/47-STAGE-08-REDESIGN-V2-PLAN.md
 
 Windows UX QA:
 docs/49-STAGE-08-REDESIGN-V2-QA.md
