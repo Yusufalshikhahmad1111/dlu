@@ -108,7 +108,11 @@ def test_stage9_tab_clicks_sync_student_navigation(tmp_path: Path):
         assert window.workspace_left.isHidden() is False
         assert window.student_navigation.active_area == "CALLS"
 
-        window.feature_tabs.setCurrentIndex(0)
+        home_index = next(
+            i for i in range(window.feature_tabs.count())
+            if window.feature_tabs.tabText(i) == "Learning Home"
+        )
+        window.feature_tabs.setCurrentIndex(home_index)
         app.processEvents()
         assert window.current_view == "learning_home"
         assert window.workspace_left.isHidden() is True
@@ -120,10 +124,13 @@ def test_stage9_keyboard_focus_reaches_home_and_action_controls(tmp_path: Path):
     app = _app()
     window = _window(tmp_path)
     try:
+        window.show()
+        app.processEvents()
         home = window.findChild(QPushButton, "Stage9HomeButton")
         action = window.learning_home.action_buttons["HARDWARE"]
 
         home.setFocus()
+        app.processEvents()
         assert app.focusWidget() is home
 
         QTest.keyClick(home, Qt.Key_Tab)

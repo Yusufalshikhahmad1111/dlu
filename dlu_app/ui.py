@@ -842,6 +842,7 @@ class DluSimulatorWindow(QMainWindow):
         info_layout.addLayout(buttons)
         info_tab.setLayout(info_layout)
         right.addTab(info_tab, "Hardware")
+        right.addTab(self.learning_home, "Learning Home")
 
         split.addWidget(right)
         split.setSizes([1060, 500])
@@ -1169,7 +1170,8 @@ class DluSimulatorWindow(QMainWindow):
     def show_hardware_home(self):
         self.current_view = "home"
         self.workspace_left.show()
-        self.student_navigation.current_context = "Hardware / DLU Fleet"
+        if self.property("dlu_stage9_enabled"):
+            self.student_navigation.current_context = "HARDWARE · DLU Fleet"
         self.clear_scene()
         self.back_btn.setEnabled(False)
         self.breadcrumb.setText("HARDWARE FLEET")
@@ -2558,6 +2560,8 @@ class DluSimulatorWindow(QMainWindow):
         self.breadcrumb.setText("LEARNING HOME")
         self.workspace_left.hide()
         self.feature_tabs.setCurrentWidget(self.learning_home)
+        if not self.student_navigation.visited_areas:
+            self.student_navigation.current_context = "Learning Home"
         if hasattr(self, "main_split"):
             self.main_split.setSizes([0, max(1, self.main_split.width())])
         self.student_navigation.visit("HOME", "Learning Home · choose your next step")
@@ -2583,7 +2587,7 @@ class DluSimulatorWindow(QMainWindow):
 
         if area == "HARDWARE":
             self.show_hardware_home()
-            self.student_navigation.visit("HARDWARE", "Hardware / DLU Fleet")
+            self.student_navigation.visit("HARDWARE", "HARDWARE · DLU Fleet")
         else:
             index = self._student_tab_index(area)
             if index is None:

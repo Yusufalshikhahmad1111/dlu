@@ -61,6 +61,36 @@ def update_stage9_context(window: QWidget, context: str) -> None:
     label.setToolTip(value)
 
 
+def update_stage9_theme(window: QWidget, mode: str) -> None:
+    mode = normalize_mode(mode)
+    home = window.findChild(QPushButton, "Stage9HomeButton")
+    if home is None:
+        return
+    tokens = get_tokens(mode)
+    home.setStyleSheet(
+        f"""
+        QPushButton#Stage9HomeButton {{
+            min-height: 32px;
+            padding: 5px 11px;
+            background: {tokens.surface_elevated};
+            border: 1px solid {tokens.border};
+            border-radius: {tokens.radius_sm}px;
+            color: {tokens.text_primary};
+            font-weight: 900;
+        }}
+        QPushButton#Stage9HomeButton:hover {{
+            background: {tokens.surface_interactive};
+            border-color: {tokens.primary};
+        }}
+        QPushButton#Stage9HomeButton:checked {{
+            background: {tokens.primary};
+            border-color: {tokens.primary};
+            color: {tokens.white};
+        }}
+        """
+    )
+
+
 def apply_stage9_ui(window: QWidget, mode: str = "morning") -> None:
     """Add the student home to the stable Stage 8 shell."""
     mode = normalize_mode(mode or window.property("dlu_theme_mode") or "morning")
