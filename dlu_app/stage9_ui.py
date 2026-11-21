@@ -84,5 +84,13 @@ def apply_stage9_ui(window: QWidget, mode: str = "morning") -> None:
     if label is not None:
         label.setText("LEARNING LAB")
     _sync_active(window, "HOME")
+
+    if not getattr(window, "_stage9_nav_hooked", False):
+        for button in window.findChildren(QPushButton, "Stage8NavButton"):
+            button.clicked.connect(
+                lambda _checked=False, target=button.text(): window.navigate_student_area(target)
+            )
+        window._stage9_nav_hooked = True
+
     if hasattr(window, "show_learning_home"):
         window.show_learning_home()
