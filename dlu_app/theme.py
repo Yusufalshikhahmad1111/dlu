@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .design_tokens import TOKENS
+from .design_tokens import get_tokens, normalize_mode
 
 
 @dataclass(frozen=True)
@@ -27,31 +27,44 @@ class ThemePalette:
     DEEP: str
 
 
-CONTROL_ROOM = ThemePalette(
-    BG=TOKENS.bg,
-    PANEL=TOKENS.surface,
-    PANEL2=TOKENS.surface,
-    PANEL3=TOKENS.surface_elevated,
-    STEEL=TOKENS.border_strong,
-    TEXT=TOKENS.text_primary,
-    MUTED=TOKENS.text_muted,
-    BORDER=TOKENS.border,
-    GREEN=TOKENS.success,
-    YELLOW=TOKENS.warning,
-    RED=TOKENS.danger,
-    BLUE=TOKENS.info,
-    CYAN=TOKENS.primary,
-    VIOLET="#A78BFA",
-    AMBER=TOKENS.warning,
-    WHITE=TOKENS.white,
-    CARD=TOKENS.surface_interactive,
-    DEEP=TOKENS.black,
-)
+def _palette(mode: str) -> ThemePalette:
+    tokens = get_tokens(mode)
+    return ThemePalette(
+        BG=tokens.bg,
+        PANEL=tokens.surface,
+        PANEL2=tokens.surface_elevated,
+        PANEL3=tokens.surface_interactive,
+        STEEL=tokens.border_strong,
+        TEXT=tokens.text_primary,
+        MUTED=tokens.text_muted,
+        BORDER=tokens.border,
+        GREEN=tokens.success,
+        YELLOW=tokens.warning,
+        RED=tokens.danger,
+        BLUE=tokens.info,
+        CYAN=tokens.primary,
+        VIOLET=tokens.primary,
+        AMBER=tokens.warning,
+        WHITE=tokens.white,
+        CARD=tokens.card,
+        DEEP=tokens.deep,
+    )
 
-# Compatibility aliases for feature widgets that still accept a legacy theme
-# name. All aliases intentionally render the Stage 8 control-room palette.
+
+MORNING = _palette("morning")
+NIGHT = _palette("night")
+
+# Compatibility aliases for existing feature widgets and saved test fixtures.
 THEMES: dict[str, ThemePalette] = {
-    "control_room": CONTROL_ROOM,
-    "ivory": CONTROL_ROOM,
-    "silver": CONTROL_ROOM,
+    "morning": MORNING,
+    "night": NIGHT,
+    "light": MORNING,
+    "dark": NIGHT,
+    "ivory": MORNING,
+    "silver": NIGHT,
+    "control_room": NIGHT,
 }
+
+
+def resolve_theme(name: str | None) -> str:
+    return normalize_mode(name)
