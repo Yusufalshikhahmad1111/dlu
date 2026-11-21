@@ -44,3 +44,50 @@ def test_stage8_shell_applies_and_preserves_feature_tabs(tmp_path: Path):
     finally:
         window.close()
         app.processEvents()
+
+
+def test_stage8_v2_theme_toggle_and_omt_command_execution(tmp_path: Path):
+    app = _app()
+    apply_application_style(app, "morning")
+
+    window = DluSimulatorWindow(tmp_path / "stage8-v2.sqlite3")
+    try:
+        apply_stage8_ui(window, "morning")
+
+        theme_button = window.findChild(QPushButton, "ThemeToggle")
+        assert theme_button is not None
+        assert not theme_button.isHidden()
+        assert "NIGHT" in theme_button.text()
+
+        nav_buttons = {
+            button.text(): button
+            for button in window.findChildren(QPushButton, "Stage8NavButton")
+        }
+        assert set(("HARDWARE", "OMT / MML", "CALLS", "COMMANDS", "COMMS LAB", "SCENARIOS")) <= set(nav_buttons)
+
+        nav_buttons["OMT / MML"].click()
+        app.processEvents()
+
+        window.input.setText("> help;")
+        send = window.findChild(QPushButton, "CommandSend")
+        assert send is not None
+        send.click()
+        app.processEvents()
+
+        terminal_text = window.terminal.toPlainText()
+        assert "[OK]" in terminal_text
+        assert "Commands:" in terminal_text
+        assert "OK · OK" in window.command_status.text()
+
+        window.set_theme("night")
+        app.processEvents()
+        assert window.property("dlu_theme_mode") == "night"
+        assert "DAY" in theme_button.text()
+
+        window.set_theme("morning")
+        app.processEvents()
+        assert window.property("dlu_theme_mode") == "morning"
+        assert "NIGHT" in theme_button.text()
+    finally:
+        window.close()
+        app.processEvents()
