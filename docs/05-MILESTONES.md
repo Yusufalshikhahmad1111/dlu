@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 9 مكتملة — Stage 10→20 مخططة**
+**الحالة: Stage 10 مكتملة — Stage 11→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -240,12 +240,30 @@ docs/53-STAGE-09-CLOSEOUT.md
 
 ## Stage 10 — Hardware UX 2.0
 
-**الحالة: مخططة**
+**الحالة: مكتملة — 90/90 tests passed — Windows Hardware UX QA passed — main CI + Windows release smoke-test passed**
 
-- Exchange → DLU → Side → Shelf → Module → Port → Subscriber hierarchy.
-- context inspector.
-- EQN/capacity/state presentation.
-- hover/selection/maintenance visualization.
+المخرجات:
+- persistent Hardware Inspector beside the hardware canvas;
+- Exchange → DLU → Side/Controller → Shelf → Module → Port → Subscriber context;
+- hover inspection without opening dialogs;
+- selection and hover highlighting;
+- explicit state, EQN, capacity, role/family and subscriber context;
+- maintenance/fault state presentation;
+- theme synchronization with Morning/Night;
+- presentation-only hit targets without database or renderer-domain changes;
+- no database migration and no duplicate MML/domain logic.
+
+Plan:
+docs/54-STAGE-10-HARDWARE-UX-2.0-PLAN.md
+
+Implementation:
+docs/55-STAGE-10-IMPLEMENTATION-REPORT.md
+
+Windows QA:
+docs/56-STAGE-10-WINDOWS-QA.md
+
+Closeout:
+docs/57-STAGE-10-CLOSEOUT.md
 
 ## Stage 11 — OMT/MML UX 2.0
 
