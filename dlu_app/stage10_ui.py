@@ -19,10 +19,15 @@ class HardwareUXController(QObject):
         self.inspector = window.hardware_inspector
         self.hover_item = None
         self.selection_item = None
+        self._shelf_targets = []
+        self._side_targets = []
+        self._module_target = None
+        self._viewport = window.hardware.viewport()
         self._wrap_navigation_methods()
-        window.hardware.viewport().installEventFilter(self)
+        self._viewport.installEventFilter(self)
+        self._viewport.setMouseTracking(True)
         window.hardware.setMouseTracking(True)
-        window.hardware.viewport().setMouseTracking(True)
+        window.destroyed.connect(self._dispose)
 
     def set_mode(self, mode: str) -> None:
         self.mode = normalize_mode(mode)
@@ -47,7 +52,7 @@ class HardwareUXController(QObject):
         )
         self._wrap(
             "show_dlu",
-            lambda dlu_id: self._inspect("dlu", dlu_id, "selection"),
+            self._after_show_dlu,
         )
         self._wrap(
             "show_shelf",
@@ -55,9 +60,7 @@ class HardwareUXController(QObject):
         )
         self._wrap(
             "show_module",
-            lambda dlu_id, shelf, module: self._inspect(
-                "module", (dlu_id, shelf, module), "selection"
-            ),
+            self._after_show_module,
         )
         self._wrap(
             "select_port",
@@ -75,6 +78,93 @@ class HardwareUXController(QObject):
             return result
 
         self.window.set_theme = themed
+
+    def _after_show_dlu(self, dlu_id: int) -> None:
+        self._add_dlu_hit_targets(int(dlu_id))
+        self._inspect("dlu", int(dlu_id), "selection")
+
+    def _after_show_module(self, dlu_id: int, shelf: int, module: int) -> None:
+        self._add_module_hit_target(int(dlu_id), int(shelf), int(module))
+        self._inspect("module", (int(dlu_id), int(shelf), int(module)), "selection")
+
+    def _add_dlu_hit_targets(self, dlu_id: int) -> None:
+        scene = self.window.hardware.scene_obj
+        for item in self._shelf_targets + self._side_targets:
+            if item.scene() is scene:
+                scene.removeItem(item)
+        self._shelf_targets.clear()
+        self._side_targets.clear()
+
+        for side in (0, 1):
+            x = 450 + side * 150
+            target = ClickableRectItem(
+                QRectF(x, 112, 132, 70),
+                lambda data: self.window.hardware_inspector.inspect(
+                    "side", data, source="selection"
+                ),
+                (dlu_id, side),
+                f"DLU {dlu_id} · SIDE {side} · CONTROLLER",
+                on_hover=lambda data: self.inspector.inspect("side", data, source="hover"),
+            )
+            target.setBrush(Qt.NoBrush)
+            target.setPen(Qt.NoPen)
+            target.setZValue(5)
+            scene.addItem(target)
+            self._side_targets.append(target)
+
+        for shelf in range(8):
+            y = 212 + shelf * 78
+            target = ClickableRectItem(
+                QRectF(54, y, 1010, 62),
+                lambda data: self.window.show_shelf(*data),
+                (dlu_id, shelf),
+                f"DLU {dlu_id} · SHELF {shelf} · 16 MODULE POSITIONS",
+                on_hover=lambda data: self.inspector.inspect("shelf", data, source="hover"),
+            )
+            target.setBrush(Qt.NoBrush)
+            target.setPen(Qt.NoPen)
+            target.setZValue(-10)
+            scene.addItem(target)
+            self._shelf_targets.append(target)
+
+    def _add_module_hit_target(self, dlu_id: int, shelf: int, module: int) -> None:
+        scene = self.window.hardware.scene_obj
+        if self._module_target is not None and self._module_target.scene() is scene:
+            scene.removeItem(self._module_target)
+        self._module_target = ClickableRectItem(
+            QRectF(34, 96, 450, 700),
+            lambda data: self.window.show_module(*data),
+            (dlu_id, shelf, module),
+            f"DLU {dlu_id} · SHELF {shelf} · MODULE {module}",
+            on_hover=lambda data: self.inspector.inspect("module", data, source="hover"),
+        )
+        self._module_target.setBrush(Qt.NoBrush)
+        self._module_target.setPen(Qt.NoPen)
+        self._module_target.setZValue(-10)
+        scene.addItem(self._module_target)
+
+    def _clear_hit_targets(self) -> None:
+        scene = self.window.hardware.scene_obj
+        for item in self._shelf_targets + self._side_targets:
+            if item.scene() is scene:
+                scene.removeItem(item)
+        self._shelf_targets.clear()
+        self._side_targets.clear()
+        if self._module_target is not None and self._module_target.scene() is scene:
+            scene.removeItem(self._module_target)
+        self._module_target = None
+
+    def _dispose(self) -> None:
+        try:
+            if self._viewport is not None:
+                self._viewport.removeEventFilter(self)
+        except RuntimeError:
+            pass
+        self._viewport = None
+        try:
+            self._clear_hit_targets()
+        except RuntimeError:
+            pass
 
     def _inspect(self, kind: str, data, source: str) -> None:
         self.inspector.inspect(kind, data, source=source)
@@ -153,7 +243,7 @@ class HardwareUXController(QObject):
         )
 
     def eventFilter(self, watched, event):
-        if watched is not self.window.hardware.viewport():
+        if self._viewport is None or watched is not self._viewport:
             return False
         if event.type() == QEvent.MouseMove:
             pos = self.window.hardware.mapToScene(event.position().toPoint())
