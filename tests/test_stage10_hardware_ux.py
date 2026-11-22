@@ -87,3 +87,24 @@ def test_stage10_theme_sync(tmp_path: Path):
         assert window.hardware_inspector.mode == "morning"
     finally:
         window.close()
+
+
+def test_stage10_hover_classifier_keeps_shelf_and_controller_contexts_distinct(tmp_path: Path):
+    window = _window(tmp_path)
+    try:
+        window.show_dlu(50)
+        controller = window._stage10_controller
+        items = [
+            item
+            for item in window.hardware.scene_obj.items()
+            if getattr(item, "toolTip", None)
+            and isinstance(getattr(item, "data", None), tuple)
+            and len(item.data) == 2
+        ]
+        shelf_item = next(item for item in items if "SHELF" in item.toolTip().upper())
+        side_item = next(item for item in items if "SIDE" in item.toolTip().upper())
+
+        assert controller._kind_for_item(shelf_item) == ("shelf", shelf_item.data)
+        assert controller._kind_for_item(side_item) == ("side", side_item.data)
+    finally:
+        window.close()
