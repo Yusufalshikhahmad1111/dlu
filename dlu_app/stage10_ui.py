@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import wraps
 
-from PySide6.QtCore import QEvent, QObject, Qt
+from PySide6.QtCore import QEvent, QObject, QRectF, Qt
 from PySide6.QtGui import QColor, QPen
 from PySide6.QtWidgets import QGraphicsRectItem, QSplitter, QVBoxLayout, QWidget
 
@@ -89,9 +89,6 @@ class HardwareUXController(QObject):
 
     def _add_dlu_hit_targets(self, dlu_id: int) -> None:
         scene = self.window.hardware.scene_obj
-        for item in self._shelf_targets + self._side_targets:
-            if item.scene() is scene:
-                scene.removeItem(item)
         self._shelf_targets.clear()
         self._side_targets.clear()
 
@@ -129,8 +126,6 @@ class HardwareUXController(QObject):
 
     def _add_module_hit_target(self, dlu_id: int, shelf: int, module: int) -> None:
         scene = self.window.hardware.scene_obj
-        if self._module_target is not None and self._module_target.scene() is scene:
-            scene.removeItem(self._module_target)
         self._module_target = ClickableRectItem(
             QRectF(34, 96, 450, 700),
             lambda data: self.window.show_module(*data),
@@ -144,14 +139,8 @@ class HardwareUXController(QObject):
         scene.addItem(self._module_target)
 
     def _clear_hit_targets(self) -> None:
-        scene = self.window.hardware.scene_obj
-        for item in self._shelf_targets + self._side_targets:
-            if item.scene() is scene:
-                scene.removeItem(item)
         self._shelf_targets.clear()
         self._side_targets.clear()
-        if self._module_target is not None and self._module_target.scene() is scene:
-            scene.removeItem(self._module_target)
         self._module_target = None
 
     def _dispose(self) -> None:
