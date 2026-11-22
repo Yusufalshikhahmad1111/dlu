@@ -162,17 +162,32 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 8 complete — DLU Lab 1.0.0 UX/UI reimagination closed**.
+الحالة الحالية: **Stage 10 complete — Hardware UX 2.0 closed on main**.
 
 Stage 8:
-- Deep Navy / Graphite / Cyan / Emerald / Amber design system;
-- new LAB navigation shell;
-- legacy theme selector removed from primary UX;
-- responsive initial window sizing;
-- post-layout Hardware scene fitting;
-- visual QA at 1280×720, 1366×768, 1600×900 and 1920×1080;
-- 79/79 tests passed;
-- Windows onefile build and smoke test passed;
-- final release screenshots uploaded.
+- accepted Morning/Night green visual system;
+- visible Morning/Night switch;
+- stable LAB navigation shell;
+- OMT/MML workbench and GUI command execution regression;
+- 80/80 tests passed on Windows UX/functional QA.
 
-Next planned stage: **Stage 9 — Student-Centered Navigation**.
+Stage 9:
+- Learning Home;
+- session-aware student navigation;
+- current-context ribbon and Quick Start;
+- 85/85 tests passed;
+- Windows Stage 9 functional/visual QA and release smoke-test passed.
+
+Stage 10:
+- persistent Hardware Inspector;
+- Exchange → DLU → Side/Controller → Shelf → Module → Port → Subscriber context;
+- hover and selection inspection;
+- explicit EQN/capacity/state/maintenance presentation;
+- 90/90 tests passed;
+- Windows Hardware UX QA passed at 1280×720, 1366×768, 1600×900 and 1920×1080;
+- Windows onefile build + smoke-test passed on main;
+- final Windows executable and screenshot artifacts uploaded.
+
+Current main:
+- SHA: c01f32b9c030d7bb7d3e7eaa82520c66bcc0da97
+- Next planned stage: **Stage 11 — OMT/MML UX 2.0**.
