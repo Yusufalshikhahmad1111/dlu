@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import wraps
 
-from PySide6.QtCore import QEvent, Qt
+from PySide6.QtCore import QEvent, QObject, Qt
 from PySide6.QtGui import QColor, QPen
 from PySide6.QtWidgets import QGraphicsRectItem, QSplitter, QVBoxLayout, QWidget
 
@@ -11,7 +11,7 @@ from .hardware_ux2 import HardwareInspectorPanel
 from .ui import ClickableRectItem
 
 
-class HardwareUXController(QObject := object):
+class HardwareUXController(QObject):
     def __init__(self, window: QWidget, mode: str = "morning"):
         self.window = window
         self.mode = normalize_mode(mode)
