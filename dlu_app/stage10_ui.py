@@ -13,6 +13,7 @@ from .ui import ClickableRectItem
 
 class HardwareUXController(QObject):
     def __init__(self, window: QWidget, mode: str = "morning"):
+        super().__init__(window)
         self.window = window
         self.mode = normalize_mode(mode)
         self.inspector = window.hardware_inspector
