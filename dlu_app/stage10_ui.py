@@ -94,11 +94,11 @@ class HardwareUXController(QObject):
             return "module", data
         if len(data) == 2:
             tooltip = item.toolTip().upper()
+            if "SHELF" in tooltip:
+                return "shelf", data
             if "SIDE" in tooltip:
                 return "side", data
-            if self.window.current_view == "dlu":
-                return "side", data
-            return "shelf", data
+            return ("side", data) if self.window.current_view == "dlu" else ("shelf", data)
         return None
 
     def _find_item(self, data):
