@@ -101,7 +101,6 @@ class HardwareUXController(QObject):
                 ),
                 (dlu_id, side),
                 f"DLU {dlu_id} · SIDE {side} · CONTROLLER",
-                on_hover=lambda data: self.inspector.inspect("side", data, source="hover"),
             )
             target.setBrush(Qt.NoBrush)
             target.setPen(Qt.NoPen)
@@ -116,7 +115,6 @@ class HardwareUXController(QObject):
                 lambda data: self.window.show_shelf(*data),
                 (dlu_id, shelf),
                 f"DLU {dlu_id} · SHELF {shelf} · 16 MODULE POSITIONS",
-                on_hover=lambda data: self.inspector.inspect("shelf", data, source="hover"),
             )
             target.setBrush(Qt.NoBrush)
             target.setPen(Qt.NoPen)
@@ -131,7 +129,6 @@ class HardwareUXController(QObject):
             lambda data: self.window.show_module(*data),
             (dlu_id, shelf, module),
             f"DLU {dlu_id} · SHELF {shelf} · MODULE {module}",
-            on_hover=lambda data: self.inspector.inspect("module", data, source="hover"),
         )
         self._module_target.setBrush(Qt.NoBrush)
         self._module_target.setPen(Qt.NoPen)
