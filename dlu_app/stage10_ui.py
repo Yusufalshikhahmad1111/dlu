@@ -201,9 +201,12 @@ class HardwareUXController(QObject):
         overlay = getattr(self, attr, None)
         if overlay is None:
             return
-        scene = self.window.hardware.scene_obj
-        if overlay.scene() is scene:
-            scene.removeItem(overlay)
+        try:
+            scene = self.window.hardware.scene_obj
+            if overlay.scene() is scene:
+                scene.removeItem(overlay)
+        except RuntimeError:
+            pass
         setattr(self, attr, None)
 
     def _add_overlay(self, attr: str, item, dashed: bool) -> None:
@@ -234,18 +237,21 @@ class HardwareUXController(QObject):
     def eventFilter(self, watched, event):
         if self._viewport is None or watched is not self._viewport:
             return False
-        if event.type() == QEvent.MouseMove:
-            pos = self.window.hardware.mapToScene(event.position().toPoint())
-            item = self._scene_target(pos)
-            if item is not None:
-                context = self._kind_for_item(item)
-                if context is not None:
-                    kind, data = context
-                    self.inspector.inspect(kind, data, source="hover")
-                    self._remove_overlay("hover_overlay")
-                    self._add_overlay("hover_overlay", item, dashed=True)
-        elif event.type() == QEvent.Leave:
-            self._remove_overlay("hover_overlay")
+        try:
+            if event.type() == QEvent.MouseMove:
+                pos = self.window.hardware.mapToScene(event.position().toPoint())
+                item = self._scene_target(pos)
+                if item is not None:
+                    context = self._kind_for_item(item)
+                    if context is not None:
+                        kind, data = context
+                        self.inspector.inspect(kind, data, source="hover")
+                        self._remove_overlay("hover_overlay")
+                        self._add_overlay("hover_overlay", item, dashed=True)
+            elif event.type() == QEvent.Leave:
+                self._remove_overlay("hover_overlay")
+        except RuntimeError:
+            return False
         return False
 
 
