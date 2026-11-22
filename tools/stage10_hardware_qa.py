@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QApplication
 from dlu_app.app_style import apply_application_style
 from dlu_app.stage8_ui import apply_stage8_ui
 from dlu_app.stage9_ui import apply_stage9_ui
+from dlu_app.stage10_ui import apply_stage10_ui
 from dlu_app.ui import DluSimulatorWindow
 
 
@@ -39,6 +40,7 @@ def main() -> int:
     try:
         apply_stage8_ui(window, "morning")
         apply_stage9_ui(window, "morning")
+        apply_stage10_ui(window, "morning")
 
         for width, height in TARGETS:
             window.resize(width, height)
