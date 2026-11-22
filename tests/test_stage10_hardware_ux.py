@@ -6,6 +6,7 @@ from dlu_app.app_style import apply_application_style
 from dlu_app.hardware_ux2 import HardwareInspectorPanel
 from dlu_app.stage8_ui import apply_stage8_ui
 from dlu_app.stage9_ui import apply_stage9_ui
+from dlu_app.stage10_ui import apply_stage10_ui
 from dlu_app.ui import DluSimulatorWindow
 
 
@@ -20,6 +21,7 @@ def _window(tmp_path: Path) -> DluSimulatorWindow:
     window = DluSimulatorWindow(tmp_path / "stage10.sqlite3")
     apply_stage8_ui(window, "morning")
     apply_stage9_ui(window, "morning")
+    apply_stage10_ui(window, "morning")
     app.processEvents()
     return window
 
