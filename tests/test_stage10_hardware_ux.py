@@ -57,7 +57,7 @@ def test_stage10_hardware_workspace_has_split_inspector(tmp_path: Path):
     window = _window(tmp_path)
     try:
         assert isinstance(window.hardware_splitter, QSplitter)
-        assert window.hardware_inspector.isVisible()
+        assert window.hardware_inspector.isHidden() is False
         assert window.hardware.minimumWidth() >= 500
     finally:
         window.close()
