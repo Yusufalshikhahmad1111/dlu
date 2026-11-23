@@ -2245,6 +2245,8 @@ class DluSimulatorWindow(QMainWindow):
             self.command_status.setText(
                 f"{'OK' if result.ok else 'ERROR'} · {result.code} · {result.message}"
             )
+        if hasattr(self, "stage11_controller"):
+            self.stage11_controller.on_command_result(command, result)
         self.student_navigation.visit(
             "OMT / MML",
             f"OMT / MML · {'Command succeeded' if result.ok else 'Command failed'}",
@@ -2486,6 +2488,8 @@ class DluSimulatorWindow(QMainWindow):
             self.terminal.append(
                 f"<pre style='color:{MUTED}'>{json.dumps(result.data,ensure_ascii=False,indent=2,default=str)}</pre>"
             )
+        if hasattr(self, "stage11_controller"):
+            self.stage11_controller.on_command_result(None, result)
         self.focus_result(result)
 
     def _student_tab_index(self, area: str) -> int | None:
