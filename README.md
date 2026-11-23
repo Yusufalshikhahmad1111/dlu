@@ -162,7 +162,7 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 10 complete — Hardware UX 2.0 closed on main**.
+الحالة الحالية: **Stage 11 complete — OMT/MML UX 2.0 closed on the Stage 11 branch; PR #11 is ready for merge**.
 
 Stage 8:
 - accepted Morning/Night green visual system;
@@ -188,6 +188,14 @@ Stage 10:
 - Windows onefile build + smoke-test passed on main;
 - final Windows executable and screenshot artifacts uploaded.
 
-Current main:
-- SHA: c01f32b9c030d7bb7d3e7eaa82520c66bcc0da97
-- Next planned stage: **Stage 11 — OMT/MML UX 2.0**.
+Stage 11:
+- educational MML command editor feedback;
+- visible command history with reuse/copy;
+- live syntax-shape guidance;
+- plain-language command explanation and target hint;
+- execution result + linked DLU/module/EQN pairing;
+- Morning/Night synchronization;
+- full pytest + Windows OMT/MML QA passed;
+- PR #11: Stage 11 OMT/MML UX 2.0.
+
+Current main remains the Stage 10 baseline until PR #11 is merged.
