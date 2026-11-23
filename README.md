@@ -196,6 +196,8 @@ Stage 11:
 - execution result + linked DLU/module/EQN pairing;
 - Morning/Night synchronization;
 - full pytest + Windows OMT/MML QA passed;
-- PR #11: Stage 11 OMT/MML UX 2.0.
+- PR #11 merged into main.
 
-Current main remains the Stage 10 baseline until PR #11 is merged.
+Current main:
+- SHA: 5e18bc26ed5cb819b1a9f54d57bdc4e9610f32c0
+- Next planned stage: **Stage 12 — Call & Network Visualization**.
