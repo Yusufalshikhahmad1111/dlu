@@ -1,5 +1,9 @@
 # Stage 11 — Windows QA
 
+## Result
+
+**PASS**
+
 ## Automated scope
 - full pytest suite;
 - Python compile;
@@ -19,3 +23,6 @@
 
 ## Acceptance
 A novice can read the command explanation and result beside the terminal, while an experienced user retains Quick Run, RUN, copy, and Up/Down history.
+
+## Integrity
+The QA path uses the real MML engine and does not add a second command parser or execution path.
