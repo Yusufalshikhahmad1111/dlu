@@ -1,0 +1,49 @@
+name: DLU Stage 11 OMT MML UX QA
+
+on:
+  push:
+    branches:
+      - stage-11-omt-mml-ux-2
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  omt-mml-ux-qa:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Python compile
+        shell: pwsh
+        run: |
+          $files = @("main.py") + (Get-ChildItem dlu_app -Filter *.py -File | ForEach-Object { $_.FullName }) + (Get-ChildItem tests -Filter *.py -File | ForEach-Object { $_.FullName })
+          python -m py_compile $files
+
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+
+      - name: Full tests
+        shell: pwsh
+        run: python -m pytest -q tests
+
+      - name: Stage 11 OMT/MML functional and visual QA
+        shell: pwsh
+        run: python tools/stage11_omt_qa.py
+
+      - name: Upload Stage 11 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Stage11-OMT-MML-UX-QA
+          path: artifacts/stage11-omt-ux/*.png
+          if-no-files-found: error
