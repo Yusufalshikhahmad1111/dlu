@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 10 مكتملة — Stage 11→20 مخططة**
+**الحالة: Stage 11 مكتملة — Stage 12→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -267,14 +267,28 @@ docs/57-STAGE-10-CLOSEOUT.md
 
 ## Stage 11 — OMT/MML UX 2.0
 
-**الحالة: مخططة**
+**الحالة: مكتملة — full pytest + Windows OMT/MML QA passed**
 
-- command editor.
-- history.
-- syntax feedback.
-- command explanation.
-- result + affected hardware pairing.
-- no duplicate MML engine.
+المخرجات:
+- command editor with live syntax-shape feedback;
+- visible history with USE/COPY/CLEAR;
+- command explanation and target hint;
+- execution result + linked DLU/module/EQN pairing;
+- preserved Quick Run and Up/Down workflow;
+- Morning/Night synchronization;
+- presentation-only layer with the existing MML engine as the sole executor.
+
+Plan:
+docs/58-STAGE-11-PLAN.md
+
+Implementation:
+docs/59-STAGE-11-IMPLEMENTATION-REPORT.md
+
+Windows QA:
+docs/60-STAGE-11-WINDOWS-QA.md
+
+Closeout:
+docs/61-STAGE-11-CLOSEOUT.md
 
 ## Stage 12 — Call & Network Visualization
 
