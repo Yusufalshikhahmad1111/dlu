@@ -151,6 +151,7 @@ class CallLabWidget(QWidget):
         self.engine = engine
         self.on_state_changed = on_state_changed
         self.current_call_id: str | None = None
+        self.stage12_view = None
         self._build()
         self._restyle()
 
@@ -164,6 +165,22 @@ class CallLabWidget(QWidget):
                 if self.current_call_id else None,
                 active=bool(self.current_call_id),
             )
+        if self.stage12_view is not None and hasattr(self.stage12_view, "set_mode"):
+            self.stage12_view.set_mode(name)
+
+    def attach_call_visualization(self, widget):
+        """Mount an optional presentation renderer without replacing CallEngine logic."""
+        if self.stage12_view is widget:
+            return
+        layout = self.layout()
+        index = layout.indexOf(self.path_view)
+        if index < 0:
+            raise RuntimeError("Call Path renderer is unavailable")
+        self.path_view.hide()
+        layout.removeWidget(self.path_view)
+        layout.insertWidget(index, widget, 1)
+        self.stage12_view = widget
+        widget.show()
 
     def _restyle(self):
         self.setStyleSheet(
@@ -337,6 +354,9 @@ class CallLabWidget(QWidget):
             )
 
         self.path_view.show_path(result.path, active=result.ok)
+        if self.stage12_view is not None and hasattr(self.stage12_view, "show_result"):
+            used, capacity = self.engine.resource_usage()
+            self.stage12_view.show_result(result, used, capacity)
 
         details: dict = {
             "ok": result.ok,
@@ -463,6 +483,8 @@ class CallLabWidget(QWidget):
         self.engine.repo.reset_demo()
         self.current_call_id = None
         self.path_view.clear()
+        if self.stage12_view is not None and hasattr(self.stage12_view, "clear"):
+            self.stage12_view.clear()
         self.status.setText("IDLE · No active call")
         self.details.clear()
         self.refresh_subscribers()
