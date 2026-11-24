@@ -463,7 +463,11 @@ class CallFlowTeachingPanel(QFrame):
 
         route = result.analysis.number_type if result.analysis else "UNKNOWN"
         path_text = " → ".join(result.path.labels()) if result.path else "No route path"
-        self.route_card.setText(f"ROUTE · {route}\n{path_text}")
+        cpt_text = ""
+        if result.analysis and result.analysis.cpt:
+            cpt = result.analysis.cpt
+            cpt_text = f"\nCPT {cpt.code} · {cpt.name} · EVAL={cpt.eval}"
+        self.route_card.setText(f"ROUTE · {route}{cpt_text}\n{path_text}")
 
         if result.code == "CALL-RESOURCE-BUSY":
             resource_line = f"PDC-VOICE · FULL · {used}/{capacity} channels in use"
