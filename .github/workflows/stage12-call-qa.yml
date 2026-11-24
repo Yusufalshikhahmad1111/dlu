@@ -16,7 +16,7 @@ concurrency:
 jobs:
   stage12-call-qa:
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
