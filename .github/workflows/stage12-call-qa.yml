@@ -35,13 +35,13 @@ jobs:
         shell: pwsh
         run: python tools/ui_static_audit.py
 
-      - name: Full tests
-        shell: pwsh
-        run: python -m pytest -q tests
-
       - name: Stage 12 tests
         shell: pwsh
         run: python -m pytest -q tests/test_stage12_call_visualization.py
+
+      - name: Full tests
+        shell: pwsh
+        run: python -m pytest -q tests
 
       - name: Functional visual QA
         shell: pwsh
