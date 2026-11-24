@@ -92,7 +92,22 @@ def test_stage12_national_call_marks_pdc_reservation(tmp_path: Path):
 def test_stage12_resource_busy_blocks_before_connected(tmp_path: Path):
     window = _window(tmp_path)
     try:
-        window.call_lab.engine.repo.reserve("TEST-STAGE12", "PDC-VOICE", 120)
+        caller, _called = window.call_lab.engine.prepare_demo_subscribers()
+        analysis = window.call_lab.engine.analyze(caller, "0522233500")
+        call_id = "TEST-STAGE12"
+        with window.call_lab.engine.db.conn:
+            window.call_lab.engine.repo.create_call(
+                call_id,
+                caller,
+                analysis.target_lac or "",
+                analysis.normalized,
+                analysis.target_dn,
+                analysis.number_type,
+                "SETUP",
+                None,
+                analysis.cpt,
+            )
+            window.call_lab.engine.repo.reserve(call_id, "PDC-VOICE", 120)
         window.call_lab.quick_national()
         _app().processEvents()
         panel = window.call_flow_teaching_panel
