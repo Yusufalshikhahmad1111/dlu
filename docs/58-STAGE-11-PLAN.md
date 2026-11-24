@@ -20,3 +20,7 @@ Improve the teaching experience around the existing MML workbench while preservi
 
 ## Validation
 Implement → automated tests → Windows functional/visual QA → documentation → closeout.
+
+## Non-destructive UX rule
+- clearing the teaching/history view must never delete the real editor history used by ↑/↓ navigation;
+- result summaries must not imply a single hardware target when the MML result contains multiple distinct targets.

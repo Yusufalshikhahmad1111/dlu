@@ -3,13 +3,16 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QSplitter
+
 
 from dlu_app.app_style import apply_application_style
 from dlu_app.stage8_ui import apply_stage8_ui
 from dlu_app.stage9_ui import apply_stage9_ui
 from dlu_app.stage10_ui import apply_stage10_ui
-from dlu_app.stage11_ui import apply_stage11_ui
+from dlu_app.stage11_ui import apply_stage11_ui, result_target
 from dlu_app.ui import DluSimulatorWindow
 
 
@@ -82,6 +85,53 @@ def test_stage11_history_reuse(tmp_path: Path):
         assert window.input.text() == "> help;"
     finally:
         window.close()
+
+
+def test_stage11_failed_command_updates_result_card(tmp_path: Path):
+    window = _window(tmp_path)
+    try:
+        window.set_command_text("> nonsense: value=1;")
+        window.execute_input()
+        _app().processEvents()
+
+        assert "ERROR · MML-UNKNOWN-COMMAND" in window.mml_ux2_panel.result.text()
+        assert "No direct hardware target" in window.mml_ux2_panel.result.text()
+    finally:
+        window.close()
+
+
+def test_stage11_clear_view_preserves_keyboard_history(tmp_path: Path):
+    window = _window(tmp_path)
+    try:
+        window.show()
+        window.set_command_text("> help;")
+        window.execute_input()
+        window.set_command_text("> stat dlu: dlu=50;")
+        window.execute_input()
+        _app().processEvents()
+
+        original_history = list(window.history)
+        assert window.mml_ux2_panel.history_list.count() == 2
+
+        window.mml_ux2_panel.clear_history_view()
+        assert window.history == original_history
+        assert window.history_index == len(original_history)
+        assert window.mml_ux2_panel.history_list.count() == 0
+
+        window.input.setFocus()
+        QTest.keyClick(window.input, Qt.Key_Up)
+        assert window.input.text() == original_history[-1]
+    finally:
+        window.close()
+
+
+def test_stage11_multi_result_target_summary():
+    data = [
+        {"eqn": "50-0-15-0"},
+        {"eqn": "50-0-15-1"},
+        {"eqn": "50-0-15-0"},
+    ]
+    assert result_target(data) == "2 linked targets · see detailed output"
 
 
 def test_stage11_theme_sync(tmp_path: Path):

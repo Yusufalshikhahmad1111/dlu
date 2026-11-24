@@ -133,26 +133,39 @@ def result_target(data) -> str:
     elif isinstance(data, list):
         rows = [row for row in data if isinstance(row, dict)]
 
+    targets: list[str] = []
+    seen: set[str] = set()
+
+    def add_target(value: str) -> None:
+        if value not in seen:
+            seen.add(value)
+            targets.append(value)
+
     for item in rows:
         eqn = item.get("eqn")
         if eqn:
-            return f"EQN {eqn}"
-        if all(key in item for key in ("dlu", "shelf", "module")):
-            return (
+            add_target(f"EQN {eqn}")
+        elif all(key in item for key in ("dlu", "shelf", "module")):
+            add_target(
                 f"DLU {item['dlu']} · Shelf {item['shelf']} "
                 f"· Module {item['module']}"
             )
-        if item.get("dlu") is not None:
-            return f"DLU {item['dlu']}"
-        if item.get("dn"):
-            return f"Subscriber DN {item['dn']}"
+        elif item.get("dlu") is not None:
+            add_target(f"DLU {item['dlu']}")
+        elif item.get("dn"):
+            add_target(f"Subscriber DN {item['dn']}")
+
         subscriber = item.get("subscriber")
         if isinstance(subscriber, dict):
             if subscriber.get("eqn"):
-                return f"EQN {subscriber['eqn']}"
-            if subscriber.get("dn"):
-                return f"Subscriber DN {subscriber['dn']}"
+                add_target(f"EQN {subscriber['eqn']}")
+            elif subscriber.get("dn"):
+                add_target(f"Subscriber DN {subscriber['dn']}")
 
+    if len(targets) == 1:
+        return targets[0]
+    if len(targets) > 1:
+        return f"{len(targets)} linked targets · see detailed output"
     if len(rows) > 1:
         return f"{len(rows)} returned records · see detailed output"
     return "No direct hardware target in this result"
@@ -220,8 +233,9 @@ class MmlTeachingPanel(QFrame):
         use_btn.clicked.connect(self.use_selected)
         copy_btn = QPushButton("COPY")
         copy_btn.clicked.connect(self.copy_selected)
-        clear_btn = QPushButton("CLEAR")
-        clear_btn.clicked.connect(self.clear_history)
+        clear_btn = QPushButton("CLEAR VIEW")
+        clear_btn.setToolTip("Clear only the visible history panel; keyboard history is preserved.")
+        clear_btn.clicked.connect(self.clear_history_view)
         actions.addWidget(use_btn)
         actions.addWidget(copy_btn)
         actions.addWidget(clear_btn)
@@ -272,11 +286,12 @@ class MmlTeachingPanel(QFrame):
         self.window.input.copy()
         self.window.command_status.setText("READY · Command copied to clipboard")
 
-    def clear_history(self) -> None:
-        self.window.history.clear()
-        self.window.history_index = 0
+    def clear_history_view(self) -> None:
+        # Presentation-only: never destroy the real ↑/↓ editor history.
         self.history_list.clear()
-        self.result.setText("History cleared. Existing terminal output is unchanged.")
+        self.result.setText(
+            "History view cleared. Keyboard history (↑/↓) and terminal output are unchanged."
+        )
 
     def on_command_result(self, command: str | None, result) -> None:
         command_text = command or "Direct MML action"

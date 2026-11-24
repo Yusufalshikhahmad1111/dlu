@@ -32,3 +32,10 @@ dlu_app/stage11_ui.py is presentation-only. It observes the existing MmlResult a
 
 ## Safety
 No database migration, command semantics, hardware data, or domain engine was changed.
+
+## Post-merge hardening
+A focused review found two presentation-layer issues that automated happy-path QA did not cover:
+- the original CLEAR action erased the real editor history, conflicting with the plan's requirement to preserve ↑/↓ behavior;
+- multi-row MML results could show only the first EQN/target, which is misleading for teaching.
+
+The hardening patch changes CLEAR to **CLEAR VIEW**, leaving the editor history and terminal output untouched, and summarizes multiple distinct linked targets as a count. No MML/domain behavior was changed.

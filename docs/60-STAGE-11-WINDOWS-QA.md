@@ -26,3 +26,8 @@ A novice can read the command explanation and result beside the terminal, while 
 
 ## Integrity
 The QA path uses the real MML engine and does not add a second command parser or execution path.
+
+## Additional hardening checks
+- CLEAR VIEW does not mutate ↑/↓ command history;
+- failed MML execution updates the result card with an error state;
+- multi-record results summarize distinct linked targets without selecting one misleadingly.
