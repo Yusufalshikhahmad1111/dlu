@@ -37,3 +37,10 @@ PR #11: stage11: OMT/MML UX 2.0
 
 ## Next
 Stage 12 — Call & Network Visualization.
+
+## Post-merge hardening
+A code-level review after the original merge identified and corrected two UX inconsistencies:
+1. CLEAR was mutating the existing ↑/↓ history. It is now CLEAR VIEW and is presentation-only.
+2. Multi-record results could surface only the first target. The result summary now reports the number of distinct linked targets.
+
+The corrective patch keeps the original Stage 11 architecture and MML engine unchanged.
