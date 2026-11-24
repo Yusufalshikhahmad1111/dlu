@@ -337,6 +337,8 @@ class CallFlowTeachingPanel(QFrame):
         self.mode = normalize_mode(mode)
         self.last_result: CallResult | None = None
         self.resource_required = False
+        self.route_type = "UNKNOWN"
+        self.cpt_text = ""
         self._build()
         self.set_mode(self.mode)
 
@@ -453,6 +455,13 @@ class CallFlowTeachingPanel(QFrame):
 
     def show_result(self, result: CallResult, used: int, capacity: int) -> None:
         self.last_result = result
+        if result.analysis:
+            self.route_type = result.analysis.number_type
+            if result.analysis.cpt:
+                cpt = result.analysis.cpt
+                self.cpt_text = f"\nCPT {cpt.code} · {cpt.name} · EVAL={cpt.eval}"
+            else:
+                self.cpt_text = ""
         if result.code not in {"CALL-RELEASED", "CALL-ALREADY-RELEASED"}:
             self.resource_required = bool(
                 result.analysis and result.analysis.number_type in {"NATIONAL", "INTERNATIONAL"}
@@ -461,13 +470,9 @@ class CallFlowTeachingPanel(QFrame):
         state = _phase_state(result, self.resource_required)
         self.state_label.setText(state.active)
 
-        route = result.analysis.number_type if result.analysis else "UNKNOWN"
+        route = self.route_type
         path_text = " → ".join(result.path.labels()) if result.path else "No route path"
-        cpt_text = ""
-        if result.analysis and result.analysis.cpt:
-            cpt = result.analysis.cpt
-            cpt_text = f"\nCPT {cpt.code} · {cpt.name} · EVAL={cpt.eval}"
-        self.route_card.setText(f"ROUTE · {route}{cpt_text}\n{path_text}")
+        self.route_card.setText(f"ROUTE · {route}{self.cpt_text}\n{path_text}")
 
         if result.code == "CALL-RESOURCE-BUSY":
             resource_line = f"PDC-VOICE · FULL · {used}/{capacity} channels in use"
@@ -491,6 +496,8 @@ class CallFlowTeachingPanel(QFrame):
     def clear(self) -> None:
         self.last_result = None
         self.resource_required = False
+        self.route_type = "UNKNOWN"
+        self.cpt_text = ""
         self.canvas.clear()
         self.state_label.setText("REQUEST")
         self.route_card.setText("ROUTE\nChoose a call case to inspect the route.")
