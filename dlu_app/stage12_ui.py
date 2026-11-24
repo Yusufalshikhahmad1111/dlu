@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget
 
@@ -243,9 +243,9 @@ class CallFlowCanvas(QWidget):
             painter.setBrush(QBrush(QColor(line_color)))
             painter.drawPolygon(
                 [
-                    (arrow_x + 6, arrow_y),
-                    (arrow_x - 5, arrow_y - 6),
-                    (arrow_x - 5, arrow_y + 6),
+                    QPoint(arrow_x + 6, arrow_y),
+                    QPoint(arrow_x - 5, arrow_y - 6),
+                    QPoint(arrow_x - 5, arrow_y + 6),
                 ]
             )
 
