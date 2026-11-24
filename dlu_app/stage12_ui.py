@@ -21,14 +21,14 @@ class PhaseState:
     skipped: tuple[str, ...] = ()
 
 
-def _phase_state(result: CallResult | None) -> PhaseState:
+def _phase_state(result: CallResult | None, resource_required: bool | None = None) -> PhaseState:
     if result is None:
         return PhaseState("REQUEST")
     if result.code in {"CALL-RELEASED", "CALL-ALREADY-RELEASED"}:
-        return PhaseState(
-            "RELEASED",
-            ("REQUEST", "ROUTING", "RESOURCE", "CONNECTED"),
-        )
+        completed = ["REQUEST", "ROUTING", "CONNECTED"]
+        if resource_required:
+            completed.insert(2, "RESOURCE")
+        return PhaseState("RELEASED", tuple(completed), () if resource_required else ("RESOURCE",))
     if not result.ok:
         if result.code == "CALL-RESOURCE-BUSY":
             return PhaseState("BLOCKED", ("REQUEST", "ROUTING"))
@@ -117,7 +117,11 @@ class CallFlowCanvas(QWidget):
         self.capacity = capacity
         self._animation_step = 0
         self._timer.stop()
-        self.animating = bool(result.ok and result.path and len(result.path.nodes) > 1)
+        self.animating = bool(
+            result.code == "CALL-CONNECTED"
+            and result.path
+            and len(result.path.nodes) > 1
+        )
         if self.animating:
             self._timer.start()
         self.update()
@@ -295,7 +299,9 @@ class CallFlowCanvas(QWidget):
                 QColor(tokens.text_primary),
             )
             node_state = "ACTIVE"
-            if not self.result.ok and i == len(self.path.nodes) - 1:
+            if self.result.code in {"CALL-RELEASED", "CALL-ALREADY-RELEASED"}:
+                node_state = "RELEASED"
+            elif not self.result.ok and i == len(self.path.nodes) - 1:
                 node_state = "BLOCKED"
             painter.setPen(QColor(tokens.text_muted))
             painter.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
@@ -330,6 +336,7 @@ class CallFlowTeachingPanel(QFrame):
         super().__init__(parent)
         self.mode = normalize_mode(mode)
         self.last_result: CallResult | None = None
+        self.resource_required = False
         self._build()
         self.set_mode(self.mode)
 
@@ -420,7 +427,7 @@ class CallFlowTeachingPanel(QFrame):
 
     def _refresh_phase_styles(self) -> None:
         tokens = get_tokens(self.mode)
-        state = _phase_state(self.last_result)
+        state = _phase_state(self.last_result, self.resource_required)
         for phase, label in self.phase_labels.items():
             if phase == state.active:
                 color = tokens.success if phase != "BLOCKED" else tokens.danger
@@ -446,8 +453,12 @@ class CallFlowTeachingPanel(QFrame):
 
     def show_result(self, result: CallResult, used: int, capacity: int) -> None:
         self.last_result = result
+        if result.code not in {"CALL-RELEASED", "CALL-ALREADY-RELEASED"}:
+            self.resource_required = bool(
+                result.analysis and result.analysis.number_type in {"NATIONAL", "INTERNATIONAL"}
+            )
         self.canvas.show_result(result, used, capacity)
-        state = _phase_state(result)
+        state = _phase_state(result, self.resource_required)
         self.state_label.setText(state.active)
 
         route = result.analysis.number_type if result.analysis else "UNKNOWN"
@@ -457,18 +468,25 @@ class CallFlowTeachingPanel(QFrame):
         if result.code == "CALL-RESOURCE-BUSY":
             resource_line = f"PDC-VOICE · FULL · {used}/{capacity} channels in use"
         elif result.code in {"CALL-RELEASED", "CALL-ALREADY-RELEASED"}:
-            resource_line = f"PDC-VOICE · RELEASED · {used}/{capacity} channels in use"
+            if self.resource_required:
+                resource_line = f"PDC-VOICE · RELEASED · {used}/{capacity} channels in use"
+            else:
+                resource_line = f"PDC-VOICE · NOT HELD · {used}/{capacity} channels in use"
         elif result.analysis and result.analysis.number_type in {"NATIONAL", "INTERNATIONAL"}:
             resource_line = f"PDC-VOICE · RESERVED · {used}/{capacity} channels in use"
         else:
             resource_line = f"PDC-VOICE · NOT REQUIRED · {used}/{capacity} channels in use"
 
         self.resource_card.setText(f"RESOURCE\n{resource_line}")
-        self.explanation_card.setText(f"WHY?\n{route_explanation(result)}")
+        explanation = route_explanation(result)
+        if result.code in {"CALL-RELEASED", "CALL-ALREADY-RELEASED"} and not self.resource_required:
+            explanation = "The local call was released. No PDC voice channel was held by this call."
+        self.explanation_card.setText(f"WHY?\n{explanation}")
         self._refresh_phase_styles()
 
     def clear(self) -> None:
         self.last_result = None
+        self.resource_required = False
         self.canvas.clear()
         self.state_label.setText("REQUEST")
         self.route_card.setText("ROUTE\nChoose a call case to inspect the route.")
