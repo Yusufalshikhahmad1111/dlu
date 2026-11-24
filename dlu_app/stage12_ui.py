@@ -523,21 +523,9 @@ class Stage12Controller:
         self.window._stage12_enabled = True
         self.window.setProperty("dlu_stage12_enabled", True)
 
+        # CallLabWidget already exposes presentation hooks for result and reset.
+        # Stage 12 only mounts the renderer; it does not monkey-patch execution methods.
         self.call_lab.attach_call_visualization(self.panel)
-        self._original_display = self.call_lab._display_result
-        self._original_reset = self.call_lab.reset
-
-        def display_result(result):
-            self._original_display(result)
-            used, capacity = self.call_lab.engine.resource_usage()
-            self.panel.show_result(result, used, capacity)
-
-        def reset():
-            self._original_reset()
-            self.panel.clear()
-
-        self.call_lab._display_result = display_result
-        self.call_lab.reset = reset
         self.window.stage12_controller = self
         self.window.call_flow_teaching_panel = self.panel
 
