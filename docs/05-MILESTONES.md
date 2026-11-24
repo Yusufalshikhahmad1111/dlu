@@ -310,8 +310,6 @@ docs/65-STAGE-12-CLOSEOUT.md
 
 ## Stage 13 — Communications Lab 2.0
 
-## Stage 13 — Communications Lab 2.0
-
 **الحالة: مخططة**
 
 - Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge.
