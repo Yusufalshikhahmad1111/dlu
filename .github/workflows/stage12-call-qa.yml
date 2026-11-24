@@ -1,0 +1,55 @@
+name: DLU Stage 12 Call Visualization QA
+
+on:
+  push:
+    branches:
+      - main
+      - stage-12-call-visualization
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  stage12-call-qa:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Compile check
+        shell: pwsh
+        run: python -m compileall dlu_app main.py
+
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+
+      - name: Full tests
+        shell: pwsh
+        run: python -m pytest -q tests
+
+      - name: Stage 12 tests
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage12_call_visualization.py
+
+      - name: Functional visual QA
+        shell: pwsh
+        run: python tools/stage12_call_qa.py
+
+      - name: Upload Stage 12 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Stage12-Call-Visualization-QA
+          path: artifacts/stage12/*.png
+          if-no-files-found: error
