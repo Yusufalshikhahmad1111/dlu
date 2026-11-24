@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 11 مكتملة — Stage 12→20 مخططة**
+**الحالة: Stage 12 مكتملة — Stage 13→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -292,13 +292,23 @@ docs/61-STAGE-11-CLOSEOUT.md
 
 ## Stage 12 — Call & Network Visualization
 
-**الحالة: مخططة**
+**الحالة: مكتملة — 7/7 Stage 12 tests passed — full regression passed — Windows visual QA passed — merged to main**
 
+المخرجات:
 - readable call-flow visualization.
-- resource reservation states.
-- route explanation.
-- blocked-call explanation.
-- controlled signal-flow animation.
+- REQUEST / ROUTING / RESOURCE / CONNECTED / BLOCKED / RELEASED states.
+- resource reservation/release presentation.
+- route and CPT explanation.
+- EVAL=NO blocked-call explanation.
+- PDC-full blocking explanation.
+- controlled deterministic signal-flow animation.
+- Morning/Night synchronization.
+- preserved CallEngine/MML semantics with no database migration or runtime dependency.
+
+Closeout:
+docs/65-STAGE-12-CLOSEOUT.md
+
+## Stage 13 — Communications Lab 2.0
 
 ## Stage 13 — Communications Lab 2.0
 
