@@ -464,8 +464,12 @@ class CallFlowTeachingPanel(QFrame):
                 self.cpt_text = ""
         if result.code not in {"CALL-RELEASED", "CALL-ALREADY-RELEASED"}:
             self.resource_required = bool(
-                result.analysis and result.analysis.number_type in {"NATIONAL", "INTERNATIONAL"}
+                result.ok
+                and result.analysis
+                and result.analysis.number_type in {"NATIONAL", "INTERNATIONAL"}
             )
+            if result.code == "CALL-RESOURCE-BUSY":
+                self.resource_required = True
         self.canvas.show_result(result, used, capacity)
         state = _phase_state(result, self.resource_required)
         self.state_label.setText(state.active)
@@ -481,7 +485,7 @@ class CallFlowTeachingPanel(QFrame):
                 resource_line = f"PDC-VOICE · RELEASED · {used}/{capacity} channels in use"
             else:
                 resource_line = f"PDC-VOICE · NOT HELD · {used}/{capacity} channels in use"
-        elif result.analysis and result.analysis.number_type in {"NATIONAL", "INTERNATIONAL"}:
+        elif result.analysis and result.analysis.number_type in {"NATIONAL", "INTERNATIONAL"} and self.resource_required:
             resource_line = f"PDC-VOICE · RESERVED · {used}/{capacity} channels in use"
         else:
             resource_line = f"PDC-VOICE · NOT REQUIRED · {used}/{capacity} channels in use"
