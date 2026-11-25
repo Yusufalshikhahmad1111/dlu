@@ -1,6 +1,6 @@
 # Stage 13 — Windows QA
 
-**Status:** Pending final CI gate
+**Status:** COMPLETE — Windows QA passed
 
 ## Target
 
@@ -35,3 +35,10 @@ The stage is only marked complete after:
 3. UI static audit passes;
 4. Windows functional visual QA passes and screenshots are uploaded;
 5. any CI/QA defects are fixed and re-run.
+
+
+## Final evidence
+
+- Windows runner passed compile, static audit, focused tests, full regression, and functional visual QA.
+- Artifact \`DLU-Stage13-Communications-Lab-2-QA\` contains 5 screenshots: OSI, Analog, 16-QAM, BER, and PCM.
+- Verification required two fixes: a BER plot syntax error and a BPSK constellation presentation fallback.
