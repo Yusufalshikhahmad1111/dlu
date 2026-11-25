@@ -129,8 +129,10 @@ def test_stage16_projector_mode_is_separate_from_student_workbench():
     try:
         widget = Stage16InstructorWidget(window)
         widget.run_selected()
-        widget.reveal_toggle.setChecked(True)
         widget.set_projector_mode(True)
+        assert "RESULT HIDDEN" in widget.projector_result.text()
+        assert "PASS" not in widget.projector_result.text()
+        widget.reveal_toggle.setChecked(True)
         assert widget._projector_mode
         assert widget.controls.isHidden()
         assert widget.steps_box.isHidden()
