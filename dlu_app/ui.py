@@ -479,7 +479,7 @@ class DluSimulatorWindow(QMainWindow):
 
         self.setWindowTitle("DLU Lab — Siemens EWSD Educational Simulator")
         self.resize(1580, 940)
-        self.setMinimumSize(1250, 760)
+        self.setMinimumSize(1180, 680)
         self._build_ui()
         self._apply_style()
         self.show_hardware_home()
@@ -571,9 +571,10 @@ class DluSimulatorWindow(QMainWindow):
         self.breadcrumb.setObjectName("Breadcrumb")
         toolbar.addWidget(self.breadcrumb, 1)
 
-        tool_btn = QToolButton()
-        tool_btn.setText("TOOLS")
-        tool_btn.setPopupMode(QToolButton.InstantPopup)
+        self.tools_btn = QToolButton()
+        self.tools_btn.setObjectName("ToolsButton")
+        self.tools_btn.setText("TOOLS")
+        self.tools_btn.setPopupMode(QToolButton.InstantPopup)
         tool_menu = QMenu(self)
         theme_menu = tool_menu.addMenu("THEME")
         ivory_action = theme_menu.addAction("Brown + Ivory")
@@ -593,13 +594,14 @@ class DluSimulatorWindow(QMainWindow):
 
         reset_action = tool_menu.addAction("Reset Demo")
         reset_action.triggered.connect(self.confirm_reset_demo)
-        tool_btn.setMenu(tool_menu)
-        toolbar.addWidget(tool_btn)
+        self.tools_btn.setMenu(tool_menu)
+        toolbar.addWidget(self.tools_btn)
 
-        fit_btn = QPushButton("FIT")
-        fit_btn.setToolTip("Fit hardware to view")
-        fit_btn.clicked.connect(lambda: self.hardware.reset_zoom())
-        toolbar.addWidget(fit_btn)
+        self.fit_btn = QPushButton("FIT")
+        self.fit_btn.setObjectName("FitHardwareButton")
+        self.fit_btn.setToolTip("Fit hardware to view")
+        self.fit_btn.clicked.connect(lambda: self.hardware.reset_zoom())
+        toolbar.addWidget(self.fit_btn)
         ll.addLayout(toolbar)
 
         navigator = QFrame()
@@ -628,9 +630,10 @@ class DluSimulatorWindow(QMainWindow):
         self.nav_module_combo = QComboBox()
         nav.addWidget(self.nav_module_combo, 1)
 
-        go_btn = QPushButton("OPEN MODULE")
-        go_btn.clicked.connect(self.open_selected_module)
-        nav.addWidget(go_btn)
+        self.open_module_btn = QPushButton("OPEN MODULE")
+        self.open_module_btn.setObjectName("OpenModuleButton")
+        self.open_module_btn.clicked.connect(self.open_selected_module)
+        nav.addWidget(self.open_module_btn)
 
         self.nav_dlu_combo.currentTextChanged.connect(
             lambda _: self.refresh_nav_modules()
@@ -638,9 +641,10 @@ class DluSimulatorWindow(QMainWindow):
         self.nav_shelf_combo.currentTextChanged.connect(
             lambda _: self.refresh_nav_modules()
         )
-        nav_menu_btn = QToolButton()
-        nav_menu_btn.setText("NAV")
-        nav_menu_btn.setPopupMode(QToolButton.InstantPopup)
+        self.nav_menu_btn = QToolButton()
+        self.nav_menu_btn.setObjectName("NavigationMenuButton")
+        self.nav_menu_btn.setText("NAV")
+        self.nav_menu_btn.setPopupMode(QToolButton.InstantPopup)
         nav_menu = QMenu(self)
         nav_dlu_action = nav_menu.addAction("Open DLU")
         nav_dlu_action.triggered.connect(self.open_selected_dlu)
@@ -648,8 +652,8 @@ class DluSimulatorWindow(QMainWindow):
         nav_shelf_action.triggered.connect(self.open_selected_shelf)
         nav_module_action = nav_menu.addAction("Open Module")
         nav_module_action.triggered.connect(self.open_selected_module)
-        nav_menu_btn.setMenu(nav_menu)
-        nav.addWidget(nav_menu_btn)
+        self.nav_menu_btn.setMenu(nav_menu)
+        nav.addWidget(self.nav_menu_btn)
 
         ll.addWidget(navigator)
         self.refresh_nav_modules()
@@ -664,25 +668,25 @@ class DluSimulatorWindow(QMainWindow):
         scenario_title.setObjectName("ScenarioTitle")
         scenario_layout.addWidget(scenario_title)
 
-        primary8 = QPushButton("8-LINE LAB")
-        primary8.setObjectName("PrimaryScenario")
-        primary8.clicked.connect(self.run_8_line)
-        primary8.setToolTip("Create eight subscriber lines on an SLMA8")
-        scenario_layout.addWidget(primary8)
+        self.eight_line_btn = QPushButton("8-LINE LAB")
+        self.eight_line_btn.setObjectName("PrimaryScenario")
+        self.eight_line_btn.clicked.connect(self.run_8_line)
+        self.eight_line_btn.setToolTip("Create eight subscriber lines on an SLMA8")
+        scenario_layout.addWidget(self.eight_line_btn)
 
-        primary_cmrl = QPushButton("CMRL LAB")
-        primary_cmrl.setObjectName("PrimaryScenario")
-        primary_cmrl.clicked.connect(self.run_cmrl)
-        primary_cmrl.setToolTip("Demonstrate the six-port CMRL capacity guard")
-        scenario_layout.addWidget(primary_cmrl)
+        self.cmrl_btn = QPushButton("CMRL LAB")
+        self.cmrl_btn.setObjectName("PrimaryScenario")
+        self.cmrl_btn.clicked.connect(self.run_cmrl)
+        self.cmrl_btn.setToolTip("Demonstrate the six-port CMRL capacity guard")
+        scenario_layout.addWidget(self.cmrl_btn)
 
-        maintenance_btn = QPushButton("MAINTENANCE")
-        maintenance_btn.clicked.connect(self.run_maintenance_demo)
-        scenario_layout.addWidget(maintenance_btn)
+        self.maintenance_btn = QPushButton("MAINTENANCE")
+        self.maintenance_btn.clicked.connect(self.run_maintenance_demo)
+        scenario_layout.addWidget(self.maintenance_btn)
 
-        inspect_btn = QPushButton("INSPECT")
-        inspect_btn.clicked.connect(self.run_inspect)
-        scenario_layout.addWidget(inspect_btn)
+        self.inspect_btn = QPushButton("INSPECT")
+        self.inspect_btn.clicked.connect(self.run_inspect)
+        scenario_layout.addWidget(self.inspect_btn)
         scenario_layout.addStretch()
         ll.addWidget(scenarios)
 
@@ -734,6 +738,7 @@ class DluSimulatorWindow(QMainWindow):
         examples_layout.setContentsMargins(8, 6, 8, 6)
         examples_layout.setSpacing(6)
         examples_layout.addWidget(QLabel("QUICK RUN"))
+        self.quick_run_buttons = {}
         for label, command in (
             ("HELP", "> help;"),
             ("DLU STATUS", "> stat dlu: dlu=50;"),
@@ -746,9 +751,12 @@ class DluSimulatorWindow(QMainWindow):
                 lambda _checked=False, value=command: self.set_command_text(value)
             )
             examples_layout.addWidget(button)
+            self.quick_run_buttons[label] = button
         clear_button = QPushButton("CLEAR")
+        clear_button.setObjectName("ClearTerminalButton")
         clear_button.clicked.connect(lambda: self.terminal.clear())
         examples_layout.addWidget(clear_button)
+        self.quick_run_buttons["CLEAR"] = clear_button
         examples_layout.addStretch(1)
         olt.addWidget(command_examples)
 
@@ -769,17 +777,18 @@ class DluSimulatorWindow(QMainWindow):
         command_layout.addWidget(prompt)
 
         self.input = QLineEdit()
+        self.input.setObjectName("MmlInput")
         self.input.setPlaceholderText("Type MML: > statport: eqn=50-0-15-0;")
         self.input.setMinimumHeight(42)
         self.input.returnPressed.connect(self.execute_input)
         self.input.installEventFilter(self)
         command_layout.addWidget(self.input, 1)
 
-        execute_btn = QPushButton("RUN")
-        execute_btn.setObjectName("CommandSend")
-        execute_btn.setMinimumHeight(42)
-        execute_btn.clicked.connect(self.execute_input)
-        command_layout.addWidget(execute_btn)
+        self.execute_button = QPushButton("RUN")
+        self.execute_button.setObjectName("CommandSend")
+        self.execute_button.setMinimumHeight(42)
+        self.execute_button.clicked.connect(self.execute_input)
+        command_layout.addWidget(self.execute_button)
 
         self.command_status = QLabel("READY · Enter a command or use QUICK RUN")
         self.command_status.setObjectName("CommandStatus")
@@ -816,17 +825,24 @@ class DluSimulatorWindow(QMainWindow):
 
         info_tab = QWidget()
         info_layout = QVBoxLayout(info_tab)
+        self.details_empty = QLabel("Select a hardware object to see technical details.")
+        self.details_empty.setObjectName("DetailsEmptyState")
+        self.details_empty.setWordWrap(True)
+        info_layout.addWidget(self.details_empty)
         self.details = QTableWidget(0, 2)
+        self.details.setObjectName("HardwareDetailsTable")
         self.details.setHorizontalHeaderLabels(["Field", "Value"])
         self.details.horizontalHeader().setStretchLastSection(True)
         info_layout.addWidget(self.details, 1)
         self.event_log = QTextEdit()
+        self.event_log.setObjectName("HardwareEventLog")
         self.event_log.setReadOnly(True)
         self.event_log.setMaximumHeight(150)
         self.event_log.setObjectName("Terminal")
         info_layout.addWidget(self.event_log)
 
         buttons = QHBoxLayout()
+        self.info_action_buttons = {}
         for label, handler in (
             ("COPY MML", self.copy_selected_mml),
             ("REFERENCE", self.open_selected_reference),
@@ -839,6 +855,7 @@ class DluSimulatorWindow(QMainWindow):
             b = QPushButton(label)
             b.clicked.connect(handler)
             buttons.addWidget(b)
+            self.info_action_buttons[label] = b
         info_layout.addLayout(buttons)
         info_tab.setLayout(info_layout)
         right.addTab(info_tab, "Hardware")
@@ -1091,6 +1108,9 @@ class DluSimulatorWindow(QMainWindow):
         if self.property("dlu_stage9_enabled"):
             update_stage9_theme(self, resolved)
         self._refresh_current_view()
+        if self.property("dlu_stage17_enabled"):
+            from .stage17_accessibility import refresh_stage17_accessibility
+            refresh_stage17_accessibility(self, resolved)
 
     def set_mode(self, mode: str):
         self.mode = mode
@@ -2117,6 +2137,8 @@ class DluSimulatorWindow(QMainWindow):
 
     def _set_details(self, details: dict):
         self.details.setRowCount(0)
+        if hasattr(self, "details_empty"):
+            self.details_empty.setVisible(not bool(details))
         for k,v in details.items():
             row=self.details.rowCount()
             self.details.insertRow(row)

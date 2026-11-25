@@ -84,6 +84,20 @@ def apply_application_style(app: QApplication, mode: str = "morning") -> None:
         QPushButton:focus, QToolButton:focus {{
             border: 2px solid {tokens.primary};
         }}
+        QCheckBox:focus {{
+            border: 2px solid {tokens.primary};
+            border-radius: {tokens.radius_sm}px;
+            padding: 2px 4px;
+        }}
+        QTabBar::tab:focus {{
+            border: 2px solid {tokens.primary};
+        }}
+        QTextEdit:focus, QPlainTextEdit:focus, QListWidget:focus, QTableWidget:focus {{
+            border: 2px solid {tokens.primary};
+        }}
+        QAbstractItemView:focus {{
+            border: 2px solid {tokens.primary};
+        }}
         QPushButton:disabled, QToolButton:disabled {{
             color: {tokens.text_muted};
             background: {tokens.bg};

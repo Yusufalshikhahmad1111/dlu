@@ -68,9 +68,12 @@ def test_stage16_runs_existing_runner_and_reveals_expected_vs_actual():
         assert widget._result is not None
         assert widget._result.scenario_id == "international-blacklist"
         assert widget._result.passed
-        assert widget.status.text() == "PASS"
+        assert "PASS" not in widget.status.text()
+        assert "FAIL" not in widget.status.text()
+        assert widget.status.text().startswith("EXECUTED")
         assert widget.actual_label.text().startswith("HIDDEN")
         widget.reveal_toggle.setChecked(True)
+        assert widget.status.text() == "PASS"
         assert "EVAL=NO" in widget.expected_label.text()
         assert "CALL-BLOCKED" in widget.actual_label.text()
         widget.close()

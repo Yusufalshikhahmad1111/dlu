@@ -241,7 +241,11 @@ class Stage16InstructorWidget(QWidget):
             self._render()
             return
         self._guided_index = -1
-        self.status.setText("PASS" if self._result.passed else "FAIL")
+        self.status.setText(
+            ("PASS" if self._result.passed else "FAIL")
+            if self.answers_revealed
+            else "EXECUTED · ANSWERS HIDDEN"
+        )
         self.guide_button.setEnabled(True)
         self.next_button.setEnabled(False)
         self._render()
@@ -311,6 +315,8 @@ class Stage16InstructorWidget(QWidget):
 
         result = self._result
         if not self.answers_revealed:
+            if result is not None:
+                self.status.setText("EXECUTED · ANSWERS HIDDEN")
             self.expected_label.setText("HIDDEN · Instructor answer visibility is OFF.")
             self.actual_label.setText(
                 "HIDDEN · Run the scenario and enable REVEAL ANSWERS to show the result."
@@ -323,6 +329,7 @@ class Stage16InstructorWidget(QWidget):
             self.actual_label.setText("NOT EXECUTED")
             self.answer_state.setText("Answers are visible; execute the scenario to populate actual evidence.")
         else:
+            self.status.setText("PASS" if result.passed else "FAIL")
             self.expected_label.setText(result.expected_result)
             self.actual_label.setText(result.actual_result)
             self.answer_state.setText(
