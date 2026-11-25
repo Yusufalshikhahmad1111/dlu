@@ -1,6 +1,6 @@
 # Stage 14 — Teaching Scenarios 2.0 Closeout
 
-**Status:** Pending closeout
+**Status:** COMPLETE — merged to main after CI / Windows gate
 
 ## Acceptance target
 
@@ -23,7 +23,22 @@ A student can complete any existing teaching scenario with the UI itself acting 
 
 ## Evidence
 
-Final status will be filled after the Stage 14 Windows QA workflow and main regression gate pass.
+- Stage 14 focused workflow: **passed**.
+- Compile check: **passed**.
+- UI static audit: **passed**.
+- Full pytest regression: **passed**.
+- Windows functional visual QA: **passed**.
+- Screenshot artifact: 5 PNGs uploaded.
+- Main DLU CI: **passed** on the Stage 14 head.
+- Final merge commit: \`32d8a9a8397a23398181c7db7eb16203fef0ab8c\`.
+
+### Fix during verification
+
+The focused all-scenarios test was initially stateful across scenarios and failed after the first mutating scenario. It was corrected to isolate each scenario on a fresh demo database. The production runner was not changed.
+
+### Scope guard
+
+No TeachingScenarioRunner semantics, expected academic results, MML behavior, CallEngine/CPT behavior, hardware data, command-file behavior, or SQLite schema were changed.
 
 ## Next
 
