@@ -70,6 +70,8 @@ def test_stage19_student_end_to_end_journey_preserves_real_workflows():
             window.navigate_student_area("COMMUNICATIONS")
             assert hasattr(window.communications_lab, "digital_summary")
             assert "error" not in window.communications_lab.digital_summary.text().lower()
+            window.reset_demo()
+            app.processEvents()
             window.navigate_student_area("SCENARIOS")
             window.teaching_scenarios.run_selected()
             app.processEvents()
