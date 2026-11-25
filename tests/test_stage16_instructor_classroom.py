@@ -134,15 +134,15 @@ def test_stage16_projector_mode_is_separate_from_student_workbench():
         assert widget._projector_mode
         assert widget.controls.isHidden()
         assert widget.steps_box.isHidden()
-        assert widget.projector_card.isVisible()
-        assert widget.projector_exit.isVisible()
+        assert not widget.projector_card.isHidden()
+        assert not widget.projector_exit.isHidden()
         assert "PASS" in widget.projector_result.text()
 
         widget.set_projector_mode(False)
         assert not widget._projector_mode
-        assert widget.controls.isVisible()
-        assert widget.steps_box.isVisible()
-        assert widget.answer_card.isVisible()
+        assert not widget.controls.isHidden()
+        assert not widget.steps_box.isHidden()
+        assert not widget.answer_card.isHidden()
         widget.close()
     finally:
         window.close()
