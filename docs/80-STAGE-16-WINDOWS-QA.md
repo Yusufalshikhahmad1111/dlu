@@ -1,6 +1,6 @@
 # Stage 16 — Windows QA
 
-**Status:** PENDING
+**Status:** COMPLETE — Windows QA passed
 
 ## Visual coverage
 
@@ -17,20 +17,26 @@ The functional runner captures:
 - six scenarios load;
 - real scenario execution reaches PASS;
 - answer visibility is off by default;
+- expected/actual and PASS/FAIL remain hidden until explicitly revealed;
 - guided demonstration reveals existing result steps progressively;
 - reset delegates to the real demo reset;
 - projector mode hides operational clutter;
 - projector mode can be exited;
 - Morning/Night styling is accepted.
 
-## Quality gates
+## Final quality gates
 
-The stage closes only after:
+- compile check: PASS;
+- UI static audit: PASS;
+- Stage 16 focused tests: **7/7 PASS**;
+- full pytest regression: **129 passed in 809.92s**;
+- Windows functional visual QA: PASS;
+- screenshot upload: PASS;
+- screenshot artifact: `DLU-Stage16-Instructor-Classroom-QA`;
+- artifact ID: `15033479880`;
+- five screenshots uploaded successfully.
 
-- compile check passes;
-- UI static audit passes;
-- focused Stage 16 tests pass;
-- full pytest regression passes;
-- Windows functional visual QA passes;
-- screenshots upload successfully;
-- any QA defects are fixed and rerun.
+## Defect found and fixed
+
+The first focused run exposed an offscreen Qt visibility assertion that checked `isVisible()` on a widget whose parent was not shown. The test was corrected to assert the widget's hidden/visible state directly. A second review also removed PASS/FAIL leakage while answer visibility was disabled, including projector mode.
+
