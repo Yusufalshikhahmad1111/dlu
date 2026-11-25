@@ -123,9 +123,15 @@ def apply_stage19_academic_ux(window: QWidget, mode: str = "morning") -> None:
         if original_navigate is not None:
             def _navigate(area: str) -> None:
                 original_navigate(area)
-                if area.strip() == "HARDWARE":
-                    _update_context(window, "Hardware")
+                _update_context(window, "Hardware" if area.strip() == "HARDWARE" else None)
             window.navigate_student_area = _navigate
+
+        original_refresh = getattr(window, "_refresh_learning_home", None)
+        if original_refresh is not None:
+            def _refresh_learning_home() -> None:
+                original_refresh()
+                _update_context(window)
+            window._refresh_learning_home = _refresh_learning_home
 
     _update_context(window)
 
