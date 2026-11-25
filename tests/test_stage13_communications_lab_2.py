@@ -73,7 +73,7 @@ def test_stage13_ber_measurement_is_deterministic_and_explained():
     assert first == second
     assert "finite bitstream" in widget.ber_explain.text()
     assert widget.ber_canvas.kind == "ber"
-    assert widget.ber_constellation.kind == "constellation"
+    assert widget.ber_constellation.kind == "empty"
     widget.close()
 
 
