@@ -55,13 +55,18 @@ def main() -> int:
 
     for area in ("COMMANDS", "COMMS LAB", "SCENARIOS"):
         window.navigate_student_area(area)
+    for _ in range(3):
+        window.teaching_scenarios.continue_phase()
     window.show_learning_home()
     window.set_theme("night")
     app.processEvents()
     window.learning_home.verify_button.click()
     app.processEvents()
+    assert window.learning_home._verified
     window.grab().save(str(OUT / "03-learning-path-verified-night.png"))
 
+    window.reset_demo()
+    assert not window.learning_home._verified
     window.close()
     return 0
 
