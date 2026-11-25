@@ -20,14 +20,14 @@ No MML, CallEngine, TeachingScenarioRunner, database schema, or telecom semantic
 
 ## Final gate — achieved
 
-- Stage 17 focused tests: **5/5 PASS**.
-- Stage 16 compatibility tests: **7/7 PASS**.
-- Full regression: **134 PASS**.
-- Compile check: **PASS**.
-- UI static audit: **PASS**.
-- Windows accessibility/resolution QA: **PASS**.
+- Stage 17 focused tests: 5/5 PASS.
+- Stage 16 compatibility tests: 7/7 PASS.
+- Full regression: 134 PASS.
+- Compile check: PASS.
+- UI static audit: PASS.
+- Windows accessibility/resolution QA: PASS.
 - Screenshot artifact uploaded successfully.
-- PR #18 contains the completed Stage 17 implementation and is ready to merge.
+- PR #18 merged to main at 6d29fa93c7d9f80a3160590554481c78aedaa9e0.
 
 ## Next
 
