@@ -359,6 +359,7 @@ class Stage13CommunicationsLabWidget(QWidget):
         self._timer.timeout.connect(self.run_current)
         self._build()
         self.set_theme(self._theme)
+        self.run_current()
 
     def _scroll(self, page: QWidget) -> QScrollArea:
         scroll = QScrollArea()
