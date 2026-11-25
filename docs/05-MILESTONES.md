@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 13 مكتملة — Stage 14→20 مخططة**
+**الحالة: Stage 13 مكتملة — Stage 14 قيد التنفيذ — Stage 15→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -327,13 +327,27 @@ Closeout: docs/69-STAGE-13-CLOSEOUT.md
 
 ## Stage 14 — Teaching Scenarios 2.0
 
-**الحالة: مخططة**
+**الحالة: قيد التنفيذ — guided teaching studio implemented; final CI/Windows gate pending**
 
 - Objective → Observe → Execute → Diagnose → Fix → Verify → Result.
-- progress.
+- progress and explicit current phase.
 - hints.
 - mistake explanations.
 - expected vs actual.
+- clear PASS/FAIL.
+- scenario-specific recovery guidance.
+
+Plan:
+docs/70-STAGE-14-PLAN.md
+
+Implementation:
+docs/71-STAGE-14-IMPLEMENTATION-REPORT.md
+
+Windows QA:
+docs/72-STAGE-14-WINDOWS-QA.md
+
+Closeout:
+docs/73-STAGE-14-CLOSEOUT.md
 
 ## Stage 15 — Academic Learning Layer
 
