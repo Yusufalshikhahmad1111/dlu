@@ -8,6 +8,8 @@ class DummyWindow:
     def __init__(self):
         self.student_navigation = StudentNavigationState()
         self.targets = []
+        self.teaching_scenarios = type("ScenarioView", (), {})()
+        self.teaching_scenarios._result = None
 
     def navigate_student_area(self, area: str):
         self.targets.append(area)
@@ -44,6 +46,7 @@ def test_stage15_progression_uses_existing_learning_areas():
     window.student_navigation.visit("COMMANDS", "Commands")
     window.student_navigation.visit("COMMS LAB", "Comms")
     window.student_navigation.visit("SCENARIOS", "Scenarios")
+    window.teaching_scenarios._result = type("Result", (), {"passed": True})()
     widget.refresh_path()
     assert widget.phase_cards["PRACTICE"].status.text() == "COMPLETE"
     assert widget.phase_cards["EXPERIMENT"].status.text() == "COMPLETE"
@@ -61,6 +64,7 @@ def test_stage15_verify_requires_all_six_existing_areas():
 
     for area in ("HARDWARE", "OMT / MML", "CALLS", "COMMANDS", "COMMS LAB", "SCENARIOS"):
         window.student_navigation.visit(area, area)
+    window.teaching_scenarios._result = type("Result", (), {"passed": True})()
     widget._verify_path()
     assert widget._verified
     assert "verified for this session" in widget.evidence_label.text()
@@ -91,4 +95,43 @@ def test_stage15_is_presentation_only():
     widget = Stage15AcademicLearningWidget(window, on_navigate=window.navigate_student_area)
     assert not hasattr(window, "db")
     assert not hasattr(window, "call_engine")
+    widget.close()
+
+
+def test_stage15_challenge_and_verify_require_a_real_pass():
+    _app()
+    window = DummyWindow()
+    widget = Stage15AcademicLearningWidget(window, on_navigate=window.navigate_student_area)
+    for area in ("HARDWARE", "OMT / MML", "CALLS", "COMMANDS", "COMMS LAB", "SCENARIOS"):
+        window.student_navigation.visit(area, area)
+    widget.refresh_path()
+    assert widget.phase_cards["CHALLENGE"].status.text() != "COMPLETE"
+    widget._verify_path()
+    assert not widget._verified
+    assert "PASS one teaching scenario" in widget.evidence_label.text()
+
+    window.teaching_scenarios._result = type("Result", (), {"passed": True})()
+    widget._verify_path()
+    assert widget._verified
+    assert widget.phase_cards["CHALLENGE"].status.text() == "COMPLETE"
+    assert widget.phase_cards["VERIFY"].status.text() == "COMPLETE"
+    assert widget.progress_bar.value() == 100
+    widget.close()
+
+
+def test_stage15_progressive_action_opens_first_missing_area():
+    _app()
+    window = DummyWindow()
+    widget = Stage15AcademicLearningWidget(window, on_navigate=window.navigate_student_area)
+
+    window.student_navigation.visit("HARDWARE", "Hardware")
+    window.student_navigation.visit("OMT / MML", "MML")
+    widget.refresh_path()
+    widget._phase_action("PRACTICE")
+    assert window.targets[-1] == "CALLS"
+
+    window.student_navigation.visit("CALLS", "Calls")
+    widget.refresh_path()
+    widget._phase_action("PRACTICE")
+    assert window.targets[-1] == "COMMANDS"
     widget.close()
