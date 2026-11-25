@@ -162,7 +162,7 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 13 — Communications Lab 2.0 complete**.
+الحالة الحالية: **Stage 14 — Teaching Scenarios 2.0 complete**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
@@ -173,4 +173,11 @@ Stage 13:
 - five screenshot artifacts uploaded;
 - merged to main at `7a75926824f7abe6a15d35f9ec374ccff658fb87`.
 
-Next planned stage: **Stage 14 — Teaching Scenarios 2.0**.
+Stage 14:
+- guided Objective → Observe → Execute → Diagnose → Fix → Verify → Result workflow across all six teaching scenarios;
+- scenario-specific hints, diagnosis, recovery guidance and verification;
+- clear PASS/FAIL meaning;
+- focused tests, full regression and Windows functional/visual QA passed;
+- merged to main at `32d8a9a8397a23398181c7db7eb16203fef0ab8c`.
+
+Next planned stage: **Stage 15 — Academic Learning Layer**.
