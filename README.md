@@ -162,7 +162,7 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 15 — Academic Learning Layer complete**.
+الحالة الحالية: **Stage 16 — Instructor / Classroom Mode complete**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
@@ -192,3 +192,18 @@ Stage 15:
 - merged to main at \`9b01ec4725f89c7c5a7409126dee48bc73774c6c\`.
 
 Next planned stage: **Stage 16 — Instructor / Classroom Mode**.
+
+
+Stage 16:
+- separate Instructor / Classroom workspace;
+- six existing teaching scenarios selectable from the real scenario catalog;
+- Reset delegates to the existing demo reset lifecycle;
+- expected/actual and PASS/FAIL remain hidden until explicitly revealed;
+- guided demonstration reveals the existing verified scenario result one step at a time;
+- projector-friendly classroom view with Morning/Night support;
+- Stage 16 focused tests 7/7 passed;
+- full regression 129/129 passed;
+- Windows functional/visual QA passed with five screenshots;
+- merged to main via PR #17.
+
+Next planned stage: **Stage 17 — Accessibility & Usability Audit**.
