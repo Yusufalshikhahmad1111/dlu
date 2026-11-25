@@ -270,10 +270,7 @@ class Stage16InstructorWidget(QWidget):
         self._guided_index += 1
         self._render()
 
-    def reset_demo(self):
-        resetter = getattr(self.window, "reset_demo", None)
-        if resetter is not None:
-            resetter()
+    def reset_view_state(self):
         self._result = None
         self._guided_index = -1
         self.status.setText("RESET")
@@ -281,6 +278,12 @@ class Stage16InstructorWidget(QWidget):
         self.next_button.setEnabled(False)
         self.step_hint.setText("Teaching demo reset. Choose a scenario and run it again.")
         self._render()
+
+    def reset_demo(self):
+        resetter = getattr(self.window, "reset_demo", None)
+        if resetter is not None:
+            resetter()
+        self.reset_view_state()
 
     def set_projector_mode(self, enabled: bool):
         self._projector_mode = bool(enabled)

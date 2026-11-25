@@ -438,14 +438,20 @@ Verified code head:
 
 ## Stage 19 — Final Academic UX Audit
 
-**الحالة: مخططة**
+**الحالة: مكتملة — 4/4 focused — 143/143 full regression — Windows Academic UX QA passed**
 
-End-to-end student/instructor audit covering:
-- Hardware.
-- MML.
-- Calls.
-- Communications.
-- Scenarios.
+المخرجات:
+- end-to-end academic workflow context across student and instructor areas;
+- `YOU ARE HERE` + `NEXT` guidance using the existing navigation shell;
+- workspace tooltips and accessibility metadata;
+- real MML → Calls → Communications → Scenarios journey verification;
+- instructor answer-visibility verification;
+- Reset Demo state synchronization hardening;
+- Windows target-resolution evidence and screenshot artifact;
+- final evidence in `docs/92-STAGE-19-WINDOWS-QA.md` and `docs/93-STAGE-19-CLOSEOUT.md`.
+
+Verified code head:
+`a8551da79ea44ee9890f2a8eea81b66a42d9b80a`.
 
 ## Stage 20 — DLU Lab 2.0 Release
 

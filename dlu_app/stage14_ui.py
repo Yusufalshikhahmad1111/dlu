@@ -414,15 +414,19 @@ class Stage14TeachingScenariosWidget(QWidget):
         self.status_chip.setText("COMMANDS COPIED")
         self._style_status("COMMANDS COPIED")
 
-    def reset_demo(self):
-        if self.on_reset_demo is None:
-            return
-        self.on_reset_demo()
+    def reset_view_state(self):
         self._result = None
         self._phase_index = 0
+        self._select_item(self.scenario_list.currentItem())
         self.status_chip.setText("RESET")
         self._style_status("RESET")
-        self._select_item(self.scenario_list.currentItem())
+
+    def reset_demo(self):
+        if self.on_reset_demo is None:
+            self.reset_view_state()
+            return
+        self.on_reset_demo()
+        self.reset_view_state()
 
     def set_theme(self, name: str):
         self._theme = normalize_mode(name)

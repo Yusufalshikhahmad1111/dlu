@@ -15,6 +15,7 @@ from .stage14_ui import apply_stage14_ui
 from .stage15_ui import apply_stage15_ui
 from .stage16_ui import apply_stage16_ui
 from .stage17_accessibility import apply_stage17_accessibility
+from .stage19_academic_ux import apply_stage19_academic_ux
 from .ui import DluSimulatorWindow
 
 
@@ -29,6 +30,7 @@ STAGE_INSTALLERS = (
     apply_stage15_ui,
     apply_stage16_ui,
     apply_stage17_accessibility,
+    apply_stage19_academic_ux,
 )
 
 
