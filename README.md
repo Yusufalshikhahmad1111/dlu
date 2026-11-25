@@ -162,7 +162,7 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 14 — Teaching Scenarios 2.0 complete**.
+الحالة الحالية: **Stage 15 — Academic Learning Layer in progress**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
@@ -180,4 +180,10 @@ Stage 14:
 - focused tests, full regression and Windows functional/visual QA passed;
 - merged to main at `32d8a9a8397a23398181c7db7eb16203fef0ab8c`.
 
-Next planned stage: **Stage 15 — Academic Learning Layer**.
+Next planned stage: **Stage 16 — Instructor / Classroom Mode**.
+
+
+Stage 15:
+- Learn → Practice → Experiment → Challenge → Verify academic path;
+- existing-module routing and session-only evidence;
+- final CI/Windows verification pending.
