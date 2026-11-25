@@ -99,7 +99,7 @@ class PhaseCard(QFrame):
         self.action = QPushButton(phase.action_label)
         self.action.setObjectName("Stage15PhaseAction")
         self.action.setAutoDefault(False)
-        self.action.clicked.connect(lambda: self.on_action(self.phase.key))
+        self.action.clicked.connect(lambda _checked=False: self.on_action(self.phase.key))
         footer.addWidget(self.action)
         root.addLayout(footer)
 
