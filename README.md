@@ -162,42 +162,12 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 11 complete — OMT/MML UX 2.0 closed on the Stage 11 branch; PR #11 is ready for merge**.
+الحالة الحالية: **Stage 13 — Communications Lab 2.0 قيد التنفيذ**.
 
-Stage 8:
-- accepted Morning/Night green visual system;
-- visible Morning/Night switch;
-- stable LAB navigation shell;
-- OMT/MML workbench and GUI command execution regression;
-- 80/80 tests passed on Windows UX/functional QA.
+Stage 13:
+- guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
+- improved waveform and constellation readability;
+- Live Update, measurement cards, deterministic mini challenges;
+- final Windows/CI verification pending.
 
-Stage 9:
-- Learning Home;
-- session-aware student navigation;
-- current-context ribbon and Quick Start;
-- 85/85 tests passed;
-- Windows Stage 9 functional/visual QA and release smoke-test passed.
-
-Stage 10:
-- persistent Hardware Inspector;
-- Exchange → DLU → Side/Controller → Shelf → Module → Port → Subscriber context;
-- hover and selection inspection;
-- explicit EQN/capacity/state/maintenance presentation;
-- 90/90 tests passed;
-- Windows Hardware UX QA passed at 1280×720, 1366×768, 1600×900 and 1920×1080;
-- Windows onefile build + smoke-test passed on main;
-- final Windows executable and screenshot artifacts uploaded.
-
-Stage 11:
-- educational MML command editor feedback;
-- visible command history with reuse/copy;
-- live syntax-shape guidance;
-- plain-language command explanation and target hint;
-- execution result + linked DLU/module/EQN pairing;
-- Morning/Night synchronization;
-- full pytest + Windows OMT/MML QA passed;
-- PR #11 merged into main.
-
-Current main:
-- SHA: 5e18bc26ed5cb819b1a9f54d57bdc4e9610f32c0
-- Next planned stage: **Stage 12 — Call & Network Visualization**.
+Next planned stage after closeout: **Stage 14 — Teaching Scenarios 2.0**.
