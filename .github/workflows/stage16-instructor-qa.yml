@@ -1,0 +1,51 @@
+name: DLU Stage 16 Instructor Classroom QA
+
+on:
+  push:
+    branches:
+      - main
+      - stage-16-instructor-classroom-mode
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: stage16-instructor-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage16-instructor-qa:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Compile check
+        shell: pwsh
+        run: python -m compileall dlu_app main.py
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+      - name: Stage 16 tests
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage16_instructor_classroom.py
+      - name: Full tests
+        shell: pwsh
+        run: python -m pytest -q tests
+      - name: Functional visual QA
+        shell: pwsh
+        run: python tools/stage16_instructor_qa.py
+      - name: Upload Stage 16 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Stage16-Instructor-Classroom-QA
+          path: artifacts/stage16/*.png
+          if-no-files-found: error
