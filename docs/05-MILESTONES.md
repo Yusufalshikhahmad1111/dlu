@@ -354,12 +354,15 @@ Next planned stage: **Stage 15 — Academic Learning Layer**.
 
 ## Stage 15 — Academic Learning Layer
 
-**الحالة: قيد التنفيذ — Academic Learning Layer implemented; final CI/Windows gate pending**
+**الحالة: COMPLETE — merged to main after CI / Windows QA**
 
 - Learn → Practice → Experiment → Challenge → Verify.
 - Existing module routing across Hardware, OMT/MML, Calls, Command Files, Communications and Scenarios.
 - Session-only evidence and explicit verification.
-- No database migration or duplicate simulator engine.
+- Challenge completion requires a real PASS from the existing Teaching Scenario runner.
+- Phase actions open the first missing area.
+- Stage 15 focused tests 7 passed; full regression and Windows visual QA passed.
+- Final merge: `PENDING`.
 
 Plan:
 docs/74-STAGE-15-PLAN.md
@@ -373,10 +376,7 @@ docs/76-STAGE-15-WINDOWS-QA.md
 Closeout:
 docs/77-STAGE-15-CLOSEOUT.md
 
-Next planned stage after closeout: **Stage 16 — Instructor / Classroom Mode**.
-
-- Learn → Practice → Experiment → Challenge → Verify.
-- coherent course progression over the existing modules.
+Next planned stage: **Stage 16 — Instructor / Classroom Mode**.
 
 ## Stage 16 — Instructor / Classroom Mode
 
