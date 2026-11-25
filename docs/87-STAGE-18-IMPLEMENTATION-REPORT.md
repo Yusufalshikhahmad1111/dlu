@@ -1,6 +1,6 @@
 # Stage 18 — Performance & Architecture Cleanup Implementation Report
 
-**Status:** IMPLEMENTED — awaiting final QA
+**Status:** COMPLETE
 
 ## Delivered
 
@@ -35,4 +35,4 @@ No MML, CallEngine, TeachingScenario, database schema, or runtime dependency cha
 
 ## Validation
 
-Final focused tests, full regression, Windows QA, screenshot evidence, and closeout are tracked by the Stage 18 workflow.
+Final evidence: Stage18 focused **5/5**, Stage16 compatibility **7/7**, Stage17 compatibility **5/5**, full regression **139/139**, compile/static audit **PASS**, Windows architecture/resolution QA **PASS**, and screenshot artifact upload **PASS**.
