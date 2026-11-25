@@ -78,6 +78,8 @@ def test_stage17_focus_and_tab_order():
         assert app.focusWidget() is window.logical_btn
 
         stage16 = window.instructor_mode
+        window.feature_tabs.setCurrentWidget(stage16)
+        app.processEvents()
         stage16.scenario_combo.setFocus()
         app.processEvents()
         QTest.keyClick(stage16.scenario_combo, Qt.Key_Tab)
