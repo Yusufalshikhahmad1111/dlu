@@ -60,6 +60,7 @@ def main() -> int:
     app.processEvents()
     window.grab().save(str(OUT / "04-hint-night.png"))
 
+    window.teaching_scenarios.reset_demo()
     window.teaching_scenarios.scenario_list.setCurrentRow(4)
     window.teaching_scenarios.continue_phase()
     window.teaching_scenarios.continue_phase()
