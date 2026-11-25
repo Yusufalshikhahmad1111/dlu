@@ -1,6 +1,6 @@
 # Stage 14 — Teaching Scenarios 2.0 Implementation Report
 
-**Status:** Implemented on stage-14-teaching-scenarios-2
+**Status:** COMPLETE — merged to main
 
 ## Delivered
 
@@ -47,3 +47,19 @@ Added:
 - \`tools/stage14_scenarios_qa.py\`
 - \`.github/workflows/stage14-scenarios-qa.yml\`
 
+
+
+## Final verification
+
+- Stage 14 focused tests: **12 passed** in the focused workflow set.
+- Compile check: **passed**.
+- UI static audit: **passed**.
+- Full pytest regression: **passed**.
+- Windows functional visual QA: **passed**.
+- Screenshot artifact: **5 PNGs uploaded successfully**.
+- Main DLU CI on the Stage 14 head: **passed**.
+- Final merge commit: \`32d8a9a8397a23398181c7db7eb16203fef0ab8c\`.
+
+### Verification fix
+
+The first focused test revision incorrectly reused one mutable database across all six scenarios. This was corrected so each scenario is executed against its own fresh demo database, matching the deterministic teaching contract rather than depending on execution order.
