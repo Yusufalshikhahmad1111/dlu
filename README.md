@@ -162,12 +162,15 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 13 — Communications Lab 2.0 قيد التنفيذ**.
+الحالة الحالية: **Stage 13 — Communications Lab 2.0 complete**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
 - improved waveform and constellation readability;
 - Live Update, measurement cards, deterministic mini challenges;
-- final Windows/CI verification pending.
+- Stage 13 focused tests 6/6 passed;
+- full regression and Windows functional/visual QA passed;
+- five screenshot artifacts uploaded;
+- merged to main at `7a75926824f7abe6a15d35f9ec374ccff658fb87`.
 
-Next planned stage after closeout: **Stage 14 — Teaching Scenarios 2.0**.
+Next planned stage: **Stage 14 — Teaching Scenarios 2.0**.
