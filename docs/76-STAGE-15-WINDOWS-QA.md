@@ -1,6 +1,6 @@
 # Stage 15 — Windows QA
 
-**Status:** Pending final CI gate
+**Status:** COMPLETE — Windows QA passed
 
 ## Visual coverage
 
@@ -29,3 +29,10 @@ The stage is complete only after:
 4. full regression passes;
 5. Windows functional visual QA and screenshot upload pass;
 6. any defects found in QA are fixed and rerun.
+
+## Final evidence
+
+- Windows QA passed compile, static audit, focused tests, full regression, functional visual QA and screenshot upload.
+- Artifact: `DLU-Stage15-Academic-Learning-QA`.
+- Screenshots cover initial path, in-progress path, and verified path in Night mode.
+- The functional runner also executed a real Teaching Scenario to PASS, verified the learning path, then reset the demo and confirmed Stage 15 verification state cleared.
