@@ -28,14 +28,6 @@ from .theme import THEMES
 from .ui_utils import make_font
 
 
-from .db import CardReference, Database
-from .mml import MmlEngine, MmlResult
-from .navigation import StudentNavigationState
-from .student_home import LearningHomeWidget
-from .theme import THEMES
-from .ui_utils import make_font
-
-
 _PALETTE = THEMES["ivory"]
 BG = _PALETTE.BG
 PANEL = _PALETTE.PANEL
