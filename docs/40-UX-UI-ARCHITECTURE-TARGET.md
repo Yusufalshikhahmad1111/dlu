@@ -2,9 +2,16 @@
 
 ## 1. Current condition
 
-The repository has a large `dlu_app/ui.py` module that coordinates the primary application window and many presentation responsibilities.
+Before Stage 18, `dlu_app/ui.py` coordinated the primary application window plus a large hardware presentation surface.
 
-This is not a reason to rewrite the simulator. It is a reason to introduce boundaries progressively.
+Stage 18 introduced the first major safe decomposition without rewriting the simulator core:
+
+- `dlu_app/app_shell.py` owns startup composition and sizing;
+- `dlu_app/hardware_view.py` owns the Hardware presentation boundary;
+- `DluSimulatorWindow` preserves public hardware methods through `HardwareWorkspaceMixin`;
+- the remaining `ui.py` coordinates cross-feature application state and shared presentation behavior.
+
+The decomposition is intentionally incremental rather than a large rewrite.
 
 ## 2. Target layers
 
@@ -57,6 +64,13 @@ Move individual feature surfaces behind small view/controller boundaries.
 
 ### Stage 18
 Perform larger decomposition only after repeated UX patterns are known.
+
+Implemented:
+
+- application-shell composition boundary;
+- Hardware feature boundary;
+- public compatibility preservation for existing adapters;
+- regression and Windows architecture/resolution validation.
 
 ## 5. Naming direction
 
