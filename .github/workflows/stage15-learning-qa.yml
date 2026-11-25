@@ -1,0 +1,51 @@
+name: DLU Stage 15 Academic Learning Layer QA
+
+on:
+  push:
+    branches:
+      - main
+      - stage-15-academic-learning-layer
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: stage15-learning-qa-\${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage15-learning-qa:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Compile check
+        shell: pwsh
+        run: python -m compileall dlu_app main.py
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+      - name: Stage 15 tests
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage15_academic_learning_layer.py
+      - name: Full tests
+        shell: pwsh
+        run: python -m pytest -q tests
+      - name: Functional visual QA
+        shell: pwsh
+        run: python tools/stage15_learning_qa.py
+      - name: Upload Stage 15 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Stage15-Academic-Learning-QA
+          path: artifacts/stage15/*.png
+          if-no-files-found: error
