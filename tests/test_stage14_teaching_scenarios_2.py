@@ -109,16 +109,29 @@ def test_stage14_failed_result_has_mistake_explanation_and_recovery():
 
 def test_stage14_all_scenarios_execute_through_existing_runner():
     _app()
-    tmp, db, widget = _widget()
-    try:
-        for row in range(widget.scenario_list.count()):
-            widget.scenario_list.setCurrentRow(row)
+    for expected_id in (
+        "aleppo-8-line",
+        "cmrl-capacity",
+        "dlu-maintenance",
+        "billing-block",
+        "international-blacklist",
+        "overnight-command-file",
+    ):
+        tmp, db, widget = _widget()
+        try:
+            index = next(
+                row
+                for row in range(widget.scenario_list.count())
+                if widget.scenario_list.item(row).data(256) == expected_id
+            )
+            widget.scenario_list.setCurrentRow(index)
             widget.continue_phase()
             widget.continue_phase()
             widget.continue_phase()
             assert widget._result is not None
+            assert widget._result.scenario_id == expected_id
             assert widget._result.passed
-    finally:
-        widget.close()
-        db.close()
-        tmp.cleanup()
+        finally:
+            widget.close()
+            db.close()
+            tmp.cleanup()
