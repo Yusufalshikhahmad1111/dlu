@@ -420,9 +420,9 @@ class Stage14TeachingScenariosWidget(QWidget):
         self.on_reset_demo()
         self._result = None
         self._phase_index = 0
+        self._select_item(self.scenario_list.currentItem())
         self.status_chip.setText("RESET")
         self._style_status("RESET")
-        self._select_item(self.scenario_list.currentItem())
 
     def set_theme(self, name: str):
         self._theme = normalize_mode(name)
