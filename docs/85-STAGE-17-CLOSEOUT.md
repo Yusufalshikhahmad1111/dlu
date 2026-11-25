@@ -1,6 +1,6 @@
 # Stage 17 — Accessibility & Usability Audit Closeout
 
-**Status:** PENDING FINAL QA
+**Status:** COMPLETE
 
 ## Delivered
 
@@ -18,17 +18,16 @@
 
 No MML, CallEngine, TeachingScenarioRunner, database schema, or telecom semantics were changed.
 
-## Final gate
+## Final gate — achieved
 
-This closeout is complete only after:
-
-- Stage 17 focused tests pass;
-- Stage 16 focused compatibility tests pass;
-- full pytest regression passes;
-- compile/static audit passes;
-- Windows target-resolution QA passes;
-- screenshots are uploaded;
-- PR is merged to main.
+- Stage 17 focused tests: **5/5 PASS**.
+- Stage 16 compatibility tests: **7/7 PASS**.
+- Full regression: **134 PASS**.
+- Compile check: **PASS**.
+- UI static audit: **PASS**.
+- Windows accessibility/resolution QA: **PASS**.
+- Screenshot artifact uploaded successfully.
+- PR #18 contains the completed Stage 17 implementation and is ready to merge.
 
 ## Next
 
