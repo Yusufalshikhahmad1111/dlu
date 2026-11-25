@@ -13,6 +13,7 @@ from dlu_app.stage9_ui import apply_stage9_ui
 from dlu_app.stage10_ui import apply_stage10_ui
 from dlu_app.stage11_ui import apply_stage11_ui
 from dlu_app.stage12_ui import apply_stage12_ui
+from dlu_app.stage13_ui import apply_stage13_ui
 from dlu_app.ui import DluSimulatorWindow
 
 
@@ -46,6 +47,7 @@ def main() -> int:
     apply_stage10_ui(window)
     apply_stage11_ui(window)
     apply_stage12_ui(window)
+    apply_stage13_ui(window)
 
     # Keep the default desktop presentation within the user's available
     # work area while preserving the larger Stage 8 reference size when space
