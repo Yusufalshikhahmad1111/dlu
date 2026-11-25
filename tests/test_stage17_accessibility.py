@@ -79,7 +79,7 @@ def test_stage17_focus_and_tab_order():
         stage16 = window.instructor_mode
         stage16.scenario_combo.setFocus()
         app.processEvents()
-        window.focusNextChild()
+        stage16.focusNextChild()
         assert app.focusWidget() is stage16.run_button
     finally:
         window.close()
