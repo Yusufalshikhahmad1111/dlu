@@ -187,3 +187,12 @@ Stage 15:
 - Learn → Practice → Experiment → Challenge → Verify academic path;
 - existing-module routing and session-only evidence;
 - final CI/Windows verification pending.
+
+
+Stage 15:
+- academic Learn → Practice → Experiment → Challenge → Verify path;
+- session-only progression over the six existing learning areas;
+- Challenge requires a real PASS from an existing Teaching Scenario;
+- Verify requires complete area evidence plus a scenario PASS;
+- focused tests, full regression, Windows QA and DLU CI passed;
+- merged to main after final closeout.
