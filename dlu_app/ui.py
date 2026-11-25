@@ -738,6 +738,7 @@ class DluSimulatorWindow(QMainWindow):
         examples_layout.setContentsMargins(8, 6, 8, 6)
         examples_layout.setSpacing(6)
         examples_layout.addWidget(QLabel("QUICK RUN"))
+        self.quick_run_buttons = {}
         for label, command in (
             ("HELP", "> help;"),
             ("DLU STATUS", "> stat dlu: dlu=50;"),
@@ -751,7 +752,6 @@ class DluSimulatorWindow(QMainWindow):
             )
             examples_layout.addWidget(button)
             self.quick_run_buttons[label] = button
-        self.quick_run_buttons = {}
         clear_button = QPushButton("CLEAR")
         clear_button.setObjectName("ClearTerminalButton")
         clear_button.clicked.connect(lambda: self.terminal.clear())
