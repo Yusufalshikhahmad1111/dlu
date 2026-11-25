@@ -1,6 +1,6 @@
 # Stage 18 — Performance & Architecture Cleanup
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
 ## Goal
 
@@ -37,5 +37,5 @@ The application bootstrap pipeline is extracted into `app_shell.py`. `main.py` r
 - domain modules remain independent;
 - hardware rendering can be tested through its feature boundary;
 - startup composition is centralized;
-- full regression remains green;
-- Windows target-resolution screenshots remain valid.
+- full regression remains green (**139/139 passed**);
+- Windows target-resolution screenshots remain valid (**QA PASS; 7 screenshots uploaded**).
