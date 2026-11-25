@@ -310,10 +310,16 @@ docs/65-STAGE-12-CLOSEOUT.md
 
 ## Stage 13 — Communications Lab 2.0
 
-**الحالة: مخططة**
+**الحالة: قيد التنفيذ — teaching studio + visualization implemented; final Windows/CI gate pending**
 
 - Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge.
 - improved waveform/constellation readability.
+- Live Update, measurement cards, deterministic mini challenges, Morning/Night sync.
+
+Plan: docs/66-STAGE-13-PLAN.md
+Implementation: docs/67-STAGE-13-IMPLEMENTATION-REPORT.md
+Windows QA: docs/68-STAGE-13-WINDOWS-QA.md
+Closeout: docs/69-STAGE-13-CLOSEOUT.md
 
 ## Stage 14 — Teaching Scenarios 2.0
 
