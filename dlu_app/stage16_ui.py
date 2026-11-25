@@ -344,7 +344,7 @@ class Stage16InstructorWidget(QWidget):
                     step.kind,
                     step.expected if self.answers_revealed else "HIDDEN",
                     step.actual if self.answers_revealed else "HIDDEN",
-                    "PASS" if step.ok else "FAIL",
+                    ("PASS" if step.ok else "FAIL") if self.answers_revealed else "HIDDEN",
                 )
                 for col, value in enumerate(values):
                     self.steps_table.setItem(row, col, QTableWidgetItem(str(value)))
@@ -373,7 +373,7 @@ class Stage16InstructorWidget(QWidget):
                 )
             else:
                 projector_text = (
-                    f"{result_line} · Answers hidden\n"
+                    "RESULT HIDDEN · Answers remain concealed\n"
                     "Instructor controls answer visibility."
                 )
         self.projector_result.setText(projector_text)
