@@ -1374,6 +1374,10 @@ class DluSimulatorWindow(HardwareWorkspaceMixin, QMainWindow):
         self.call_engine.repo.reset_demo()
         if hasattr(self, "call_lab"):
             self.call_lab.reset()
+        if hasattr(self, "teaching_scenarios") and hasattr(self.teaching_scenarios, "reset_view_state"):
+            self.teaching_scenarios.reset_view_state()
+        if hasattr(self, "instructor_mode") and hasattr(self.instructor_mode, "reset_view_state"):
+            self.instructor_mode.reset_view_state()
         if hasattr(self, "learning_home") and hasattr(self.learning_home, "reset_session_verification"):
             self.learning_home.reset_session_verification()
         self.student_navigation.recent_activity.insert(0, "Reset teaching demo · source-backed state restored")
