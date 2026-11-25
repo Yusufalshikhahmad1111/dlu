@@ -315,7 +315,7 @@ class SignalCanvas(QWidget):
         self._title(painter, "BER vs Eb/N0")
         top = max(
             1e-5,
-            max(max(point.theoretical, 1e-5), max(point.empirical or 0.0, 1e-5) for point in points),
+            max(max(point.theoretical, point.empirical or 0.0, 1e-5) for point in points),
         )
         bottom = 1e-5
         self._grid(painter, rect)
