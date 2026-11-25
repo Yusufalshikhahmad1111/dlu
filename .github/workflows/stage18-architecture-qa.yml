@@ -1,0 +1,57 @@
+name: DLU Stage 18 Architecture Cleanup QA
+
+on:
+  push:
+    branches:
+      - main
+      - stage-18-architecture-cleanup
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: stage18-architecture-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage18-architecture:
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Compile check
+        shell: pwsh
+        run: python -m compileall dlu_app main.py
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+      - name: Stage 18 architecture tests
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage18_architecture.py
+      - name: Stage 16 compatibility tests
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage16_instructor_classroom.py
+      - name: Stage 17 compatibility tests
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage17_accessibility.py
+      - name: Full regression
+        shell: pwsh
+        run: python -m pytest -q tests
+      - name: Windows architecture and resolution QA
+        shell: pwsh
+        run: python tools/stage18_architecture_qa.py
+      - name: Upload Stage 18 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Stage18-Architecture-QA
+          path: artifacts/stage18/*.png
+          if-no-files-found: error
