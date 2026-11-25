@@ -44,6 +44,8 @@ def main() -> int:
         app.processEvents()
         window.grab().save(str(OUT / "08-call-local-result.png"))
         _capture(window, app, "COMMUNICATIONS", "09-communications-context.png")
+        window.reset_demo()
+        app.processEvents()
         _capture(window, app, "SCENARIOS", "10-scenarios-context.png")
         window.teaching_scenarios.run_selected()
         app.processEvents()
