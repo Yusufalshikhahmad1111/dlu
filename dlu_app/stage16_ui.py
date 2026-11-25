@@ -496,6 +496,13 @@ class Stage16Controller:
         self.window.instructor_mode = view
         self.window.stage16_controller = self
         self.window.setProperty("dlu_stage16_enabled", True)
+        theme_button = getattr(self.window, "theme_btn", None)
+        if theme_button is not None:
+            theme_button.clicked.connect(self._sync_theme_from_window)
+
+    def _sync_theme_from_window(self):
+        from . import ui as ui_module
+        self.set_mode(getattr(ui_module, "THEME_NAME", self.mode))
 
     def set_mode(self, mode: str):
         self.mode = normalize_mode(mode)
