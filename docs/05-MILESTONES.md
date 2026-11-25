@@ -422,16 +422,19 @@ docs/85-STAGE-17-CLOSEOUT.md
 
 ## Stage 18 — Performance & Architecture Cleanup
 
-**الحالة: مخططة**
+**الحالة: مكتملة — 5/5 focused — 139/139 full regression — Windows architecture/resolution QA passed**
 
-Target boundaries:
-- app_shell.
-- navigation.
-- design_tokens.
-- feature views.
-- shared components.
+المخرجات:
+- centralized application-shell composition in `dlu_app/app_shell.py`;
+- extracted Hardware feature surface into `dlu_app/hardware_view.py`;
+- preserved `ClickableRectItem` and existing hardware public APIs for compatibility;
+- reduced `dlu_app/ui.py` from ~2,836 lines / 105KB to ~1,484 lines / 56KB;
+- no MML/CallEngine/TeachingScenario/database/runtime dependency changes;
+- architecture tests + target-resolution QA + screenshot artifact;
+- Stage 18 final evidence documented in `docs/88-STAGE-18-WINDOWS-QA.md` and `docs/89-STAGE-18-CLOSEOUT.md`.
 
-The domain core remains independent.
+Verified code head:
+`4db6d50ba4e0cdb0a08ecd928c9a3e89dc218ad1`.
 
 ## Stage 19 — Final Academic UX Audit
 
