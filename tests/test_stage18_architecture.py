@@ -26,6 +26,7 @@ def test_stage18_app_shell_owns_feature_installation_order():
         "apply_stage15_ui",
         "apply_stage16_ui",
         "apply_stage17_accessibility",
+        "apply_stage19_academic_ux",
     ]
 
 def test_stage18_hardware_feature_has_explicit_boundary():
