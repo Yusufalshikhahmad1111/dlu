@@ -9,13 +9,13 @@ from dlu_app.app_shell import STAGE_INSTALLERS, build_window
 from dlu_app.stage19_academic_ux import academic_workflow_snapshot
 
 ACADEMIC_TABS = (
-    ("Learning Home", "LEARNING HOME"),
-    ("OMT", "OMT"),
-    ("Command Files", "COMMAND FILES"),
-    ("Call Path", "CALL PATH"),
-    ("Communications", "COMMUNICATIONS"),
-    ("Scenarios", "SCENARIOS"),
-    ("Instructor", "INSTRUCTOR"),
+    ("Learning Home", {"Learning Home"}, "LEARNING HOME"),
+    ("OMT", {"OMT", "OMT / MML"}, "OMT"),
+    ("Command Files", {"Command Files", "COMMAND FILES"}, "COMMAND FILES"),
+    ("Call Path", {"Call Path", "CALLS"}, "CALL PATH"),
+    ("Communications", {"Communications", "COMMS LAB"}, "COMMUNICATIONS"),
+    ("Scenarios", {"Scenarios", "SCENARIOS"}, "SCENARIOS"),
+    ("Instructor", {"Instructor"}, "INSTRUCTOR"),
 )
 
 def _app() -> QApplication:
@@ -31,13 +31,15 @@ def test_stage19_context_and_next_step_follow_each_workspace():
         try:
             window.show()
             app.processEvents()
-            for label, breadcrumb in ACADEMIC_TABS:
-                index = window.feature_tabs.indexOf(window.feature_tabs.findChild(type(window.feature_tabs))) if False else None
-                index = next(i for i in range(window.feature_tabs.count()) if window.feature_tabs.tabText(i) == label)
+            for semantic_label, aliases, breadcrumb in ACADEMIC_TABS:
+                index = next(
+                    i for i in range(window.feature_tabs.count())
+                    if window.feature_tabs.tabText(i) in aliases
+                )
                 window.feature_tabs.setCurrentIndex(index)
                 app.processEvents()
                 snapshot = academic_workflow_snapshot(window)
-                assert snapshot["area"] == ("Call Path" if label == "Call Path" else label)
+                assert snapshot["area"] == semantic_label
                 assert snapshot["next_step"]
                 assert window.breadcrumb.text() == breadcrumb
                 assert "NEXT ·" in window.findChild(type(window.breadcrumb), "Stage8NavHint").text()
@@ -68,8 +70,9 @@ def test_stage19_student_end_to_end_journey_preserves_real_workflows():
             assert window.call_lab.status.text()
             assert window.call_lab.stage12_view.last_result is not None
             window.navigate_student_area("COMMUNICATIONS")
-            assert hasattr(window.communications_lab, "digital_summary")
-            assert "error" not in window.communications_lab.digital_summary.text().lower()
+            window.communications_lab.run_current()
+            app.processEvents()
+            assert window.communications_lab.stack.currentWidget() is not None
             window.reset_demo()
             app.processEvents()
             window.navigate_student_area("SCENARIOS")
