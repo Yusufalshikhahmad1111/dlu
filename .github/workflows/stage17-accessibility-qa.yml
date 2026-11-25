@@ -10,7 +10,7 @@ on:
       - main
 
 concurrency:
-  group: stage17-accessibility-\${{ github.ref }}
+  group: stage17-accessibility-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
