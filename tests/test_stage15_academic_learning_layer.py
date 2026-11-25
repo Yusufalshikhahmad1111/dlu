@@ -60,7 +60,7 @@ def test_stage15_verify_requires_all_six_existing_areas():
     widget = Stage15AcademicLearningWidget(window, on_navigate=window.navigate_student_area)
     widget._verify_path()
     assert not widget._verified
-    assert "Missing session evidence" in widget.evidence_label.text()
+    assert "Missing evidence" in widget.evidence_label.text()
 
     for area in ("HARDWARE", "OMT / MML", "CALLS", "COMMANDS", "COMMS LAB", "SCENARIOS"):
         window.student_navigation.visit(area, area)
