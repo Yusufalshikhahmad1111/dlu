@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 16 مكتملة — Stage 17→20 مخططة**
+**الحالة: Stage 17 مكتملة — Stage 18→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -403,15 +403,22 @@ Next planned stage: **Stage 17 — Accessibility & Usability Audit**.
 
 ## Stage 17 — Accessibility & Usability Audit
 
-**الحالة: مخططة**
+**الحالة: مكتملة — 5/5 focused tests — 134/134 full regression — Windows accessibility/resolution QA passed**
 
-- contrast.
-- focus.
-- keyboard navigation.
-- state communication.
-- typography.
-- empty/error/loading states.
-- target resolution audit.
+المخرجات:
+- WCAG 2.2-oriented desktop accessibility audit.
+- visible keyboard focus and deterministic tab order.
+- accessible names/descriptions for primary controls.
+- technical tooltips and improved discoverability.
+- explicit Hardware empty state.
+- Morning/Night focus styling and contrast regression checks.
+- target-resolution hardening at 1280×720, 1366×768, 1600×900 and 1920×1080.
+- Instructor PASS/FAIL answer visibility hardened until REVEAL ANSWERS.
+- dedicated Windows QA workflow and screenshot artifact.
+- no telecom/MML/CallEngine semantics changed.
+
+Closeout:
+docs/85-STAGE-17-CLOSEOUT.md
 
 ## Stage 18 — Performance & Architecture Cleanup
 
