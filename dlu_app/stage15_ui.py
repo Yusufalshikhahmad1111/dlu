@@ -103,11 +103,11 @@ class PhaseCard(QFrame):
         footer.addWidget(self.action)
         root.addLayout(footer)
 
-    def set_state(self, status: str, evidence: str, available: bool, tokens) -> None:
+    def set_state(self, status: str, evidence: str, available: bool, tokens, action_label: str | None = None) -> None:
         self.status.setText(status)
         self.evidence.setText(evidence)
         self.action.setEnabled(available or self.phase.key == "VERIFY")
-        self.action.setText("SHOW GAPS" if self.phase.key == "VERIFY" and not available else self.phase.action_label)
+        self.action.setText(action_label or ("SHOW GAPS" if self.phase.key == "VERIFY" and not available else self.phase.action_label))
 
         if status == "COMPLETE":
             accent, bg = tokens.success, tokens.surface
@@ -296,36 +296,55 @@ class Stage15AcademicLearningWidget(QWidget):
         state = getattr(self.window, "student_navigation", None)
         return set(getattr(state, "visited_areas", set()))
 
+    def _scenario_passed(self) -> bool:
+        scenario_view = getattr(self.window, "teaching_scenarios", None)
+        result = getattr(scenario_view, "_result", None)
+        return bool(getattr(result, "passed", False))
+
     def _phase_complete(self, phase: LearningPhase, visited: set[str]) -> bool:
-        return self._verified if phase.key == "VERIFY" else all(area in visited for area in phase.areas)
+        if phase.key == "VERIFY":
+            return self._verified
+        if phase.key == "CHALLENGE":
+            return "SCENARIOS" in visited and self._scenario_passed()
+        return all(area in visited for area in phase.areas)
 
     def _phase_ready(self, index: int, visited: set[str]) -> bool:
         return index == 0 or self._phase_complete(PHASES[index - 1], visited)
 
+    def _next_area_for_phase(self, phase: LearningPhase, visited: set[str]) -> str | None:
+        for area in phase.areas:
+            if area not in visited:
+                return area
+        return phase.action_area
+
     def _phase_action(self, phase_key: str):
+        visited = self._visited()
         if phase_key == "VERIFY":
             self._verify_path()
             return
         phase = next(item for item in PHASES if item.key == phase_key)
-        if self.on_navigate is not None:
-            self.on_navigate(phase.action_area)
+        target = self._next_area_for_phase(phase, visited)
+        if self.on_navigate is not None and target is not None:
+            self.on_navigate(target)
 
     def _verify_path(self):
         visited = self._visited()
         required = ("HARDWARE", "OMT / MML", "CALLS", "COMMANDS", "COMMS LAB", "SCENARIOS")
         missing = [area for area in required if area not in visited]
+        if not self._scenario_passed():
+            missing.append("PASS one teaching scenario")
         if missing:
             self._verified = False
             self.evidence_label.setText(
-                "Verification is not ready yet. Missing session evidence: "
+                "Verification is not ready yet. Missing evidence: "
                 + ", ".join(missing)
-                + ". Open those learning areas, then return here."
+                + ". Complete the missing work, then verify again."
             )
         else:
             self._verified = True
             self.evidence_label.setText(
                 "✓ Learning path verified for this session. "
-                "All six existing learning areas have been visited without adding a second simulator engine."
+                "All six learning areas were evidenced and a teaching scenario reached PASS."
             )
         self.refresh_path()
 
@@ -348,11 +367,21 @@ class Stage15AcademicLearningWidget(QWidget):
                 status, evidence = "LOCKED", "Complete the previous phase first."
             card = self.phase_cards[phase.key]
             card.areas.setText("Areas · " + " + ".join(phase.areas))
-            card.set_state(status, evidence, ready, tokens)
+            action_label = None
+            if phase.key != "VERIFY":
+                target = self._next_area_for_phase(phase, visited)
+                action_label = "OPEN " + (target or phase.action_area)
+            elif complete:
+                action_label = "VERIFIED"
+            card.set_state(status, evidence, ready, tokens, action_label)
 
-        count = len(visited)
-        percent = round((count / 6) * 100)
-        self.progress_label.setText(f"{count} / 6 learning areas evidenced · {percent}%")
+        completed_phases = sum(
+            1 for phase in PHASES if self._phase_complete(phase, visited)
+        )
+        percent = round((completed_phases / len(PHASES)) * 100)
+        self.progress_label.setText(
+            f"{completed_phases} / {len(PHASES)} phases complete · {len(visited)} / 6 areas evidenced · {percent}%"
+        )
         self.progress_bar.setValue(percent)
         self.context_label.setText(
             "Verified learning path for the current session."
