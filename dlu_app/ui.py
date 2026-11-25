@@ -52,6 +52,7 @@ from .theme import THEMES
 from .ui_utils import make_font
 from .hardware_view import (
     CardLibraryDialog,
+    ClickableRectItem,
     HardwareSelectorDialog,
     HardwareView,
     HardwareWorkspaceMixin,
