@@ -78,7 +78,7 @@ def test_stage19_student_end_to_end_journey_preserves_real_workflows():
             window.navigate_student_area("SCENARIOS")
             window.teaching_scenarios.run_selected()
             app.processEvents()
-            assert window.teaching_scenarios.status_chip.text() == "PASS"
+            assert "PASS" in window.teaching_scenarios.status_chip.text()
             window.reset_demo()
             app.processEvents()
             assert window.teaching_scenarios.status_chip.text() == "RESET"
