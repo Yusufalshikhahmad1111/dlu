@@ -56,3 +56,15 @@ Added:
 - \`.github/workflows/stage15-learning-qa.yml\`
 
 Final verification is pending the Stage 15 CI/Windows gate.
+
+## Final verification
+
+- Stage 15 focused tests: **7 passed**.
+- Compile check: **passed**.
+- UI static audit: **passed**.
+- Full pytest regression: **passed**.
+- Windows functional visual QA: **passed**.
+- Screenshot artifact: **3 PNGs uploaded successfully**.
+- Main DLU CI on the Stage 15 head: **passed**.
+
+Final code commit tested before documentation closeout: `009a651d527495c8ba3c3d2ff3281ff291a5f265`.
