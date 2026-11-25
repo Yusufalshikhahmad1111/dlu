@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 12 مكتملة — Stage 13→20 مخططة**
+**الحالة: Stage 13 مكتملة — Stage 14→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -310,11 +310,15 @@ docs/65-STAGE-12-CLOSEOUT.md
 
 ## Stage 13 — Communications Lab 2.0
 
-**الحالة: قيد التنفيذ — teaching studio + visualization implemented; final Windows/CI gate pending**
+**الحالة: COMPLETE — merged to main after CI / Windows QA**
 
 - Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge.
 - improved waveform/constellation readability.
 - Live Update, measurement cards, deterministic mini challenges, Morning/Night sync.
+- Stage 13 focused tests 6/6 passed; full regression and Windows visual QA passed.
+- Final merge: `7a75926824f7abe6a15d35f9ec374ccff658fb87`.
+
+Next planned stage: **Stage 14 — Teaching Scenarios 2.0**.
 
 Plan: docs/66-STAGE-13-PLAN.md
 Implementation: docs/67-STAGE-13-IMPLEMENTATION-REPORT.md
