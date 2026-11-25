@@ -1,0 +1,59 @@
+name: DLU Stage 13 Communications Lab 2.0 QA
+
+on:
+  push:
+    branches:
+      - main
+      - stage-13-communications-lab-2
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: stage13-comms-qa-\${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage13-comms-qa:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Compile check
+        shell: pwsh
+        run: python -m compileall dlu_app main.py
+
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+
+      - name: Stage 13 tests
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage13_communications_lab_2.py
+
+      - name: Full tests
+        shell: pwsh
+        run: python -m pytest -q tests
+
+      - name: Functional visual QA
+        shell: pwsh
+        run: python tools/stage13_comms_qa.py
+
+      - name: Upload Stage 13 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Stage13-Communications-Lab-2-QA
+          path: artifacts/stage13/*.png
+          if-no-files-found: error
