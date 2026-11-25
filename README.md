@@ -162,7 +162,7 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 16 — Instructor / Classroom Mode complete**.
+الحالة الحالية: **Stage 17 — Accessibility & Usability Audit complete**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
@@ -206,4 +206,18 @@ Stage 16:
 - Windows functional/visual QA passed with five screenshots;
 - merged to main via PR #17.
 
-Next planned stage: **Stage 17 — Accessibility & Usability Audit**.
+Next planned stage: **Stage 18 — Performance & Architecture Cleanup**.
+
+Stage 17:
+- WCAG 2.2-oriented desktop accessibility hardening;
+- visible keyboard focus and deterministic tab order;
+- accessible names/descriptions and technical tooltips;
+- explicit Hardware empty state;
+- target-resolution QA at 1280×720, 1366×768, 1600×900 and 1920×1080;
+- Morning/Night contrast and focus regression checks;
+- Instructor PASS/FAIL answer visibility remains hidden until REVEAL ANSWERS;
+- Stage 17 focused tests 5/5 passed;
+- Stage 16 compatibility tests 7/7 passed;
+- full regression 134/134 passed;
+- Windows accessibility/resolution QA passed;
+- merged to main via PR #18 at 6d29fa93c7d9f80a3160590554481c78aedaa9e0.
