@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 14 مكتملة — Stage 15 قيد التنفيذ — Stage 16→20 مخططة**
+**الحالة: Stage 15 مكتملة — Stage 16→20 مخططة**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -362,7 +362,7 @@ Next planned stage: **Stage 15 — Academic Learning Layer**.
 - Challenge completion requires a real PASS from the existing Teaching Scenario runner.
 - Phase actions open the first missing area.
 - Stage 15 focused tests 7 passed; full regression and Windows visual QA passed.
-- Final merge: `PENDING`.
+- Final merge: `9b01ec4725f89c7c5a7409126dee48bc73774c6c`.
 
 Plan:
 docs/74-STAGE-15-PLAN.md
