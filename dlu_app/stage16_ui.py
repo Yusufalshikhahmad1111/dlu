@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -241,7 +241,7 @@ class Stage16InstructorWidget(QWidget):
             self._render()
             return
         self._guided_index = -1
-        self.status.setText("PASS" if self._result.passed else "FAIL")
+        self.status.setText("RESULT READY")
         self.guide_button.setEnabled(True)
         self.next_button.setEnabled(False)
         self._render()
@@ -310,6 +310,13 @@ class Stage16InstructorWidget(QWidget):
         self.summary_label.setText(selected.summary)
 
         result = self._result
+        if result is None:
+            self.status.setText("LOADED")
+        elif self.answers_revealed:
+            self.status.setText("PASS" if result.passed else "FAIL")
+        else:
+            self.status.setText("RESULT READY")
+
         if not self.answers_revealed:
             self.expected_label.setText("HIDDEN · Instructor answer visibility is OFF.")
             self.actual_label.setText(
@@ -496,13 +503,18 @@ class Stage16Controller:
         self.window.instructor_mode = view
         self.window.stage16_controller = self
         self.window.setProperty("dlu_stage16_enabled", True)
-        theme_button = getattr(self.window, "theme_btn", None)
+        theme_button = self.window.findChild(QPushButton, "ThemeToggle")
         if theme_button is not None:
-            theme_button.clicked.connect(self._sync_theme_from_window)
+            theme_button.clicked.connect(
+                lambda: QTimer.singleShot(0, self._sync_theme_from_window)
+            )
 
     def _sync_theme_from_window(self):
-        from . import ui as ui_module
-        self.set_mode(getattr(ui_module, "THEME_NAME", self.mode))
+        self.set_mode(
+            normalize_mode(
+                self.window.property("dlu_theme_mode") or self.mode
+            )
+        )
 
     def set_mode(self, mode: str):
         self.mode = normalize_mode(mode)
