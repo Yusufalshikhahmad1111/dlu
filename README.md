@@ -145,13 +145,13 @@ Stage 0–6: **completed**
 Stage 5 — Communications Labs:
 - automated release verified;
 - 63/63 tests passed at closeout;
-- PR #1 merged into `main`.
+- PR #1 merged into \`main\`.
 
 Stage 6 — Teaching Scenarios:
 - six formal PASS/FAIL scenarios;
 - automated Windows release gate passed;
 - 71/71 tests passed at closeout;
-- PR #2 merged into `main`.
+- PR #2 merged into \`main\`.
 
 Stage 7 — Packaging & Final Audit:
 - release version 1.0.0;
@@ -162,7 +162,7 @@ Stage 7 — Packaging & Final Audit:
 - user manual and final academic test report;
 - **76/76 tests passed on Windows CI**.
 
-الحالة الحالية: **Stage 15 — Academic Learning Layer in progress**.
+الحالة الحالية: **Stage 15 — Academic Learning Layer complete**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
@@ -171,28 +171,24 @@ Stage 13:
 - Stage 13 focused tests 6/6 passed;
 - full regression and Windows functional/visual QA passed;
 - five screenshot artifacts uploaded;
-- merged to main at `7a75926824f7abe6a15d35f9ec374ccff658fb87`.
+- merged to main at \`7a75926824f7abe6a15d35f9ec374ccff658fb87\`.
 
 Stage 14:
 - guided Objective → Observe → Execute → Diagnose → Fix → Verify → Result workflow across all six teaching scenarios;
 - scenario-specific hints, diagnosis, recovery guidance and verification;
 - clear PASS/FAIL meaning;
 - focused tests, full regression and Windows functional/visual QA passed;
-- merged to main at `32d8a9a8397a23398181c7db7eb16203fef0ab8c`.
-
-Next planned stage: **Stage 16 — Instructor / Classroom Mode**.
-
-
-Stage 15:
-- Learn → Practice → Experiment → Challenge → Verify academic path;
-- existing-module routing and session-only evidence;
-- final CI/Windows verification pending.
-
+- merged to main at \`32d8a9a8397a23398181c7db7eb16203fef0ab8c\`.
 
 Stage 15:
 - academic Learn → Practice → Experiment → Challenge → Verify path;
 - session-only progression over the six existing learning areas;
 - Challenge requires a real PASS from an existing Teaching Scenario;
 - Verify requires complete area evidence plus a scenario PASS;
-- focused tests, full regression, Windows QA and DLU CI passed;
-- merged to main after final closeout.
+- phase actions open the first missing learning area;
+- focused tests 7 passed;
+- full regression, Windows functional/visual QA, and DLU CI passed;
+- three QA screenshots uploaded;
+- merged to main at \`9b01ec4725f89c7c5a7409126dee48bc73774c6c\`.
+
+Next planned stage: **Stage 16 — Instructor / Classroom Mode**.
