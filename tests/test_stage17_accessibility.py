@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton
+from PySide6.QtTest import QTest
 
 from dlu_app.app_style import apply_application_style
 from dlu_app.stage8_ui import apply_stage8_ui
@@ -79,7 +80,8 @@ def test_stage17_focus_and_tab_order():
         stage16 = window.instructor_mode
         stage16.scenario_combo.setFocus()
         app.processEvents()
-        stage16.focusNextChild()
+        QTest.keyClick(stage16.scenario_combo, Qt.Key_Tab)
+        app.processEvents()
         assert app.focusWidget() is stage16.run_button
     finally:
         window.close()
