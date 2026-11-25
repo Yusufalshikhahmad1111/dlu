@@ -98,6 +98,351 @@ def apply_hardware_theme(name: str):
     apply_theme_palette(name)
 
 
+class ClickableRectItem(QGraphicsRectItem):
+    def __init__(
+        self,
+        rect: QRectF,
+        on_click,
+        data=None,
+        tooltip="",
+        on_double_click=None,
+        on_context=None,
+    ):
+        super().__init__(rect)
+        self.on_click = on_click
+        self.data = data
+        self.on_double_click = on_double_click
+        self.on_context = on_context
+        self.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
+        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        if tooltip:
+            self.setToolTip(tooltip)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton and self.on_context:
+            callback = self.on_context
+            data = self.data
+            callback(data)
+            event.accept()
+            return
+        if event.button() == Qt.LeftButton and self.on_click:
+            callback = self.on_click
+            data = self.data
+            callback(data)
+            # The callback may rebuild the scene and delete this QGraphicsItem.
+            # Never call into the C++ base object after that point.
+            event.accept()
+            return
+        super().mousePressEvent(event)
+
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.LeftButton and self.on_double_click:
+            callback = self.on_double_click
+            data = self.data
+            callback(data)
+            event.accept()
+            return
+        super().mouseDoubleClickEvent(event)
+
+
+class HardwareView(QGraphicsView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.scene_obj = QGraphicsScene(self)
+        self.setScene(self.scene_obj)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setDragMode(QGraphicsView.ScrollHandDrag)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
+        self.setBackgroundBrush(QColor(BG))
+        self.current_dlu = 50
+        self.current_shelf = 0
+        self.current_module = 15
+        self.controller = None
+        self.setAcceptDrops(True)
+
+    def wheelEvent(self, event):
+        factor = 1.18 if event.angleDelta().y() > 0 else 0.85
+        self.scale(factor, factor)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasFormat("application/x-dlu-card"):
+            event.acceptProposedAction()
+            return
+        event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasFormat("application/x-dlu-card"):
+            event.acceptProposedAction()
+            return
+        event.ignore()
+
+    def dropEvent(self, event):
+        if not event.mimeData().hasFormat("application/x-dlu-card"):
+            event.ignore()
+            return
+        card = bytes(event.mimeData().data("application/x-dlu-card")).decode("utf-8")
+        scene_pos = self.mapToScene(event.position().toPoint())
+        item = self.scene_obj.itemAt(scene_pos, self.transform())
+        target = item
+        while target is not None and not isinstance(target, ClickableRectItem):
+            target = target.parentItem()
+        if (
+            isinstance(target, ClickableRectItem)
+            and isinstance(target.data, tuple)
+            and len(target.data) == 3
+            and self.controller is not None
+        ):
+            dlu, shelf, module = target.data
+            self.controller.install_card_at(
+                int(dlu), int(shelf), int(module), card
+            )
+            event.acceptProposedAction()
+            return
+        event.ignore()
+
+    def reset_zoom(self):
+        self.resetTransform()
+        rect = self.scene().itemsBoundingRect().adjusted(-30, -30, 30, 30)
+        if rect.width() > 0 and rect.height() > 0:
+            self.fitInView(rect, Qt.KeepAspectRatio)
+
+class HardwareSelectorDialog(QDialog):
+    def __init__(self, db: Database, parent=None, card_type: str | None = None):
+        super().__init__(parent)
+        self.db = db
+        self.card_type = card_type
+        self.selected: tuple[int, int, int] | None = None
+        self.setWindowTitle("Select hardware" + (f" · {card_type}" if card_type else ""))
+        self.resize(560, 320)
+
+        root = QVBoxLayout(self)
+        heading = QLabel(
+            "Choose the physical location" if not card_type
+            else f"Choose a {card_type} module"
+        )
+        heading.setObjectName("SectionTitle")
+        root.addWidget(heading)
+
+        form = QFormLayout()
+        self.dlu_combo = QComboBox()
+        self.shelf_combo = QComboBox()
+        self.module_combo = QComboBox()
+        for row in self.db.list_dlus():
+            self.dlu_combo.addItem(str(row["dlu_id"]))
+        self.shelf_combo.addItems([str(i) for i in range(8)])
+        form.addRow("DLU", self.dlu_combo)
+        form.addRow("Shelf", self.shelf_combo)
+        form.addRow("Module", self.module_combo)
+        root.addLayout(form)
+
+        self.status = QLabel()
+        self.status.setWordWrap(True)
+        self.status.setObjectName("Legend")
+        root.addWidget(self.status)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
+        self.ok_button = buttons.button(QDialogButtonBox.Ok)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        root.addWidget(buttons)
+
+        self.dlu_combo.currentTextChanged.connect(self.refresh_modules)
+        self.shelf_combo.currentTextChanged.connect(self.refresh_modules)
+        self.module_combo.currentIndexChanged.connect(self.refresh_status)
+        self.refresh_modules()
+
+    def refresh_modules(self):
+        if not self.dlu_combo.currentText() or not self.shelf_combo.currentText():
+            return
+        dlu = int(self.dlu_combo.currentText())
+        shelf = int(self.shelf_combo.currentText())
+        self.module_combo.blockSignals(True)
+        self.module_combo.clear()
+        rows = {r["module"]: r for r in self.db.list_shelf(dlu, shelf)}
+        for module in range(16):
+            row = rows[module]
+            self.module_combo.addItem(
+                f"{module} · {row['card_type']} · {row['port_count']}P",
+                module,
+            )
+        self.module_combo.blockSignals(False)
+        self.refresh_status()
+
+    def refresh_status(self):
+        module = self.module_combo.currentData()
+        if module is None:
+            self.ok_button.setEnabled(False)
+            self.status.setText("No module selected.")
+            return
+        slot = self.db.get_slot(
+            int(self.dlu_combo.currentText()),
+            int(self.shelf_combo.currentText()),
+            int(module),
+        )
+        if slot is None:
+            self.ok_button.setEnabled(False)
+            self.status.setText("Module not found.")
+            return
+        if self.card_type and slot.card_type != self.card_type:
+            self.ok_button.setEnabled(False)
+            self.status.setText(
+                f"Not compatible: {slot.card_type}. Required {self.card_type}. "
+                "Empty positions stay visible instead of being hidden."
+            )
+        else:
+            self.ok_button.setEnabled(True)
+            self.status.setText(
+                f"Compatible · {slot.card_type} · {slot.port_count} ports · "
+                f"EQN base {slot.dlu_id}-{slot.shelf}-{slot.module}"
+            )
+
+    def accept(self):
+        if not self.ok_button.isEnabled():
+            return
+        self.selected = (
+            int(self.dlu_combo.currentText()),
+            int(self.shelf_combo.currentText()),
+            int(self.module_combo.currentData()),
+        )
+        super().accept()
+
+
+class ReferenceDialog(QDialog):
+    def __init__(self, ref: CardReference, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(f"Hardware Reference · {ref.code}")
+        self.resize(640, 450)
+        layout = QVBoxLayout(self)
+
+        title = QLabel(ref.display_name)
+        title.setObjectName("Title")
+        layout.addWidget(title)
+
+        table = QTableWidget(0, 2)
+        table.setHorizontalHeaderLabels(["Field", "Value"])
+        table.horizontalHeader().setStretchLastSection(True)
+        data = {
+            "Type": ref.code,
+            "Family": ref.family,
+            "Role": ref.role,
+            "Capacity": ref.port_count,
+            "Port range": (
+                f"{ref.port_start}..{ref.port_end}"
+                if ref.port_count
+                else "Not specified"
+            ),
+            "Subscriber type": ref.subscriber_type or "—",
+            "Verified": "YES" if ref.verified else "NO",
+            "Source ID": ref.source_id or "—",
+            "Source": ref.source_title or "—",
+            "Course page": ref.source_page or "—",
+            "Source note": ref.source_note or "—",
+        }
+        for k, v in data.items():
+            row = table.rowCount()
+            table.insertRow(row)
+            table.setItem(row, 0, QTableWidgetItem(str(k)))
+            table.setItem(row, 1, QTableWidgetItem(str(v)))
+        layout.addWidget(table)
+
+        lesson = QLabel(
+            "What the student should learn: identify the hardware role, "
+            "capacity, placement address, and how the card affects subscriber/EQN state."
+        )
+        lesson.setWordWrap(True)
+        lesson.setObjectName("Legend")
+        layout.addWidget(lesson)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Close)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+
+class CardLibraryList(QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setDragEnabled(True)
+
+    def startDrag(self, supportedActions):
+        item = self.currentItem()
+        if item is None:
+            return
+        code = item.data(Qt.UserRole)
+        if not code or code == "UNCONFIGURED":
+            return
+        mime = QMimeData()
+        mime.setData("application/x-dlu-card", str(code).encode("utf-8"))
+        mime.setText(str(code))
+        drag = QDrag(self)
+        drag.setMimeData(mime)
+        drag.exec(Qt.CopyAction)
+
+class CardLibraryDialog(QDialog):
+    def __init__(self, db: Database, parent=None):
+        super().__init__(parent)
+        self.db = db
+        self.setWindowTitle("Hardware Library")
+        self.resize(950, 520)
+        root = QVBoxLayout(self)
+        list_widget = CardLibraryList()
+        details = QTableWidget(0, 2)
+        details.setHorizontalHeaderLabels(["Field", "Value"])
+        details.horizontalHeader().setStretchLastSection(True)
+
+        refs = self.db.list_card_references()
+        for ref in refs:
+            item = QListWidgetItem(
+                f"{ref.code} · {ref.port_count}P · "
+                f"{'VERIFIED' if ref.verified else 'UNVERIFIED'}"
+            )
+            item.setData(Qt.UserRole, ref.code)
+            list_widget.addItem(item)
+
+        split = QSplitter(Qt.Horizontal)
+        split.addWidget(list_widget)
+        split.addWidget(details)
+        split.setSizes([360, 580])
+        root.addWidget(split)
+
+        def show_ref(item):
+            code = item.data(Qt.UserRole)
+            ref = self.db.get_card_reference(code)
+            details.setRowCount(0)
+            if not ref:
+                return
+            values = {
+                "Type": ref.code,
+                "Display": ref.display_name,
+                "Family": ref.family,
+                "Role": ref.role,
+                "Ports": ref.port_count,
+                "Range": (
+                    f"{ref.port_start}..{ref.port_end}"
+                    if ref.port_count else "Not specified"
+                ),
+                "Source": ref.source_title or "—",
+                "Page": ref.source_page or "—",
+                "Verified": "YES" if ref.verified else "NO",
+            }
+            for k, v in values.items():
+                row = details.rowCount()
+                details.insertRow(row)
+                details.setItem(row, 0, QTableWidgetItem(str(k)))
+                details.setItem(row, 1, QTableWidgetItem(str(v)))
+
+        list_widget.currentItemChanged.connect(
+            lambda current, _previous: show_ref(current) if current else None
+        )
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Close)
+        buttons.rejected.connect(self.reject)
+        root.addWidget(buttons)
+
+
+
 class HardwareWorkspaceMixin:
     """Presentation boundary for the hardware workspace.
 
