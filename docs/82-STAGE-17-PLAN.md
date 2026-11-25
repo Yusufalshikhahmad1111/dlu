@@ -1,6 +1,6 @@
 # Stage 17 — Accessibility & Usability Audit
 
-**Status:** IMPLEMENTATION
+**Status:** COMPLETE
 
 ## Goal
 
@@ -35,6 +35,11 @@ WCAG 2.2 is used as the current W3C reference for this audit.
 
 This is a native PySide6 application rather than a web page. The audit therefore uses Qt focus policy, tab order, accessible names/descriptions, tooltips, QPalette/QSS focus states, and explicit textual status labels as the desktop equivalents of the relevant accessibility outcomes.
 
-## Execution
+## Final evidence
 
-Implement → focused tests → compatibility tests → full regression → Windows target-resolution QA → fix → closeout → merge.
+- Stage 17 focused tests: 5/5 PASS.
+- Stage 16 compatibility tests: 7/7 PASS.
+- Full regression: 134 PASS.
+- Compile and UI static audit: PASS.
+- Windows accessibility/resolution QA: PASS.
+- PR #18 merged to main at 6d29fa93c7d9f80a3160590554481c78aedaa9e0.
