@@ -2703,6 +2703,8 @@ class DluSimulatorWindow(QMainWindow):
         self.call_engine.repo.reset_demo()
         if hasattr(self, "call_lab"):
             self.call_lab.reset()
+        if hasattr(self, "learning_home") and hasattr(self.learning_home, "reset_session_verification"):
+            self.learning_home.reset_session_verification()
         self.student_navigation.recent_activity.insert(0, "Reset teaching demo · source-backed state restored")
         self.student_navigation.recent_activity = self.student_navigation.recent_activity[:8]
         self.student_navigation.current_context = "Learning Home" if self.current_view == "learning_home" else self.student_navigation.current_context
