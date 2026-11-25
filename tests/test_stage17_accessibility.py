@@ -60,6 +60,7 @@ def test_stage17_keyboard_accessibility_metadata():
         assert window.instructor_mode.projector_button.toolTip()
     finally:
         window.close()
+        window.db.close()
         tmp.cleanup()
         app.processEvents()
 
@@ -82,6 +83,7 @@ def test_stage17_focus_and_tab_order():
         assert app.focusWidget() is stage16.run_button
     finally:
         window.close()
+        window.db.close()
         tmp.cleanup()
 
 
