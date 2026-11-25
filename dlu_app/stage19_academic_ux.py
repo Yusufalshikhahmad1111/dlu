@@ -118,6 +118,15 @@ def apply_stage19_academic_ux(window: QWidget, mode: str = "morning") -> None:
             _update_context(window)
         tabs.currentChanged.connect(_changed)
         window._stage19_academic_hooked = True
+
+        original_navigate = getattr(window, "navigate_student_area", None)
+        if original_navigate is not None:
+            def _navigate(area: str) -> None:
+                original_navigate(area)
+                if area.strip() == "HARDWARE":
+                    _update_context(window, "Hardware")
+            window.navigate_student_area = _navigate
+
     _update_context(window)
 
 
