@@ -840,7 +840,10 @@ class Stage13CommunicationsLabWidget(QWidget):
             return
         self.ber_canvas.set_ber(points)
         mode = self.ber_mode.currentText()
-        self.ber_constellation.set_constellation(constellation_points(mode), f"{mode} constellation")
+        if mode in {"QPSK", "16-QAM"}:
+            self.ber_constellation.set_constellation(constellation_points(mode), f"{mode} constellation")
+        else:
+            self.ber_constellation.clear("BPSK uses two antipodal symbols on the I axis; detailed constellation points are available for QPSK and 16-QAM.")
         target = self.ber_target.value()
         nearest = min(points, key=lambda x: abs(x.ebn0_db - target))
         empirical = nearest.empirical or 0.0
