@@ -105,7 +105,7 @@ jobs:
 
       - name: Build and smoke-test Windows package
         shell: pwsh
-        run: .	oolsuild_windows.ps1
+        run: .\tools\build_windows.ps1
 
       - name: Upload Windows executable
         uses: actions/upload-artifact@v4
