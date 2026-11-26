@@ -1,13 +1,18 @@
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
-Write-Host "== DLU Lab Windows release build =="
+Write-Host "== DLU Lab 2.0 Windows release build =="
 
 python -m pip install --upgrade pip
 python -m pip install -r requirements-dev.txt
 
+$version = python -c "import dlu_app; print(dlu_app.__version__)"
+if ($version.Trim() -ne "2.0.0") {
+    throw "Release build expects DLU Lab 2.0.0, found $version."
+}
+
 $env:QT_QPA_PLATFORM = "offscreen"
-python tools/capture_screenshots.py --output-dir artifacts/screenshots
+python tools/stage20_release_qa.py --output-dir artifacts/screenshots
 
 if (Test-Path pysidedeploy.spec) { Remove-Item pysidedeploy.spec -Force }
 pyside6-deploy --force --init main.py
@@ -36,6 +41,11 @@ if (-not $exe) {
 }
 
 Write-Host "Built executable: $($exe.FullName)"
+& $exe.FullName --version
+if ($LASTEXITCODE -ne 0) {
+    throw "Packaged executable --version failed with exit code $LASTEXITCODE."
+}
+
 & $exe.FullName --smoke-test
 if ($LASTEXITCODE -ne 0) {
     throw "Packaged executable smoke test failed with exit code $LASTEXITCODE."
