@@ -188,7 +188,7 @@ docs/35-STAGE-07-CLOSEOUT.md
 
 # Post-Release Roadmap — Stage 8→20
 
-**الحالة: Stage 17 مكتملة — Stage 18→20 مخططة**
+**الحالة: Stage 20 مكتملة — DLU Lab 2.0.0 released**
 
 الهدف: تحويل DLU Lab من simulator release-ready إلى **University Communications Digital Laboratory** مع الحفاظ على المنطق الأكاديمي وبيانات العتاد المصدرية.
 
@@ -455,39 +455,54 @@ Verified code head:
 
 ## Stage 20 — DLU Lab 2.0 Release
 
-**الحالة: مخططة**
+**الحالة: مكتملة — Windows release gate PASS — 148/148 full regression**
 
-- full regression.
-- visual/accessibility QA.
-- Windows packaging.
-- screenshots.
-- updated manuals/guides.
-- final closeout.
+المخرجات:
+- DLU Lab runtime and packaging version synchronized to 2.0.0;
+- final academic/accessibility QA across the complete student and instructor surfaces;
+- target-resolution evidence at 1280x720, 1366x768, 1600x900 and 1920x1080;
+- Windows onefile executable built successfully;
+- packaged version check returned DLU Lab 2.0.0;
+- packaged smoke-test passed;
+- 14 final screenshots uploaded;
+- User Manual, Academic Guide and Instructor Guide synchronized;
+- final academic report and release closeout completed.
 
-Master plan:
-docs/36-POST-RELEASE-UX-UI-MASTER-PLAN.md
+Final Stage 20 evidence:
+- Workflow: 45790237917
+- Verified application/package tree: 21a2ca410b68abdcc78752066d2c75e0497dca80
+- Stage 20 focused: 4/4 PASS
+- Stage 19 compatibility: 4/4 PASS
+- Stage 17 compatibility: 5/5 PASS
+- Stage 18 compatibility: 5/5 PASS
+- Full regression: 148/148 PASS
+- Compile: PASS
+- UI static audit: PASS
+- Final Windows visual/accessibility QA: PASS
+- Windows package artifact: DLU-Lab-2.0.0-Windows, ID 15103962398, 28,288,215 bytes
+- Windows package SHA-256: 1af1b3f171843e25626c72416d5218088f94f31a92f372362867a4cdf05e11be
+- Screenshot artifact: DLU-Lab-2.0.0-Screenshots, ID 15102814267, 14 PNGs, 605,635 bytes
+- Screenshot SHA-256: 93a04f77007ca6c888461b4bbeb118ecdc2735880eef9d3b115f7aed497fa95e
 
-Research:
-docs/37-UX-UI-RESEARCH-STUDY.md
+Post-verification commit 147ea8e66416f7f45164c63d363a1eeb52c8d4d1 changes only the Stage 20 workflow trigger configuration and does not modify application/runtime/package source.
 
-Design System:
-docs/38-DESIGN-SYSTEM-SPECIFICATION.md
+Plan:
+docs/94-STAGE-20-PLAN.md
 
-UX Journeys:
-docs/39-UX-JOURNEYS-AND-INFORMATION-ARCHITECTURE.md
+Implementation:
+docs/95-STAGE-20-IMPLEMENTATION-REPORT.md
 
-Architecture Target:
-docs/40-UX-UI-ARCHITECTURE-TARGET.md
+Windows QA:
+docs/96-STAGE-20-WINDOWS-QA.md
 
-Quality Gates:
-docs/41-UX-UI-QUALITY-GATES.md
+Academic Guide:
+docs/97-STAGE-20-ACADEMIC-GUIDE.md
 
-Stage 8 Prompt:
-docs/42-STAGE-08-EXECUTION-PROMPT.md
+Instructor Guide:
+docs/98-STAGE-20-INSTRUCTOR-GUIDE.md
 
-Stage 9→20 Prompts:
-docs/43-STAGE-09-20-EXECUTION-PROMPTS.md
-
+Closeout:
+docs/99-STAGE-20-CLOSEOUT.md
 
 ## قاعدة التنفيذ
 
