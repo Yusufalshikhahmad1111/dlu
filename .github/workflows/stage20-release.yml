@@ -1,0 +1,122 @@
+name: DLU Stage 20 Final Release
+
+on:
+  push:
+    branches:
+      - main
+      - stage-20-release
+    paths:
+      - "main.py"
+      - "pyproject.toml"
+      - "requirements.txt"
+      - "requirements-dev.txt"
+      - "dlu_app/**"
+      - "data/**"
+      - "tests/**"
+      - "tools/**"
+      - "docs/05-MILESTONES.md"
+      - "docs/32-USER-MANUAL.md"
+      - "docs/33-FINAL-ACADEMIC-TEST-REPORT.md"
+      - "docs/94-STAGE-20-PLAN.md"
+      - "docs/95-STAGE-20-IMPLEMENTATION-REPORT.md"
+      - "docs/96-STAGE-20-WINDOWS-QA.md"
+      - "docs/97-STAGE-20-ACADEMIC-GUIDE.md"
+      - "docs/98-STAGE-20-INSTRUCTOR-GUIDE.md"
+      - "docs/99-STAGE-20-CLOSEOUT.md"
+      - ".github/workflows/stage20-release.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "main.py"
+      - "pyproject.toml"
+      - "requirements.txt"
+      - "requirements-dev.txt"
+      - "dlu_app/**"
+      - "data/**"
+      - "tests/**"
+      - "tools/**"
+      - ".github/workflows/stage20-release.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: stage20-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Verify release version
+        shell: pwsh
+        run: |
+          $version = python -c "import dlu_app; print(dlu_app.__version__)"
+          if ($version.Trim() -ne "2.0.0") {
+            throw "Expected release version 2.0.0, found $version."
+          }
+
+      - name: Compile check
+        shell: pwsh
+        run: python -m compileall dlu_app main.py tools tests
+
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+
+      - name: Stage 20 focused release gate
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage20_release.py
+
+      - name: Stage 19 academic compatibility
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage19_academic_ux.py
+
+      - name: Stage 17 accessibility compatibility
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage17_accessibility.py
+
+      - name: Stage 18 architecture compatibility
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage18_architecture.py
+
+      - name: Full regression
+        shell: pwsh
+        run: python -m pytest -q tests
+
+      - name: Final Windows visual and accessibility QA
+        shell: pwsh
+        run: |
+          $env:QT_QPA_PLATFORM = "offscreen"
+          python tools/stage20_release_qa.py --output-dir artifacts/stage20
+
+      - name: Build and smoke-test Windows package
+        shell: pwsh
+        run: .	oolsuild_windows.ps1
+
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Lab-2.0.0-Windows
+          path: dist/*.exe
+          if-no-files-found: error
+
+      - name: Upload Stage 20 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Lab-2.0.0-Screenshots
+          path: artifacts/stage20/*.png
+          if-no-files-found: error
