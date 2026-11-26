@@ -60,7 +60,11 @@ def main() -> int:
             if hasattr(window, "mml_ux2_panel"):
                 panel = window.mml_ux2_panel
                 if hasattr(panel, "editor"):
-                    panel.editor.setPlainText("> stat dlu: dlu=50;")
+                    command = "> stat dlu: dlu=50;"
+                    if hasattr(panel.editor, "setText"):
+                        panel.editor.setText(command)
+                    elif hasattr(panel.editor, "setPlainText"):
+                        panel.editor.setPlainText(command)
                     if hasattr(panel, "quick_run"):
                         panel.quick_run()
                         app.processEvents()
