@@ -1,4 +1,4 @@
-# DLU Lab 1.0.0 — User Manual
+# DLU Lab 2.0.0 — User Manual
 
 ## 1. What is DLU Lab?
 
@@ -18,7 +18,7 @@ run.bat
 
 Hardware → OMT/MML → Call Path → Command Files → Communications → Scenarios
 
-Start with the **Scenarios** tab for guided demonstrations, then inspect the same state through Hardware and OMT.
+Start at **Learning Home**. Follow the visible **YOU ARE HERE / NEXT** context, then move through Hardware → OMT/MML → Call Path → Communications → Scenarios. Use Instructor / Classroom mode for projector-safe demonstrations.
 
 ## 4. Teaching Scenarios
 
@@ -75,6 +75,15 @@ The **TOOLS → Open Data Folder** action opens this directory.
 > cr sub: dlu=50, type=ms, eqn=50-0-15-0, lac=021, dn=2233500;
 ```
 
-## 10. Academic boundary
+## 10. Instructor / Classroom mode
+
+The Instructor workspace supports scenario selection, Reset Demo, hidden answers, REVEAL ANSWERS, guided demonstration, and projector mode. Answers remain hidden until explicitly revealed.
+
+## 11. Academic boundary
 
 The simulator intentionally keeps unknown physical placement as UNCONFIGURED and does not invent capacities or placements that are not supported by the course dataset.
+## 12. Release identity
+
+**DLU Lab 2.0.0 — Stage 20 final release**
+
+The current Stage 0→20 roadmap is complete after the final Windows release gates pass.
