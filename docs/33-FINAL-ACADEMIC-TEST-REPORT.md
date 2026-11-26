@@ -1,14 +1,14 @@
-# Final Academic Test Report — DLU Lab 1.0.0
+# Final Academic Test Report — DLU Lab 2.0.0
 
-Date: 2026-11-18
+## Release scope
 
-## Executive result
+This report closes the full DLU Lab roadmap from Stage 0 through Stage 20.
 
-DLU Lab 1.0.0 passed the final automated Windows release gate. The complete suite executed on the Windows runner with **76 passed tests**.
+Stage 0–19 were already completed before the final release pass. Stage 20 re-verifies the integrated application, packaging and current documentation on the release tree.
 
-## Final verification matrix
+## Verification matrix
 
-| Stage | Academic / Engineering scope | Final result |
+| Stage | Scope | Result |
 | --- | --- | --- |
 | 0 | Architecture, source-backed hardware rule, SQLite foundation | PASS |
 | 1 | Seeded hardware dataset, DLU fleet, source registry | PASS |
@@ -17,80 +17,56 @@ DLU Lab 1.0.0 passed the final automated Windows release gate. The complete suit
 | 4 | Command files, lifecycle, scheduling, virtual clock | PASS |
 | 5 | OSI/TCP-UDP, analog/pulse/digital/BER labs | PASS |
 | 6 | Six formal teaching scenarios and PASS/FAIL workbench | PASS |
-| 7 | Backup/restore, packaging, screenshots, release smoke test | PASS |
+| 7 | Backup/restore, initial packaging and release smoke test | PASS |
+| 8 | UX/UI redesign v2 | PASS |
+| 9 | Student-centered navigation | PASS |
+| 10 | Hardware UX 2.0 | PASS |
+| 11 | OMT/MML UX 2.0 | PASS |
+| 12 | Call/network visualization | PASS |
+| 13 | Communications Lab 2.0 | PASS |
+| 14 | Teaching Scenarios 2.0 | PASS |
+| 15 | Academic Learning Layer | PASS |
+| 16 | Instructor / Classroom Mode | PASS |
+| 17 | Accessibility & Usability Audit | PASS |
+| 18 | Performance & Architecture Cleanup | PASS |
+| 19 | Final Academic UX Audit | PASS |
+| 20 | Final DLU Lab 2.0 release gate | PENDING FINAL WINDOWS EVIDENCE |
 
-## Automated release evidence
+## Existing Stage 19 evidence carried into the final release
 
-- Windows Python compilation: PASS.
-- UI static audit: PASS.
-- Full pytest suite: **76 passed**.
-- Windows onefile deployment: PASS.
-- Packaged executable smoke test: PASS.
-- Windows executable artifact uploaded: PASS.
-- Final UI screenshot artifact uploaded: PASS.
+- Stage 19 focused audit: 4/4 PASS.
+- Stage 17 accessibility compatibility: 5/5 PASS.
+- Stage 18 architecture compatibility: 5/5 PASS.
+- Stage 19 full regression: 143/143 PASS.
+- Windows Academic UX QA: PASS.
+- DLU CI: PASS.
 
-Release artifacts:
-- `DLU-Lab-Windows` — Windows executable artifact, approximately 27.9 MB.
-- `DLU-Lab-Screenshots` — five final UI PNG screenshots, approximately 309 KB total.
+## Stage 20 final release evidence
+
+To be recorded after the Windows release workflow completes:
+
+- compile;
+- UI static audit;
+- Stage 20 focused tests;
+- Stage 19/17/18 compatibility;
+- complete pytest regression;
+- final visual/accessibility QA;
+- Windows onefile package;
+- packaged version check;
+- packaged smoke-test;
+- final screenshot artifact.
 
 ## Hardware academic integrity
 
-The final package does not alter the course-backed physical dataset.
+The release does not alter the course-backed physical dataset.
 
 Authoritative seeded placements remain:
+
 - DLU 50 / Shelf 0 / Module 15 → SLMA8.
 - DLU 10 / Shelf 1 / Module 7 → CMRL.
 
 Unknown physical placement remains UNCONFIGURED.
 
-## Critical call-engine verification
-
-Stage 3 regression confirms:
-- deterministic exact/prefix/range CPT matching;
-- LOCAL / NATIONAL / INTERNATIONAL routing;
-- EVAL=NO blocking before PDC reservation;
-- PDC capacity of 120;
-- resource release;
-- busy subscriber guard;
-- atomic rollback after internal persistence failure;
-- structured invalid-number errors.
-
-## Command-file verification
-
-Stage 4 regression confirms:
-- source-line preservation;
-- malformed-file rejection;
-- nested EXECMDFILE rejection;
-- Accepted → Started → Finished → Executed/Failed lifecycle;
-- HH:MM validation;
-- midnight rollover;
-- no duplicate scheduled execution;
-- scheduled_at cleanup.
-
-## Stage 6 teaching verification
-
-All six formal scenarios are covered:
-- Aleppo 8-Line Expansion;
-- CMRL Capacity Limit;
-- DLU / Card Maintenance;
-- Billing Block;
-- International Blacklist;
-- Command File Overnight Run.
-
-## Stage 7 data-safety verification
-
-Backup/restore coverage confirms:
-- SQLite backup API is used instead of raw file copying for live backup;
-- integrity check validates every backup;
-- required schema tables are checked;
-- restore is staged safely;
-- automatic pre-restore safety backup is created;
-- restore is applied only on a clean application restart.
-
-## Manual boundary
-
-The final release was validated on GitHub's Windows runner, including automated GUI construction and screenshot capture. A separate physical hands-on session on the developer's own Windows machine was not performed during this closeout, so no unsupported claim is made about a local monitor/driver-specific visual result.
-
 ## Academic conclusion
 
-**The simulator is release-ready for the next packaging/distribution step and for course use as a local educational lab, subject to normal classroom machine verification.**
+The simulator is architecturally complete through Stage 19 and is undergoing its final integrated 2.0.0 release gate. The final closeout will be marked COMPLETE only after the Windows evidence is green.
