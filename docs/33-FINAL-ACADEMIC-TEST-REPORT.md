@@ -30,7 +30,7 @@ Stage 0–19 were already completed before the final release pass. Stage 20 re-v
 | 17 | Accessibility & Usability Audit | PASS |
 | 18 | Performance & Architecture Cleanup | PASS |
 | 19 | Final Academic UX Audit | PASS |
-| 20 | Final DLU Lab 2.0 release gate | PENDING FINAL WINDOWS EVIDENCE |
+| 20 | Final DLU Lab 2.0 release gate | PASS — Windows release verified |
 
 ## Existing Stage 19 evidence carried into the final release
 
@@ -43,18 +43,23 @@ Stage 0–19 were already completed before the final release pass. Stage 20 re-v
 
 ## Stage 20 final release evidence
 
-To be recorded after the Windows release workflow completes:
+Workflow 45790237917 on release tree 21a2ca410b68abdcc78752066d2c75e0497dca80 verified:
+- compile: PASS;
+- UI static audit: PASS;
+- Stage 20 focused: 4/4 PASS;
+- Stage 19 compatibility: 4/4 PASS;
+- Stage 17 accessibility compatibility: 5/5 PASS;
+- Stage 18 architecture compatibility: 5/5 PASS;
+- full regression: 148/148 PASS;
+- final visual/accessibility QA: PASS;
+- Windows onefile package: PASS;
+- packaged version: DLU Lab 2.0.0;
+- packaged smoke-test: PASS;
+- screenshots: 14 PNGs;
+- Windows package artifact ID: 15103962398;
+- screenshot artifact ID: 15102814267.
 
-- compile;
-- UI static audit;
-- Stage 20 focused tests;
-- Stage 19/17/18 compatibility;
-- complete pytest regression;
-- final visual/accessibility QA;
-- Windows onefile package;
-- packaged version check;
-- packaged smoke-test;
-- final screenshot artifact.
+Commit 147ea8e66416f7f45164c63d363a1eeb52c8d4d1 was a workflow-trigger-only change after the verified application/package tree; no application/runtime/package source changed.
 
 ## Hardware academic integrity
 
@@ -69,4 +74,4 @@ Unknown physical placement remains UNCONFIGURED.
 
 ## Academic conclusion
 
-The simulator is architecturally complete through Stage 19 and is undergoing its final integrated 2.0.0 release gate. The final closeout will be marked COMPLETE only after the Windows evidence is green.
+The simulator is complete through Stage 20 and the DLU Lab 2.0.0 Windows release gate is green. The release preserves the source-backed hardware boundary and the existing MML, CallEngine, Communications, Command Files, Teaching Scenario and database semantics.
