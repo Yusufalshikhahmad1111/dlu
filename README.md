@@ -1,223 +1,156 @@
-# DLU — Siemens EWSD Educational Simulator
+# DLU Lab 2.0 — Siemens EWSD Educational Simulator
 
 محاكي تعليمي محلي لمقسم Siemens EWSD ووحدة الخطوط الرقمية DLU، مخصص لمقرر مبادئ الاتصالات على Windows 11.
 
-> القاعدة الأساسية: لا نخترع شكلًا أو سعة أو ترقيمًا للعتاد. الرسم مبسط، لكن DLU/Shelf/Module/Port/EQN/Card Capacity مبنية على Dataset موثق.
+القاعدة الأكاديمية الأساسية: لا نخترع شكلًا أو سعة أو ترقيمًا للعتاد. الرسم مبسط، لكن DLU/Shelf/Module/Port/EQN/Card Capacity مبنية على Dataset موثق، والمواضع غير المدعومة تبقى UNCONFIGURED.
 
-## التقنية
+## الإصدار
+
+DLU Lab 2.0.0
 
 Python 3.12 + PySide6 + SQLite
 
-## Hardware-first Training Lab
+## المسار الأكاديمي الكامل
 
-المسار البصري والوظيفي:
+Learning Home
+→ Hardware
+→ OMT / MML
+→ Call Path
+→ Command Files
+→ Communications
+→ Scenarios
 
-Exchange → DLU → Side/Controller → Shelf → Module/Card → Port → Subscriber → MML
+Instructor / Classroom Mode متاح للتدريس والعرض والإسقاط على الشاشة.
 
-### Physical Mode
-- DLU frame
-- DLUC0 / DLUC1
-- DIUD/PDC training area
-- Shelf 0..7
-- Module 0..15
-- Card faceplates
-- Port LEDs
+## الوظائف الأساسية
 
-### Logical Mode
-DLU → Controller → DIUD → SLM → Port → DN
+### Hardware
 
-## Hardware Dataset
+- Exchange → DLU → Side/Controller → Shelf → Module/Card → Port → Subscriber.
+- Physical وLogical views.
+- Inspector يعرض object/state/EQN/capacity/role/family.
+- Maintenance وfault workflow.
+- OMT ↔ hardware highlighting.
 
-البيانات منفصلة عن الواجهة:
+### OMT / MML
 
-- data/hardware_seed.json
-- data/references.json
-- Source Registry داخل SQLite
-
-### Registry الحالي
-- SLMA8 — 8 ports
-- SLMA16 — 16 ports
-- SLMA64 — 64 ports
-- CMRL — 6 ports
-- SLMD — digital subscriber module
-- TU
-- BDE
-- BDCG
-- DLUC
-- DIUD
-- RGMG
-- DCC
-
-إذا لم يكن Placement موثقًا يبقى UNCONFIGURED.
-
-## Seed الأكاديمي
-
-- DLU 50 / Shelf 0 / Module 15 → SLMA8
-- DLU 10 / Shelf 1 / Module 7 → CMRL
-- كل DLU يملك Shelf 0..7 وModule 0..15
-
-## OMT ↔ Hardware
+المحرك الحقيقي هو المصدر الوحيد للتنفيذ.
 
 أمثلة:
+stat dlu: dlu=50;
+disp dlumod: dlu=50, shelf=0, module=15;
+disp dlupport: eqn=50-0-15-0;
+statport: eqn=50-0-15-0;
+cr sub: dlu=50, type=ms, eqn=50-0-15-0, lac=021, dn=2233500;
 
-> stat dlu: dlu=50;
-> disp dlumod: dlu=50, shelf=0, module=15;
-> disp dlupport: eqn=50-0-15-0;
-> statport: eqn=50-0-15-0;
-> cr sub: dlu=50, type=ms, eqn=50-0-15-0, lac=021, dn=2233500;
-> stat sub: lac=021, dn=2233500;
-> test sub: lac=021, dn=2233500;
-> can sub: lac=021, dn=2233500;
+### Call Path
 
-نتيجة MML التي تحتوي EQN أو DLU/Shelf/Module تربط مباشرة بالمجسم.
+Origin → CPT → Resource → Switching → Destination
 
-## Maintenance
+الحالات المرئية تشمل REQUEST وROUTING وRESOURCE وCONNECTED وBLOCKED وRELEASED.
 
-FAULT → MBL → DIAG → REMOVE → INSTALL → ACTIVATE → VERIFY
+### Command Files
 
-مع سجل hardware_events وMaintenance Timeline داخل الواجهة.
+- parser حقيقي؛
+- Accepted → Started → Finished → Executed/Failed؛
+- HH:MM scheduling؛
+- virtual clock؛
+- OMT EXECMDFILE integration.
 
-## Communications Labs
+### Communications
 
-تبويب **Communications** يضم:
-- OSI 7-layer model.
-- TCP vs UDP comparison.
-- AM / FM / PM.
-- PAM / PWM / PPM / PCM.
-- ASK / FSK / PSK / QPSK / 16-QAM.
-- QPSK / 16-QAM constellation.
+- OSI 7-layer;
+- TCP vs UDP;
+- AM / FM / PM;
+- PAM / PWM / PPM / PCM;
+- ASK / FSK / PSK / QPSK / 16-QAM;
+- constellation visualizer;
 - BPSK / QPSK / 16-QAM BER basics.
 
-النماذج الحسابية normalized وتعليمية وليست محاكاة RF كهربائية كاملة.
+النماذج normalized وتعليمية وليست محاكاة RF كهربائية كاملة.
 
-## Scenarios
+### Teaching Scenarios
 
-تبويب **Scenarios** يقدّم ستة Teaching Scenarios رسمية موحدة:
-- Aleppo 8-Line Expansion.
-- CMRL Capacity Limit.
-- DLU / Card Maintenance.
-- Billing Block.
-- International Blacklist.
-- Command File Overnight Run.
+السيناريوهات الرسمية الستة:
 
-كل Scenario يعرض:
-- commands/actions;
-- affected EQN;
-- expected result;
-- actual result;
-- PASS/FAIL.
+- Aleppo 8-Line Expansion
+- CMRL Capacity Limit
+- DLU / Card Maintenance
+- Billing Block
+- International Blacklist
+- Command File Overnight Run
 
-التنفيذ يعيد استخدام MML وDB وCall Engine وCommand Files الفعلية، ولا ينشئ منطقًا موازيًا للتدريس.
+المسار:
+Objective → Observe → Execute → Diagnose → Fix → Verify → Result
 
-## التشغيل على Windows 11
+### Instructor / Classroom
 
-### Packaged release
+- scenario selection;
+- reset;
+- real scenario execution;
+- REVEAL ANSWERS;
+- expected vs actual;
+- guided demonstration;
+- projector mode;
+- Morning/Night.
 
-Stage 7 produces a Windows onefile executable through Qt for Python `pyside6-deploy`. The packaged executable runs without a Python installation.
+## Student experience
 
-### Development
+Stage 19 added academic context continuity:
 
-```bat
+YOU ARE HERE → NEXT
+
+وتم ربط الـbreadcrumb والـtooltips والـaccessible descriptions بالمساحات التعليمية الحالية.
+
+## Data safety
+
+- SQLite live data under %USERPROFILE%\\AppData\\Local\\DLULab.
+- Backup uses SQLite backup API and integrity validation.
+- Restore uses staged validation and a pre-restore safety backup.
+- Reset Demo يعيد الحالة التعليمية المصدرية ويحافظ على حدود الـdataset.
+
+## تشغيل المصدر
+
 run.bat
-```
 
 أو:
-
-```bat
 py -3.12 -m venv .venv
-.venv\Scripts\activate
+.venv\\Scripts\\activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python main.py
-```
 
 الاختبارات:
-
-```bat
 python -m pip install -r requirements-dev.txt
 python -m pytest -q tests
-```
 
-## الحالة
+## Windows release
 
-Stage 0–6: **completed**
+الـrelease الرسمي يستخدم pyside6-deploy بوضع onefile.
 
-Stage 5 — Communications Labs:
-- automated release verified;
-- 63/63 tests passed at closeout;
-- PR #1 merged into \`main\`.
+بناء محلي:
+powershell -ExecutionPolicy Bypass -File tools\\build_windows.ps1
 
-Stage 6 — Teaching Scenarios:
-- six formal PASS/FAIL scenarios;
-- automated Windows release gate passed;
-- 71/71 tests passed at closeout;
-- PR #2 merged into \`main\`.
+الـrelease build يرفض أي نسخة runtime غير 2.0.0، ثم يشغّل:
 
-Stage 7 — Packaging & Final Audit:
-- release version 1.0.0;
-- safe SQLite backup/restore;
-- Windows onefile executable;
-- executable smoke test;
-- five final UI screenshots uploaded as release artifacts;
-- user manual and final academic test report;
-- **76/76 tests passed on Windows CI**.
+- final visual/accessibility QA؛
+- packaged version check؛
+- packaged smoke-test.
 
-الحالة الحالية: **Stage 17 — Accessibility & Usability Audit complete**.
+## الأدلة
 
-Stage 13:
-- guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
-- improved waveform and constellation readability;
-- Live Update, measurement cards, deterministic mini challenges;
-- Stage 13 focused tests 6/6 passed;
-- full regression and Windows functional/visual QA passed;
-- five screenshot artifacts uploaded;
-- merged to main at \`7a75926824f7abe6a15d35f9ec374ccff658fb87\`.
+- User Manual: docs/32-USER-MANUAL.md
+- Academic Learning Guide: docs/97-STAGE-20-ACADEMIC-GUIDE.md
+- Instructor / Classroom Guide: docs/98-STAGE-20-INSTRUCTOR-GUIDE.md
+- Stage 20 Plan: docs/94-STAGE-20-PLAN.md
+- Stage 20 Implementation: docs/95-STAGE-20-IMPLEMENTATION-REPORT.md
+- Stage 20 Windows QA: docs/96-STAGE-20-WINDOWS-QA.md
+- Stage 20 Closeout: docs/99-STAGE-20-CLOSEOUT.md
 
-Stage 14:
-- guided Objective → Observe → Execute → Diagnose → Fix → Verify → Result workflow across all six teaching scenarios;
-- scenario-specific hints, diagnosis, recovery guidance and verification;
-- clear PASS/FAIL meaning;
-- focused tests, full regression and Windows functional/visual QA passed;
-- merged to main at \`32d8a9a8397a23398181c7db7eb16203fef0ab8c\`.
+## Roadmap status
 
-Stage 15:
-- academic Learn → Practice → Experiment → Challenge → Verify path;
-- session-only progression over the six existing learning areas;
-- Challenge requires a real PASS from an existing Teaching Scenario;
-- Verify requires complete area evidence plus a scenario PASS;
-- phase actions open the first missing learning area;
-- focused tests 7 passed;
-- full regression, Windows functional/visual QA, and DLU CI passed;
-- three QA screenshots uploaded;
-- merged to main at \`9b01ec4725f89c7c5a7409126dee48bc73774c6c\`.
+Stage 0 → Stage 19: completed.
 
-Next planned stage: **Stage 16 — Instructor / Classroom Mode**.
+Stage 20 — DLU Lab 2.0 Release: final release gate in progress until the Windows package, screenshots and complete regression are re-verified on the release tree.
 
-
-Stage 16:
-- separate Instructor / Classroom workspace;
-- six existing teaching scenarios selectable from the real scenario catalog;
-- Reset delegates to the existing demo reset lifecycle;
-- expected/actual and PASS/FAIL remain hidden until explicitly revealed;
-- guided demonstration reveals the existing verified scenario result one step at a time;
-- projector-friendly classroom view with Morning/Night support;
-- Stage 16 focused tests 7/7 passed;
-- full regression 129/129 passed;
-- Windows functional/visual QA passed with five screenshots;
-- merged to main via PR #17.
-
-Next planned stage: **Stage 18 — Performance & Architecture Cleanup**.
-
-Stage 17:
-- WCAG 2.2-oriented desktop accessibility hardening;
-- visible keyboard focus and deterministic tab order;
-- accessible names/descriptions and technical tooltips;
-- explicit Hardware empty state;
-- target-resolution QA at 1280×720, 1366×768, 1600×900 and 1920×1080;
-- Morning/Night contrast and focus regression checks;
-- Instructor PASS/FAIL answer visibility remains hidden until REVEAL ANSWERS;
-- Stage 17 focused tests 5/5 passed;
-- Stage 16 compatibility tests 7/7 passed;
-- full regression 134/134 passed;
-- Windows accessibility/resolution QA passed;
-- merged to main via PR #18 at 6d29fa93c7d9f80a3160590554481c78aedaa9e0.
+No stage is closed from code changes alone; the release is closed only after the complete Windows evidence gate is green.
