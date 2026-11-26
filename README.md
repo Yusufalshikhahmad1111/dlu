@@ -149,8 +149,22 @@ powershell -ExecutionPolicy Bypass -File tools\\build_windows.ps1
 
 ## Roadmap status
 
-Stage 0 → Stage 19: completed.
+Stage 0 → Stage 20: **completed**.
 
-Stage 20 — DLU Lab 2.0 Release: final release gate in progress until the Windows package, screenshots and complete regression are re-verified on the release tree.
+DLU Lab 2.0.0 final Windows release gate:
+- 148/148 full regression;
+- 4/4 Stage20 focused;
+- 4/4 Stage19 compatibility;
+- 5/5 Stage17 accessibility compatibility;
+- 5/5 Stage18 architecture compatibility;
+- final visual/accessibility QA PASS at all four target resolutions;
+- Windows onefile package PASS;
+- packaged --version → DLU Lab 2.0.0;
+- packaged --smoke-test PASS;
+- 14 screenshots uploaded.
 
-No stage is closed from code changes alone; the release is closed only after the complete Windows evidence gate is green.
+Final Windows artifacts:
+- DLU-Lab-2.0.0-Windows — ID 15103962398
+- DLU-Lab-2.0.0-Screenshots — ID 15102814267
+
+The release gate was verified in workflow 45790237917 on the application/package tree 21a2ca410b68abdcc78752066d2c75e0497dca80. The later commit 147ea8e66416f7f45164c63d363a1eeb52c8d4d1 changes only the workflow trigger configuration; no application/runtime/package source changed.
