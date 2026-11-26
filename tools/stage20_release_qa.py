@@ -74,8 +74,8 @@ def main() -> int:
             _capture(window, app, "06-call-local-night-1366x768.png")
 
             window.navigate_student_area("COMMUNICATIONS")
-            if hasattr(window.communications, "run_current"):
-                window.communications.run_current()
+            if hasattr(window.communications_lab, "run_current"):
+                window.communications_lab.run_current()
                 app.processEvents()
             _capture(window, app, "07-communications-night-1366x768.png")
 
