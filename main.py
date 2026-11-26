@@ -17,6 +17,15 @@ def main() -> int:
     app.setApplicationVersion(__version__)
     app.setOrganizationName("PEU")
 
+    if "--write-version" in sys.argv[1:]:
+        index = sys.argv.index("--write-version")
+        if index + 1 >= len(sys.argv):
+            return 2
+        Path(sys.argv[index + 1]).write_text(
+            f"{APP_NAME} {__version__}\n", encoding="utf-8"
+        )
+        return 0
+
     if "--version" in sys.argv[1:]:
         print(f"{APP_NAME} {__version__}")
         return 0
