@@ -1,0 +1,106 @@
+name: DLU Stage 20 — DLU Lab 2.0 Release
+
+on:
+  push:
+    branches:
+      - main
+      - stage-20-dlu-lab-2-release
+    tags:
+      - "v2.*.*"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: stage20-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 110
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Compile check
+        shell: pwsh
+        run: python -m compileall dlu_app main.py tests
+
+      - name: UI static audit
+        shell: pwsh
+        run: python tools/ui_static_audit.py
+
+      - name: Stage 20 focused release checks
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage20_release.py
+
+      - name: Stage 17 accessibility compatibility
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage17_accessibility.py
+
+      - name: Stage 18 architecture compatibility
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage18_architecture.py
+
+      - name: Stage 19 academic compatibility
+        shell: pwsh
+        run: python -m pytest -q tests/test_stage19_academic_ux.py
+
+      - name: Full regression
+        shell: pwsh
+        run: python -m pytest -q tests
+
+      - name: Windows Stage 20 visual QA
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python tools/stage20_release_qa.py
+
+      - name: Build and smoke-test Windows release
+        shell: pwsh
+        run: .\tools\build_windows.ps1
+
+      - name: Verify packaged version
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path dist -Filter "*.exe" -File | Select-Object -First 1
+          if (-not $exe) { throw "No packaged executable found." }
+          $version = & $exe.FullName --version
+          if ($LASTEXITCODE -ne 0) { throw "Packaged --version command failed." }
+          if ($version.Trim() -ne "DLU Lab 2.0.0") {
+            throw "Unexpected packaged version: $version"
+          }
+
+      - name: Upload DLU Lab 2.0 Windows package
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Lab-2.0.0-Windows
+          path: dist/*.exe
+          if-no-files-found: error
+
+      - name: Upload DLU Lab 2.0 screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Lab-2.0.0-Screenshots
+          path: artifacts/stage20/*.png
+          if-no-files-found: error
+
+      - name: Upload build screenshots for continuity
+        uses: actions/upload-artifact@v4
+        with:
+          name: DLU-Lab-2.0.0-Build-Screenshots
+          path: artifacts/screenshots/*.png
+          if-no-files-found: error
