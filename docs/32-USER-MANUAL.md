@@ -1,26 +1,99 @@
-# DLU Lab 1.0.0 — User Manual
+# DLU Lab 2.0.0 — User Manual
 
 ## 1. What is DLU Lab?
 
 DLU Lab is a local Windows 11 educational simulator for Siemens EWSD DLU training. It is designed for the Principles of Communications course and keeps the hardware dataset source-backed.
 
-## 2. Recommended release
+The application is deterministic and local. It is a teaching laboratory, not a full physical-network or RF simulator.
 
-Use the Windows onefile executable produced by the Stage 7 release workflow. No Python installation is required for the packaged executable.
+## 2. Start the application
 
-For development from source:
+### Packaged Windows release
 
-```bat
+Use the DLU Lab 2.0.0 onefile executable. No Python installation is required.
+
+### From source
+
 run.bat
-```
 
-## 3. Main learning flow
+Or:
+py -3.12 -m venv .venv
+.venv\\Scripts\\activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python main.py
 
-Hardware → OMT/MML → Call Path → Command Files → Communications → Scenarios
+## 3. Recommended learning flow
 
-Start with the **Scenarios** tab for guided demonstrations, then inspect the same state through Hardware and OMT.
+Learning Home
+→ Hardware
+→ OMT / MML
+→ Call Path
+→ Command Files
+→ Communications
+→ Scenarios
 
-## 4. Teaching Scenarios
+The current workspace displays its academic context and recommended NEXT action.
+
+## 4. Hardware
+
+Follow:
+
+Exchange → DLU → Side/Controller → Shelf → Module → Port → Subscriber.
+
+Use the Inspector to read:
+
+- object;
+- state;
+- EQN;
+- capacity;
+- role/family;
+- subscriber context.
+
+Physical placement that is not supported by the dataset remains UNCONFIGURED.
+
+## 5. OMT / MML
+
+Enter a real command in the OMT/MML workspace.
+
+The result should be read as:
+
+Intent → Command → Result → Affected object → Explanation
+
+Starting examples:
+
+stat dlu: dlu=50;
+disp dlumod: dlu=50, shelf=0, module=15;
+disp dlupport: eqn=50-0-15-0;
+statport: eqn=50-0-15-0;
+cr sub: dlu=50, type=ms, eqn=50-0-15-0, lac=021, dn=2233500;
+
+## 6. Call Path
+
+Observe:
+
+Origin → CPT → Resource → Switching → Destination
+
+Use the visible state and explanation to determine why the call connected, was blocked, or was released.
+
+## 7. Command Files
+
+Use the Command Files workspace to:
+
+- compose commands;
+- schedule HH:MM execution;
+- inspect lifecycle state;
+- execute due files through the real MML engine.
+
+## 8. Communications
+
+Work through:
+
+Concept → Parameters → Experiment → Visualization → Measurement → Interpretation → Challenge
+
+The lab contains OSI, TCP/UDP, analog, pulse, digital modulation, constellation and BER teaching surfaces.
+
+## 9. Teaching Scenarios
 
 Six formal scenarios are available:
 
@@ -31,50 +104,73 @@ Six formal scenarios are available:
 - International Blacklist
 - Command File Overnight Run
 
-Every scenario reports affected EQN(s), the expected result, the actual result and step-level PASS/FAIL.
+Every scenario reports commands/actions, affected EQN, expected result, actual result and the final PASS/FAIL state.
 
-## 5. Backup
+The guided flow is:
 
-Open **TOOLS → Backup Database**.
+Objective → Observe → Execute → Diagnose → Fix → Verify → Result
 
-Choose a `.sqlite3` destination. DLU Lab creates a SQLite backup using the database backup API, checks SQLite integrity and writes a small metadata sidecar.
+## 10. Instructor / Classroom mode
 
-Recommended practice: create a backup before a large teaching session or before resetting demo state.
+Instructor mode is separate from normal student workspaces.
 
-## 6. Restore
+It supports:
 
-Open **TOOLS → Restore Database** and select a valid backup.
+- scenario selection;
+- reset;
+- real execution;
+- REVEAL ANSWERS;
+- expected vs actual;
+- guided demonstration;
+- projector mode.
 
-The backup is validated first. DLU Lab stages the file, closes the current application, creates an automatic pre-restore safety backup, replaces the database, and starts the application again.
+Expected/actual and PASS/FAIL are hidden until answers are explicitly revealed.
 
-Never interrupt the computer during the restore/restart step.
+## 11. Morning / Night
 
-## 7. Reset Demo
+Use the visible theme control to switch between Morning and Night. Projector use is supported through the Instructor projector mode.
 
-**TOOLS → Reset Demo** restores the source-backed hardware placement and clears teaching subscribers, alarms, command files and hardware-event history. A confirmation dialog is shown.
+## 12. Backup
+
+Open TOOLS → Backup Database.
+
+Choose a .sqlite3 destination.
+
+DLU Lab creates a SQLite backup through the database backup API, validates integrity and writes metadata.
+
+Recommended practice: create a backup before a large teaching session or before resetting important state.
+
+## 13. Restore
+
+Open TOOLS → Restore Database and select a valid backup.
+
+The backup is validated first. DLU Lab stages the restore, closes the active database safely, creates an automatic pre-restore safety backup, replaces the database and starts the application again.
+
+Do not interrupt the computer during the restart step.
+
+## 14. Reset Demo
+
+Open TOOLS → Reset Demo.
+
+Reset restores the source-backed hardware placement and clears teaching subscribers, alarms, command files and hardware-event history. Stage 19 also synchronizes the Scenario and Instructor view state so stale PASS/FAIL/READY information is not carried into the reset state.
 
 Use Backup first when the current state matters.
 
-## 8. Data location
+## 15. Data location
 
 Live application data is stored under:
 
-```text
 %USERPROFILE%\\AppData\\Local\\DLULab
-```
 
-The **TOOLS → Open Data Folder** action opens this directory.
+TOOLS → Open Data Folder opens this directory.
 
-## 9. MML examples
+## 16. Academic boundary
 
-```text
-> stat dlu: dlu=50;
-> disp dlumod: dlu=50, shelf=0, module=15;
-> disp dlupport: eqn=50-0-15-0;
-> statport: eqn=50-0-15-0;
-> cr sub: dlu=50, type=ms, eqn=50-0-15-0, lac=021, dn=2233500;
-```
+The simulator intentionally keeps unknown physical placement as UNCONFIGURED and does not invent capacities, placements or telecom semantics that are not supported by the course dataset.
 
-## 10. Academic boundary
+## 17. Documentation
 
-The simulator intentionally keeps unknown physical placement as UNCONFIGURED and does not invent capacities or placements that are not supported by the course dataset.
+For lesson planning use:
+
+- Academic Learning Guide: docs/97-STAGE-20-ACADEMIC-GUIDE.md
+- Instructor / Classroom Guide: docs/98-STAGE-20-INSTRUCTOR-GUIDE.md
