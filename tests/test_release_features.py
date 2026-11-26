@@ -17,7 +17,13 @@ def make_db():
 
 
 def test_release_version_is_stable():
-    assert __version__ == "1.0.0"
+    assert __version__ == "2.0.0"
+
+
+def test_project_version_matches_runtime_version():
+    pyproject = Path(__file__).parents[1] / "pyproject.toml"
+    text = pyproject.read_text(encoding="utf-8")
+    assert 'version = "2.0.0"' in text
 
 
 def test_database_backup_round_trip_and_integrity_validation():
