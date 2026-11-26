@@ -1,4 +1,4 @@
-# DLU — Siemens EWSD Educational Simulator
+# DLU Lab 2.0.0 — Siemens EWSD Educational Simulator
 
 محاكي تعليمي محلي لمقسم Siemens EWSD ووحدة الخطوط الرقمية DLU، مخصص لمقرر مبادئ الاتصالات على Windows 11.
 
@@ -153,16 +153,15 @@ Stage 6 — Teaching Scenarios:
 - 71/71 tests passed at closeout;
 - PR #2 merged into \`main\`.
 
-Stage 7 — Packaging & Final Audit:
-- release version 1.0.0;
-- safe SQLite backup/restore;
-- Windows onefile executable;
-- executable smoke test;
-- five final UI screenshots uploaded as release artifacts;
-- user manual and final academic test report;
-- **76/76 tests passed on Windows CI**.
+Stage 7 — Packaging & Final Audit: complete.
 
-الحالة الحالية: **Stage 17 — Accessibility & Usability Audit complete**.
+Stage 18 — Performance & Architecture Cleanup: complete — 139/139 regression, Windows QA passed.
+
+Stage 19 — Final Academic UX Audit: complete — 143/143 regression, Windows QA passed.
+
+Stage 20 — DLU Lab 2.0 Release: final release gate defined for full regression, accessibility/architecture compatibility, academic UX QA, Windows packaging, screenshots, manuals, and final closeout.
+
+**Current release: DLU Lab 2.0.0**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
@@ -221,3 +220,10 @@ Stage 17:
 - full regression 134/134 passed;
 - Windows accessibility/resolution QA passed;
 - merged to main via PR #18 at 6d29fa93c7d9f80a3160590554481c78aedaa9e0.
+
+
+## DLU Lab 2.0 learning guides
+
+- `docs/32-USER-MANUAL.md` — user manual
+- `docs/94-DLU-LAB-2.0-ACADEMIC-GUIDE.md` — student academic guide
+- `docs/95-DLU-LAB-2.0-INSTRUCTOR-GUIDE.md` — instructor/classroom guide
