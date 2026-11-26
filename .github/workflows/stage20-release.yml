@@ -78,9 +78,13 @@ jobs:
         run: |
           $exe = Get-ChildItem -Path dist -Filter "*.exe" -File | Select-Object -First 1
           if (-not $exe) { throw "No packaged executable found." }
-          $version = & $exe.FullName --version
-          if ($LASTEXITCODE -ne 0) { throw "Packaged --version command failed." }
-          if ($version.Trim() -ne "DLU Lab 2.0.0") {
+          $versionFile = Join-Path $env:RUNNER_TEMP "dlu-version.txt"
+          if (Test-Path $versionFile) { Remove-Item $versionFile -Force }
+          & $exe.FullName --write-version $versionFile
+          if ($LASTEXITCODE -ne 0) { throw "Packaged version-write command failed." }
+          if (-not (Test-Path $versionFile)) { throw "Packaged version file was not created." }
+          $version = (Get-Content -Raw -Path $versionFile).Trim()
+          if ($version -ne "DLU Lab 2.0.0") {
             throw "Unexpected packaged version: $version"
           }
 
