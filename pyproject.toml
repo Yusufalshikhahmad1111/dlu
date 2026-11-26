@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dlu-lab"
-version = "1.0.0"
+version = "2.0.0"
 description = "Educational Siemens EWSD DLU simulator"
 requires-python = ">=3.12,<3.14"
 dependencies = ["PySide6>=6.10,<6.13"]
@@ -23,20 +23,36 @@ extra_args = "--windows-console-mode=disable --include-data-dir=data=data --assu
 files = [
   "main.py",
   "dlu_app/__init__.py",
-  "dlu_app/db.py",
-  "dlu_app/mml.py",
-  "dlu_app/ui.py",
-  "dlu_app/navigation.py",
-  "dlu_app/student_home.py",
-  "dlu_app/stage9_ui.py",
+  "dlu_app/app_shell.py",
+  "dlu_app/app_style.py",
+  "dlu_app/backup_restore.py",
   "dlu_app/call_engine.py",
   "dlu_app/call_ui.py",
   "dlu_app/command_files.py",
   "dlu_app/command_file_ui.py",
-  "dlu_app/theme.py",
-  "dlu_app/ui_utils.py",
   "dlu_app/communications_lab.py",
   "dlu_app/communications_ui.py",
+  "dlu_app/db.py",
+  "dlu_app/design_tokens.py",
+  "dlu_app/hardware_ux2.py",
+  "dlu_app/hardware_view.py",
+  "dlu_app/mml.py",
+  "dlu_app/navigation.py",
+  "dlu_app/stage8_ui.py",
+  "dlu_app/stage9_ui.py",
+  "dlu_app/stage10_ui.py",
+  "dlu_app/stage11_ui.py",
+  "dlu_app/stage12_ui.py",
+  "dlu_app/stage13_ui.py",
+  "dlu_app/stage14_ui.py",
+  "dlu_app/stage15_ui.py",
+  "dlu_app/stage16_ui.py",
+  "dlu_app/stage17_accessibility.py",
+  "dlu_app/stage19_academic_ux.py",
+  "dlu_app/student_home.py",
   "dlu_app/teaching_scenarios.py",
   "dlu_app/teaching_scenarios_ui.py",
+  "dlu_app/theme.py",
+  "dlu_app/ui.py",
+  "dlu_app/ui_utils.py",
 ]
