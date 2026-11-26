@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - stage-20-release
     paths:
       - "main.py"
       - "pyproject.toml"
@@ -22,19 +23,6 @@ on:
       - "docs/97-STAGE-20-ACADEMIC-GUIDE.md"
       - "docs/98-STAGE-20-INSTRUCTOR-GUIDE.md"
       - "docs/99-STAGE-20-CLOSEOUT.md"
-      - ".github/workflows/stage20-release.yml"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "main.py"
-      - "pyproject.toml"
-      - "requirements.txt"
-      - "requirements-dev.txt"
-      - "dlu_app/**"
-      - "data/**"
-      - "tests/**"
-      - "tools/**"
       - ".github/workflows/stage20-release.yml"
   workflow_dispatch:
 
