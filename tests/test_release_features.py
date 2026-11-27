@@ -85,6 +85,7 @@ def test_pyproject_contains_release_deployment_intent():
     assert "include-data-dir=data=data" in text
 
 
-def test_version_file_override_is_supported_for_packaged_smoke_verification():
+def test_gui_safe_release_probe_is_present_for_packaged_verification():
     main = (Path(__file__).parents[1] / "main.py").read_text(encoding="utf-8")
     assert "DLU_VERSION_FILE" in main
+    assert "DLU_RELEASE_PROBE" in main
