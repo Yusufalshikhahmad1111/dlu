@@ -1,17 +1,7 @@
 name: DLU Stage 12 Call Visualization QA
 
 on:
-  push:
-    branches:
-      - main
-      - stage-12-call-visualization
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage12-call-qa-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage12-call-qa:

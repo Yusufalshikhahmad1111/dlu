@@ -1,12 +1,7 @@
 name: DLU Stage 8 v2 UX QA
 
 on:
-  push:
-    branches:
-      - stage-08-ui-redesign-v2
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   ux-qa:

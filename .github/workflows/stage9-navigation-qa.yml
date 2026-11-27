@@ -1,12 +1,7 @@
 name: DLU Stage 9 Student Navigation QA
 
 on:
-  push:
-    branches:
-      - stage-09-student-navigation
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   student-navigation-qa:

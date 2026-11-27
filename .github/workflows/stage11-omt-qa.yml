@@ -1,12 +1,7 @@
 name: DLU Stage 11 OMT MML UX QA
 
 on:
-  push:
-    branches:
-      - stage-11-omt-mml-ux-2
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   omt-mml-ux-qa:

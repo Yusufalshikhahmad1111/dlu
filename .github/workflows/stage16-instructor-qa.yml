@@ -1,17 +1,7 @@
 name: DLU Stage 16 Instructor Classroom QA
 
 on:
-  push:
-    branches:
-      - main
-      - stage-16-instructor-classroom-mode
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage16-instructor-qa-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage16-instructor-qa:

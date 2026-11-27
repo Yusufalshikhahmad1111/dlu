@@ -1,17 +1,7 @@
 name: DLU Stage 19 Final Academic UX Audit
 
 on:
-  push:
-    branches:
-      - main
-      - stage-19-academic-ux-audit
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage19-academic-ux-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage19-academic-ux:

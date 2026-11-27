@@ -1,17 +1,7 @@
 name: DLU Stage 18 Architecture Cleanup QA
 
 on:
-  push:
-    branches:
-      - main
-      - stage-18-architecture-cleanup
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage18-architecture-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage18-architecture:

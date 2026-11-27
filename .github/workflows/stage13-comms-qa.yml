@@ -1,17 +1,7 @@
 name: DLU Stage 13 Communications Lab 2.0 QA
 
 on:
-  push:
-    branches:
-      - main
-      - stage-13-communications-lab-2
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage13-comms-qa-\${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage13-comms-qa:

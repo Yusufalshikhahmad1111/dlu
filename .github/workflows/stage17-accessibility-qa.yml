@@ -1,17 +1,7 @@
 name: DLU Stage 17 Accessibility & Usability QA
 
 on:
-  push:
-    branches:
-      - main
-      - stage-17-accessibility-usability
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage17-accessibility-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage17-accessibility:

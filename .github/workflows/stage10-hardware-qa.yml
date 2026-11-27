@@ -1,12 +1,7 @@
 name: DLU Stage 10 Hardware UX QA
 
 on:
-  push:
-    branches:
-      - stage-10-hardware-ux-2
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   hardware-ux-qa:

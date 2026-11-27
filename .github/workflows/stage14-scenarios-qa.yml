@@ -1,17 +1,7 @@
 name: DLU Stage 14 Teaching Scenarios 2.0 QA
 
 on:
-  push:
-    branches:
-      - main
-      - stage-14-teaching-scenarios-2
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage14-scenarios-qa-\${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage14-scenarios-qa:

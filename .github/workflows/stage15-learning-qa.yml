@@ -1,17 +1,7 @@
 name: DLU Stage 15 Academic Learning Layer QA
 
 on:
-  push:
-    branches:
-      - main
-      - stage-15-academic-learning-layer
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: stage15-learning-qa-\${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   stage15-learning-qa:
