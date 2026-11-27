@@ -14,6 +14,15 @@ from dlu_app.app_shell import build_window, configure_application, size_window_t
 def main() -> int:
     args = sys.argv[1:]
 
+    # GUI-safe release probe: environment variables work with Windows onefile
+    # deployments even when console/argv probing is unavailable.
+    version_file = os.environ.get("DLU_VERSION_FILE")
+    if os.environ.get("DLU_RELEASE_PROBE") == "1" and version_file:
+        Path(version_file).write_text(
+            f"{APP_NAME} {__version__}\n", encoding="utf-8"
+        )
+        return 0
+
     # Release probes exit before Qt startup so the packaged GUI executable
     # can be queried safely from Windows CI without initializing a window.
     if "--write-version" in args:
