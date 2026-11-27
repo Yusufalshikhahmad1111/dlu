@@ -68,9 +68,6 @@ jobs:
         shell: bash
         run: python -m pytest -q tests/test_stage19_academic_ux.py --timeout=90 --timeout-method=thread
 
-      - name: Full regression
-        shell: bash
-        run: python -m pytest -q tests --timeout=90 --timeout-method=thread
 
   windows-release:
     needs: verify
@@ -92,6 +89,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
+
+      - name: Full regression
+        shell: pwsh
+        run: python -m pytest -q tests --timeout=90 --timeout-method=thread
 
       - name: Windows Stage 20 visual QA
         shell: pwsh
