@@ -48,7 +48,8 @@ def test_stage20_release_workflow_has_full_release_gates():
         "Stage 20 focused release checks",
         "Windows Stage 20 visual QA",
         "Build and smoke-test Windows release",
-        "--write-version",
+        "DLU_RELEASE_PROBE",
+        "DLU_VERSION_FILE",
         "DLU-Lab-2.0.0-Windows",
     ):
         assert marker in workflow
