@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: dlu-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     runs-on: windows-latest
@@ -32,4 +36,4 @@ jobs:
 
       - name: Tests
         shell: pwsh
-        run: python -m pytest -q tests
+        run: python -m pytest -q tests --timeout=90 --timeout-method=thread
