@@ -68,7 +68,7 @@ jobs:
 
       - name: Full regression
         shell: pwsh
-        run: python -m pytest -q tests
+        run: python -m pytest -q tests --timeout=90 --timeout-method=thread
 
       - name: Build and smoke-test Windows release
         shell: pwsh
