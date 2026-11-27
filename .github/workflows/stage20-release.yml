@@ -18,9 +18,60 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  release:
-    runs-on: windows-latest
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      QT_QPA_PLATFORM: offscreen
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Compile check
+        shell: bash
+        run: python -m compileall dlu_app main.py tests
+
+      - name: UI static audit
+        shell: bash
+        run: python tools/ui_static_audit.py
+
+      - name: Stage 20 focused release checks
+        shell: bash
+        run: python -m pytest -q tests/test_stage20_release.py --timeout=90 --timeout-method=thread
+
+      - name: Stage 17 accessibility compatibility
+        shell: bash
+        run: python -m pytest -q tests/test_stage17_accessibility.py --timeout=90 --timeout-method=thread
+
+      - name: Stage 18 architecture compatibility
+        shell: bash
+        run: python -m pytest -q tests/test_stage18_architecture.py --timeout=90 --timeout-method=thread
+
+      - name: Stage 19 academic compatibility
+        shell: bash
+        run: python -m pytest -q tests/test_stage19_academic_ux.py --timeout=90 --timeout-method=thread
+
+      - name: Full regression
+        shell: bash
+        run: python -m pytest -q tests --timeout=90 --timeout-method=thread
+
+  windows-release:
+    needs: verify
+    runs-on: windows-2022
     timeout-minutes: 110
+    env:
+      QT_QPA_PLATFORM: offscreen
 
     steps:
       - uses: actions/checkout@v4
@@ -36,39 +87,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
 
-      - name: Compile check
-        shell: pwsh
-        run: python -m compileall dlu_app main.py tests
-
-      - name: UI static audit
-        shell: pwsh
-        run: python tools/ui_static_audit.py
-
-      - name: Stage 20 focused release checks
-        shell: pwsh
-        run: python -m pytest -q tests/test_stage20_release.py --timeout=90 --timeout-method=thread
-
-      - name: Stage 17 accessibility compatibility
-        shell: pwsh
-        run: python -m pytest -q tests/test_stage17_accessibility.py --timeout=90 --timeout-method=thread
-
-      - name: Stage 18 architecture compatibility
-        shell: pwsh
-        run: python -m pytest -q tests/test_stage18_architecture.py --timeout=90 --timeout-method=thread
-
-      - name: Stage 19 academic compatibility
-        shell: pwsh
-        run: python -m pytest -q tests/test_stage19_academic_ux.py --timeout=90 --timeout-method=thread
-
       - name: Windows Stage 20 visual QA
         shell: pwsh
-        env:
-          QT_QPA_PLATFORM: offscreen
         run: python tools/stage20_release_qa.py
-
-      - name: Full regression
-        shell: pwsh
-        run: python -m pytest -q tests --timeout=90 --timeout-method=thread
 
       - name: Build and smoke-test Windows release
         shell: pwsh
