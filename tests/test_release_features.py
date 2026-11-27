@@ -87,5 +87,5 @@ def test_pyproject_contains_release_deployment_intent():
 
 def test_gui_safe_release_probe_is_present_for_packaged_verification():
     main = (Path(__file__).parents[1] / "main.py").read_text(encoding="utf-8")
-    assert "DLU_VERSION_FILE" in main
-    assert "DLU_RELEASE_PROBE" in main
+    assert "dlu-release-probe.trigger" in main
+    assert "dlu-release-probe.result" in main
