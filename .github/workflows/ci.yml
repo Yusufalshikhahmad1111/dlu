@@ -10,7 +10,9 @@ concurrency:
 
 jobs:
   tests:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
 
     steps:
       - uses: actions/checkout@v4
