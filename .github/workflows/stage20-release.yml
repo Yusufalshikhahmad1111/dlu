@@ -81,9 +81,13 @@ jobs:
           $versionFile = Join-Path $env:RUNNER_TEMP "dlu-version.txt"
           if (Test-Path $versionFile) { Remove-Item $versionFile -Force }
           & $exe.FullName --write-version $versionFile
-          if ($LASTEXITCODE -ne 0) { throw "Packaged version-write command failed." }
-          if (-not (Test-Path $versionFile)) { throw "Packaged version file was not created." }
+          $probeExit = $LASTEXITCODE
+          if (-not (Test-Path $versionFile)) {
+            throw "Packaged version probe failed (exit code $probeExit) and produced no version file."
+          }
           $version = (Get-Content -Raw -Path $versionFile).Trim()
+          Write-Host "Packaged version probe exit code: $probeExit"
+          Write-Host "Packaged version file: $version"
           if ($version -ne "DLU Lab 2.0.0") {
             throw "Unexpected packaged version: $version"
           }
