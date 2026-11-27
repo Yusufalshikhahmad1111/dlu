@@ -80,7 +80,9 @@ jobs:
           if (-not $exe) { throw "No packaged executable found." }
           $versionFile = Join-Path $env:RUNNER_TEMP "dlu-version.txt"
           if (Test-Path $versionFile) { Remove-Item $versionFile -Force }
-          & $exe.FullName --write-version $versionFile
+          $env:DLU_RELEASE_PROBE = "1"
+          $env:DLU_VERSION_FILE = $versionFile
+          & $exe.FullName
           $probeExit = $LASTEXITCODE
           if (-not (Test-Path $versionFile)) {
             throw "Packaged version probe failed (exit code $probeExit) and produced no version file."
