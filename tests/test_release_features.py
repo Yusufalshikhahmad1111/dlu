@@ -17,7 +17,7 @@ def make_db():
 
 
 def test_release_version_is_stable():
-    assert __version__ == "1.0.0"
+    assert __version__ == "2.0.0"
 
 
 def test_database_backup_round_trip_and_integrity_validation():
@@ -83,3 +83,9 @@ def test_pyproject_contains_release_deployment_intent():
     assert "[tool.pyside6.deploy]" in text
     assert 'mode = "onefile"' in text
     assert "include-data-dir=data=data" in text
+
+
+def test_gui_safe_release_probe_is_present_for_packaged_verification():
+    main = (Path(__file__).parents[1] / "main.py").read_text(encoding="utf-8")
+    assert "DLU_VERSION_FILE" in main
+    assert "DLU_RELEASE_PROBE" in main
