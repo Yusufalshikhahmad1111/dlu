@@ -73,8 +73,6 @@ jobs:
     needs: verify
     runs-on: windows-2022
     timeout-minutes: 110
-    env:
-      QT_QPA_PLATFORM: offscreen
 
     steps:
       - uses: actions/checkout@v4
@@ -96,6 +94,8 @@ jobs:
 
       - name: Windows Stage 20 visual QA
         shell: pwsh
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: python tools/stage20_release_qa.py
 
       - name: Build and smoke-test Windows release
