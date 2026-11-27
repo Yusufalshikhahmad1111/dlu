@@ -83,15 +83,20 @@ jobs:
               tests/test_mml.py
               tests/test_release_features.py
               tests/test_teaching_scenarios.py
-          - name: ui-foundation
-            tests: >-
-              tests/test_ui_hardening.py
-              tests/test_hardware_stage2.py
-              tests/test_stage8_ui.py
-              tests/test_stage9_navigation.py
-              tests/test_stage10_hardware_ux.py
-              tests/test_stage11_omt_ux.py
-              tests/test_stage12_call_visualization.py
+          - name: ui-hardening
+            tests: tests/test_ui_hardening.py
+          - name: hardware
+            tests: tests/test_hardware_stage2.py
+          - name: stage8-ui
+            tests: tests/test_stage8_ui.py
+          - name: stage9-navigation
+            tests: tests/test_stage9_navigation.py
+          - name: stage10-hardware
+            tests: tests/test_stage10_hardware_ux.py
+          - name: stage11-omt
+            tests: tests/test_stage11_omt_ux.py
+          - name: stage12-call-visualization
+            tests: tests/test_stage12_call_visualization.py
           - name: learning
             tests: >-
               tests/test_communications_ui.py
@@ -106,7 +111,7 @@ jobs:
               tests/test_stage19_academic_ux.py
               tests/test_stage20_release.py
     runs-on: windows-2022
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
