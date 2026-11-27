@@ -1,0 +1,96 @@
+name: DLU Stage 20 — stale workflow cleanup
+
+on:
+  push:
+    branches:
+      - stage-20-final-release
+  workflow_dispatch:
+
+jobs:
+  cleanup_stage12:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage12-call-qa-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 12 stale PR run cleanup"
+
+  cleanup_stage14:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage14-scenarios-qa-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 14 stale PR run cleanup"
+
+  cleanup_stage15:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage15-learning-qa-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 15 stale PR run cleanup"
+
+  cleanup_stage16:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage16-instructor-qa-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 16 stale PR run cleanup"
+
+  cleanup_stage17:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage17-accessibility-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 17 stale PR run cleanup"
+
+  cleanup_stage18:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage18-architecture-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 18 stale PR run cleanup"
+
+  cleanup_stage19:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage19-academic-ux-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 19 stale PR run cleanup"
+
+  cleanup_stage20_pr:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage20-release-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 20 stale PR release cleanup"
+
+  cleanup_stage20_branch:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: stage20-release-refs/heads/stage-20-final-release
+      cancel-in-progress: true
+    steps:
+      - run: echo "Stage 20 stale branch release cleanup"
+
+  cleanup_ci_pr:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: dlu-ci-refs/pull/22/merge
+      cancel-in-progress: true
+    steps:
+      - run: echo "DLU CI stale PR cleanup"
+
+  cleanup_ci_branch:
+    runs-on: ubuntu-slim
+    concurrency:
+      group: dlu-ci-refs/heads/stage-20-final-release
+      cancel-in-progress: true
+    steps:
+      - run: echo "DLU CI stale branch cleanup"
