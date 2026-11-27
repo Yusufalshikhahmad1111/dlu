@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - stage-20-dlu-lab-2-release
+      - stage-20-final-release
     tags:
       - "v2.*.*"
   pull_request:
@@ -80,13 +81,15 @@ jobs:
           if (-not $exe) { throw "No packaged executable found." }
           $versionFile = Join-Path $env:RUNNER_TEMP "dlu-version.txt"
           if (Test-Path $versionFile) { Remove-Item $versionFile -Force }
-          & $exe.FullName --write-version $versionFile
+          $env:DLU_RELEASE_PROBE = "1"
+          $env:DLU_VERSION_FILE = $versionFile
+          & $exe.FullName
           $probeExit = $LASTEXITCODE
           if (-not (Test-Path $versionFile)) {
-            throw "Packaged version probe failed (exit code $probeExit) and produced no version file."
+            throw "Packaged GUI-safe version probe failed (exit code $probeExit) and produced no version file."
           }
           $version = (Get-Content -Raw -Path $versionFile).Trim()
-          Write-Host "Packaged version probe exit code: $probeExit"
+          Write-Host "Packaged GUI-safe version probe exit code: $probeExit"
           Write-Host "Packaged version file: $version"
           if ($version -ne "DLU Lab 2.0.0") {
             throw "Unexpected packaged version: $version"
