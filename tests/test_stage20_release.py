@@ -41,6 +41,7 @@ def test_stage20_release_documents_are_present_and_synchronised():
 def test_stage20_release_workflow_has_full_release_gates():
     workflow = _read(".github/workflows/stage20-release.yml")
     assert ("Full regression" in workflow) or ("Regression shard" in workflow)
+    assert "dlu-release-probe.trigger" in workflow
     for marker in (
         "Stage 17 accessibility compatibility",
         "Stage 17 accessibility compatibility",
