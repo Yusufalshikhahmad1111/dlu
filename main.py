@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
 import sys
 
 from PySide6.QtWidgets import QApplication, QMessageBox
@@ -27,7 +28,11 @@ def main() -> int:
         return 0
 
     if "--version" in sys.argv[1:]:
-        print(f"{APP_NAME} {__version__}")
+        version_text = f"{APP_NAME} {__version__}"
+        print(version_text)
+        version_file = os.environ.get("DLU_VERSION_FILE")
+        if version_file:
+            Path(version_file).write_text(version_text + "\n", encoding="utf-8")
         return 0
 
     data_dir = Path.home() / "AppData" / "Local" / "DLULab"
