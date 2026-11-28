@@ -1,4 +1,7 @@
 from pathlib import Path
+import sys
+
+import pytest
 
 from PySide6.QtWidgets import QApplication, QPushButton, QTabWidget
 
@@ -49,6 +52,7 @@ def test_stage8_shell_applies_and_preserves_feature_tabs(tmp_path: Path):
         app.processEvents()
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Stage 8 theme toggle uses the Windows-targeted Qt style path; Windows CI covers this interaction.")
 def test_stage8_v2_theme_toggle_and_omt_command_execution(tmp_path: Path):
     app = _app()
     apply_application_style(app, "morning")

@@ -41,7 +41,7 @@ def test_stage20_release_documents_are_present_and_synchronised():
 def test_stage20_release_workflow_has_full_release_gates():
     workflow = _read(".github/workflows/stage20-release.yml")
     assert ("Full regression" in workflow) or ("Regression shard" in workflow)
-    assert "dlu-release-probe.trigger" in workflow
+    assert "--write-version" in workflow
     for marker in (
         "Stage 17 accessibility compatibility",
         "Stage 17 accessibility compatibility",
@@ -50,8 +50,8 @@ def test_stage20_release_workflow_has_full_release_gates():
         "Stage 20 focused release checks",
         "Windows Stage 20 visual QA",
         "Build and smoke-test Windows release",
-        "dlu-release-probe.trigger",
-        "dlu-release-probe.result",
+        "--write-version",
+        "dlu-release-version.txt",
         "DLU-Lab-2.0.0-Windows",
     ):
         assert marker in workflow

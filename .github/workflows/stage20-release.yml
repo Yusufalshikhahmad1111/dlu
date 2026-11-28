@@ -166,21 +166,21 @@ jobs:
           $exe = Get-ChildItem -Path dist -Filter "*.exe" -File | Select-Object -First 1
           if (-not $exe) { throw "No packaged executable found." }
           $exeDir = Split-Path -Parent $exe.FullName
-          $trigger = Join-Path $exeDir "dlu-release-probe.trigger"
-          $result = Join-Path $exeDir "dlu-release-probe.result"
-          if (Test-Path $trigger) { Remove-Item $trigger -Force }
+          $result = Join-Path $env:RUNNER_TEMP "dlu-release-version.txt"
           if (Test-Path $result) { Remove-Item $result -Force }
-          New-Item -ItemType File -Path $trigger | Out-Null
-          & $exe.FullName
+          $process = Start-Process -FilePath $exe.FullName -ArgumentList @("--write-version", $result) -WorkingDirectory $exeDir -Wait -PassThru
+          if ($process.ExitCode -ne 0) {
+            throw "Packaged --write-version probe exited with code $($process.ExitCode)."
+          }
           if (-not (Test-Path $result)) {
-            throw "Packaged release probe did not produce dlu-release-probe.result."
+            throw "Packaged --write-version probe did not produce the version file."
           }
           $version = (Get-Content -Raw -Path $result).Trim()
           Write-Host "Packaged version: $version"
           if ($version -ne "DLU Lab 2.0.0") {
             throw "Unexpected packaged version: $version"
           }
-          Remove-Item $trigger,$result -Force
+          Remove-Item $result -Force
 
       - name: Upload DLU Lab 2.0 Windows package
         uses: actions/upload-artifact@v4
