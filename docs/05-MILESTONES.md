@@ -455,14 +455,26 @@ Verified code head:
 
 ## Stage 20 — DLU Lab 2.0 Release
 
-**الحالة: مخططة**
+**الحالة: مكتملة — final release verified on merged main**
 
-- full regression.
-- visual/accessibility QA.
-- Windows packaging.
-- screenshots.
-- updated manuals/guides.
-- final closeout.
+المخرجات النهائية:
+- merge commit `fe0b21b33db7239c294d82b02b5e6dc6f35e88f5`;
+- Stage 20 post-merge workflow Run #83 — PASS;
+- Stage 20 focused 5/5;
+- Stage 17 compatibility 5/5;
+- Stage 18 compatibility 5/5;
+- Stage 19 compatibility 4/4;
+- Windows regression shards 149/149 passed;
+- Windows Stage 20 visual QA passed;
+- Windows onefile packaging and packaged smoke-test passed;
+- packaged version verified as `DLU Lab 2.0.0`;
+- release artifacts uploaded: Windows package + Stage 20 screenshots + build screenshots;
+- Main DLU CI Run #732 — PASS (148 passed, 1 intentional Linux platform skip).
+
+Final artifact IDs:
+- `DLU-Lab-2.0.0-Windows`: 15262455683
+- `DLU-Lab-2.0.0-Screenshots`: 15262455686
+- `DLU-Lab-2.0.0-Build-Screenshots`: 15262580481
 
 Master plan:
 docs/36-POST-RELEASE-UX-UI-MASTER-PLAN.md

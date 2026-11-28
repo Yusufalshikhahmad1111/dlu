@@ -159,9 +159,9 @@ Stage 18 — Performance & Architecture Cleanup: complete — 139/139 regression
 
 Stage 19 — Final Academic UX Audit: complete — 143/143 regression, Windows QA passed.
 
-Stage 20 — DLU Lab 2.0 Release: final release gate defined for full regression, accessibility/architecture compatibility, academic UX QA, Windows packaging, screenshots, manuals, and final closeout.
+Stage 20 — DLU Lab 2.0 Release: **COMPLETE** — final release gate passed on merged `main` commit `fe0b21b33db7239c294d82b02b5e6dc6f35e88f5`. Post-merge Stage 20 workflow Run #83 passed, including 149/149 Windows regression tests, Stage 20/17/18/19 focused compatibility, Windows visual QA, onefile packaging, packaged smoke-test, packaged version `DLU Lab 2.0.0`, and all three release artifacts.
 
-**Current release: DLU Lab 2.0.0**.
+**Current release: DLU Lab 2.0.0 — FINAL**.
 
 Stage 13:
 - guided Concept → Parameters → Experiment → Visualization → Measurement → Explanation → Challenge workflow;
@@ -227,3 +227,14 @@ Stage 17:
 - `docs/32-USER-MANUAL.md` — user manual
 - `docs/94-DLU-LAB-2.0-ACADEMIC-GUIDE.md` — student academic guide
 - `docs/95-DLU-LAB-2.0-INSTRUCTOR-GUIDE.md` — instructor/classroom guide
+
+
+## Stage 20 Final Release Evidence
+
+- Merge commit: `fe0b21b33db7239c294d82b02b5e6dc6f35e88f5`.
+- Stage 20 post-merge workflow: Run #83 — PASS.
+- Stage 20 focused: 5/5; Stage 17 compatibility: 5/5; Stage 18 compatibility: 5/5; Stage 19 compatibility: 4/4.
+- Windows regression shards: 149/149 passed.
+- Windows visual QA: PASS; onefile package: PASS; packaged smoke-test: PASS; packaged version: `DLU Lab 2.0.0`.
+- Release artifacts: `DLU-Lab-2.0.0-Windows`, `DLU-Lab-2.0.0-Screenshots`, `DLU-Lab-2.0.0-Build-Screenshots`.
+- Main CI Run #732: PASS — 148 passed, 1 intentional Linux platform skip; the skipped Stage 8 theme-toggle interaction remains covered by the Windows Stage 20 regression shard.
